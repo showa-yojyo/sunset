@@ -24,11 +24,12 @@ description: >- # this means to ignore newlines until "baseurl:"
   TBW
 baseurl: /folklore # the subpath of your site, e.g. /blog
 url: "https://showa-yojyo.github.io" # the base hostname & protocol for your site, e.g. http://example.com
+repository: https://github.com/showa-yojyo/folklore
 twitter_username: showa_yojyo
 github_username: showa-yojyo
 
 # Build settings
-theme: minima
+theme: jekyll-theme-midnight
 plugins:
   - jekyll-feed
 
