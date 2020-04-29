@@ -1,0 +1,50 @@
+---
+# Only the main Sass file needs front matter (the dashes are enough)
+---
+
+$text-color: #f0e7d5;
+$background-color: #252525;
+$brand-color: #ff2493;
+
+$grey-color: #828282;
+$grey-color-light: darken($grey-color, 40%);
+$grey-color-dark: lighten($grey-color, 25%);
+
+@import "minima";
+
+.PageNavigation {
+  font-size: $small-font-size;
+  display: block;
+  width: auto;
+  overflow: hidden;
+}
+
+.PageNavigation a {
+  display: block;
+  width: 50%;
+  float: left;
+  margin: 1em 0;
+}
+
+.PageNavigation .next {
+  text-align: right;
+}
+
+div.notice {
+  width: 100%;
+  border: 1px solid $brand-color;
+  margin-bottom: 24pt;
+}
+div.notice #left, div.notice #right {
+  display: inline-block;
+  vertical-align: top;
+  padding: 6pt;
+}
+div.notice #left {
+  background: $brand-color;
+  color: white;
+  font-weight: bold;
+}
+div.notice #right {
+  color: black;
+}
