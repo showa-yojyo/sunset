@@ -29,6 +29,10 @@ repository: https://github.com/showa-yojyo/sunset
 
 show_excerpts: true
 
+header_pages:
+  - about.md
+  - archive.html
+
 twitter_username: showa_yojyo
 github_username: showa-yojyo
 rss: RSS
