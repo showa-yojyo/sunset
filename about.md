@@ -14,6 +14,9 @@ permalink: /about/
 このページの下部で示されているように、私の Twitter のアカウントもある。
 移動先でインターネットに接続可能なときは許される限り目を通している。
 
+インターネット接続事情は段階的に良くなってきており、2020 年の夏の終わりから携帯電話を所有するようになる。
+Twitter に関しては毎日 2, 3 度は目を通せるようになった。目標は部屋で YouTube を視聴できるようになることだ。
+
 ## 関連文書
 
 次のブログは本ブログの前作に相当する。
@@ -26,5 +29,7 @@ permalink: /about/
 * [読書ノート](https://github.com/showa-yojyo/notebook/index.html)
 * [Jupyter Notebook によるメモ集](https://github.com/showa-yojyo/jupyter-notebooks)
 * [Gists に置いたメモ集](https://gist.github.com/showa-yojyo)
+
+もっとも、就労活動や転居騒動などで集中力が維持できなくなり、各種研究活動はひじょうに鈍くなっている。
 
 以上
