@@ -23,13 +23,8 @@ Twitter に関しては毎日 2, 3 度は目を通せるようになった。目
 
 * [前作ブログ](https://showa-yojyo.github.io/wandering/)
 
-次のサイト群は著者の余裕のあるときに執筆したものをある程度まとめたものだ。
+その他についてはこちらから：
 
-* [ドラクエ命](https://github.com/showa-yojyo/dqbook/index.html)
-* [読書ノート](https://github.com/showa-yojyo/notebook/index.html)
-* [Jupyter Notebook によるメモ集](https://github.com/showa-yojyo/jupyter-notebooks)
-* [Gists に置いたメモ集](https://gist.github.com/showa-yojyo)
-
-もっとも、就労活動や転居騒動などで集中力が維持できなくなり、各種研究活動はひじょうに鈍くなっている。
+* [プレハブ小屋](https://showa-yojyo.github.io/)
 
 以上
