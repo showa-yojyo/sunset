@@ -44,9 +44,13 @@
 		"prefix": "bshf20",
 		"body": "[bshf20]: https://wodifes.net/game/show/412"
 	},
-	"bshf21":{
-		"prefix": "bshf21",
-		"body": "[bshf21]: https://www.freem.ne.jp/win/game/24805"
+	"bshf21a":{
+		"prefix": "bshf21a",
+		"body": "[bshf21a]: https://www.freem.ne.jp/win/game/24805"
+	},
+	"bshf2ba":{
+		"prefix": "bshf21b",
+		"body": "[bshf21b]: https://wodifes.net/game/show/446"
 	},
 	"cpprefjp": {
 		"prefix": "cpprefjp",
