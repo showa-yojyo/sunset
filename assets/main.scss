@@ -12,6 +12,16 @@ $grey-color-dark: lighten($grey-color, 25%);
 
 @import "minima";
 
+.post-title {
+  @include relative-font-size(2.0);
+  letter-spacing: -1px;
+  line-height: 1;
+
+  @include media-query($on-laptop) {
+    @include relative-font-size(1.75);
+  }
+}
+
 .PageNavigation {
   font-size: $small-font-size;
   display: block;
