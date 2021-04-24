@@ -56,6 +56,10 @@
 		"prefix": "cpprefjp",
 		"body": "[cpprefjp]: https://cpprefjp.github.io/reference/"
 	},
+	"Haverbeke18": {
+		"prefix": ["Haverbeke18", "eloquent"],
+		"body": "${1|[Eloquent JavaScript][Haverbeke18],[Haverbeke18]: https://eloquentjavascript.net/|}"
+	},
 	"gist": {
 		"prefix": "gist",
 		"body": "[gist]: https://gist.github.com/showa-yojyo/"
