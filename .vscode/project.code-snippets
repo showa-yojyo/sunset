@@ -76,6 +76,10 @@
 		"prefix": "note",
 		"body": "${1|読書ノート,[note]: https://showa-yojyo.github.io/notebook/|}"
 	},
+	"pytube": {
+		"prefix": "pytube",
+		"body": "${1|[Pytube],[pytube]: https://pytube.io/en/latest/|}"
+	},
 	"scrapy": {
 		"prefix": "scrapy",
 		"body": "${1|[Scrapy],[scrapy]: https://scrapy.org/|}"
