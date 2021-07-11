@@ -4,29 +4,30 @@ title: トップページ
 ---
 
 <div class="home">
-    {%- assign posts = site.posts | slice: 0, 20 -%}
-    {%- assign date_format = site.minima.date_format -%}
-    <ul class="post-list">
-      <!-- This loops through the paginated posts -->
-      {% for post in posts %}
-      <li>
-        <h1>
-          <a class="post-link" href="{{ post.url | relative_url }}">
-            {{ post.title | escape }}
-          </a>
-        </h1>
-        <p class="post-meta">
-          <time class="dt-published" datetime="{{ post.date | date_to_xmlschema }}" itemprop="datePublished">
-            {{ post.date | date: date_format }}
-          </time>
-          {%- if post.author -%}
-            • <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span class="p-author h-card" itemprop="name">{{ post.author }}</span></span>
-          {%- endif -%}
-        </p>
-        {%- if site.show_excerpts -%}
-          {{ post.excerpt | truncate: 160 }}
+  {%- assign posts = site.posts | slice: 0, 20 -%}
+  {%- assign date_format = site.minima.date_format -%}
+  <ul class="post-list">
+    <!-- This loops through the paginated posts -->
+    {% for post in posts %}
+    <li>
+      <h1>
+        <a class="post-link" href="{{ post.url | relative_url }}">
+          {{ post.title | escape }}
+        </a>
+      </h1>
+      <p class="post-meta">
+        <time class="dt-published" datetime="{{ post.date | date_to_xmlschema }}" itemprop="datePublished">
+          {{ post.date | date: date_format }}
+        </time>
+        {%- if post.author -%}
+        • <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span class="p-author h-card"
+            itemprop="name">{{ post.author }}</span></span>
         {%- endif -%}
-      </li>
-      {%- endfor -%}
-    </ul>
+      </p>
+      {%- if site.show_excerpts -%}
+      <article>{{ post.excerpt }}</article>
+      {%- endif -%}
+    </li>
+    {%- endfor -%}
+  </ul>
 </div>
