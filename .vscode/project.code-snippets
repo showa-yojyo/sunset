@@ -33,63 +33,63 @@
 			"アガリ率 $8% ($9)",
 			"アガリ飜平均 ${10}",
 			"アガリ巡目平均 ${11} 巡",
-			"振り込み率 ${12}% (${13})"
+			"振り込み率 ${12}% (${13})$0"
 		]
 	},
 	"abs-guide": {
 		"prefix": "Advanced Bash-Scripting Guide",
-		"body": "${1|[abs-guide],[abs-guide]: https://www.tldp.org/LDP/abs/abs-guide.pdf|}"
+		"body": "${1|[abs-guide],[abs-guide]: https://www.tldp.org/LDP/abs/abs-guide.pdf|}$0"
 	},
 	"bshf20": {
 		"prefix": "bshf20",
-		"body": "${1|[地獄の伯爵令嬢の逆襲][bshf20],[bshf20]: https://wodifes.net/game/show/412|}"
+		"body": "${1|[地獄の伯爵令嬢の逆襲][bshf20],[bshf20]: https://wodifes.net/game/show/412|}$0"
 	},
 	"bshf21a":{
 		"prefix": "bshf21a",
-		"body": "${1|[地獄の伯爵令嬢の逆襲 v1.10][bshf21a],[bshf21a]: https://www.freem.ne.jp/win/game/24805|}"
+		"body": "${1|[地獄の伯爵令嬢の逆襲 v1.10][bshf21a],[bshf21a]: https://www.freem.ne.jp/win/game/24805|}$0"
 	},
 	"bshf21b":{
 		"prefix": "bshf21b",
-		"body": "${1|[ウルファールのサンプルゲーム with DTC][bshf21b],[bshf21b]: https://wodifes.net/game/show/446|}"
+		"body": "${1|[ウルファールのサンプルゲーム with DTC][bshf21b],[bshf21b]: https://wodifes.net/game/show/446|}$0"
 	},
 	"cpprefjp": {
 		"prefix": "cpprefjp",
-		"body": "[cpprefjp]: https://cpprefjp.github.io/reference/"
+		"body": "[cpprefjp]: https://cpprefjp.github.io/reference/$0"
 	},
 	"DeepL": {
 		"prefix": "DeepL",
-		"body": "${1|[DeepL],[DeepL]: https://www.deepl.com/translator|}"
+		"body": "${1|[DeepL],[DeepL]: https://www.deepl.com/translator|}$0"
 	},
 	"Haverbeke18": {
 		"prefix": ["Haverbeke18", "eloquent"],
-		"body": "${1|[Eloquent JavaScript][Haverbeke18],[Haverbeke18]: https://eloquentjavascript.net/|}"
+		"body": "${1|[Eloquent JavaScript][Haverbeke18],[Haverbeke18]: https://eloquentjavascript.net/|}$0"
 	},
 	"gist": {
 		"prefix": "gist",
-		"body": "[gist]: https://gist.github.com/showa-yojyo/"
+		"body": "[gist]: https://gist.github.com/showa-yojyo/$0"
 	},
 	"metal": {
 		"prefix": "metal",
-		"body": "[metal]: http://metal.the-ninja.jp/"
+		"body": "[metal]: http://metal.the-ninja.jp/$0"
 	},
 	"note": {
 		"prefix": "note",
-		"body": "${1|読書ノート,[note]: https://showa-yojyo.github.io/notebook/|}"
+		"body": "${1|読書ノート,[note]: https://showa-yojyo.github.io/notebook/|}$0"
 	},
 	"pytube": {
 		"prefix": "pytube",
-		"body": "${1|[Pytube],[pytube]: https://pytube.io/en/latest/|}"
+		"body": "${1|[Pytube],[pytube]: https://pytube.io/en/latest/|}$0"
 	},
 	"scrapy": {
 		"prefix": "scrapy",
-		"body": "${1|[Scrapy],[scrapy]: https://scrapy.org/|}"
+		"body": "${1|[Scrapy],[scrapy]: https://scrapy.org/|}$0"
 	},
 	"soejima1000": {
 		"prefix": "soejima1000",
-		"body": "${1|[soejima1000 - YouTube],[soejima1000]: https://www.youtube.com/user/soejima1000/videos|}"
+		"body": "${1|[soejima1000 - YouTube],[soejima1000]: https://www.youtube.com/user/soejima1000/videos|}$0"
 	},
 	"wf": {
 		"prefix": "wf",
-		"body": "${1|[WebGL2 Fundamentals],[WebGL2 Fundamentals]: https://webgl2fundamentals.org|}"
+		"body": "${1|[WebGL2 Fundamentals],[WebGL2 Fundamentals]: https://webgl2fundamentals.org|}$0"
 	}
 }
