@@ -88,6 +88,10 @@
 		"prefix": "soejima1000",
 		"body": "${1|[soejima1000 - YouTube],[soejima1000]: https://www.youtube.com/user/soejima1000/videos|}$0"
 	},
+	"twgl":{
+		"prefix": "twgl",
+		"body": "${1|[TWGL],[TWGL]: https://twgljs.org/docs/|}$0"
+	},
 	"wf": {
 		"prefix": "wf",
 		"body": "${1|[WebGL2 Fundamentals],[WebGL2 Fundamentals]: https://webgl2fundamentals.org|}$0"
