@@ -68,6 +68,10 @@
 		"prefix": "gist",
 		"body": "[gist]: https://gist.github.com/showa-yojyo/$0"
 	},
+	"glMatrix": {
+		"prefix": "glMatrix",
+		"body": "${1|[glMatrix],[glMatrix]: https://glmatrix.net/|}"
+	},
 	"metal": {
 		"prefix": "metal",
 		"body": "[metal]: http://metal.the-ninja.jp/$0"
