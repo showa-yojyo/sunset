@@ -14,7 +14,7 @@
 	"画像挿し込み": {
 		"scope": "markdown",
 		"prefix": "image",
-		"body": "![$1]({{ \"/assets/images/${CURRENT_YEAR}${CURRENT_MONTH}${CURRENT_DATE}{$2}.png\" | relative_url }})$0",
+		"body": "![$1]({{ \"/assets/images/${CURRENT_YEAR}${CURRENT_MONTH}${CURRENT_DATE}$2.png\" | relative_url }})$0",
 		"description": "![$1]({{ \"/assets/images/${CURRENT_YEAR}${CURRENT_MONTH}${CURRENT_DATE}$2.png\" | relative_url }})"
 	},
 	"mjeventscore": {
