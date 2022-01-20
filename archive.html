@@ -4,35 +4,8 @@ title: 全記録
 permalink: /archive/
 ---
 
-{%- assign date_format = site.minima.date_format -%}
-{% for post in site.posts %}
-  {% capture year %}{{ post.date | date: '%Y' }}{% endcapture %}
-  {% capture month %}{{ post.date | date: '%m' }}{% endcapture %}
-  {% unless post.next %}
-    <h2 id="{{year}}{{nmonth}}">{{ year }}-{{ month }}</h2>
-    <ul class="posts">
-      <li>
-        <span class="post-date">{{ post.date | date: date_format }}</span>
-        <a href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a>
-      </li>
-  {% else %}
-    {% capture nmonth %}{{ post.next.date | date: '%m' }}{% endcapture %}
-    {% if month != nmonth %}
-      </ul>
-      <h2 id="{{year}}{{nmonth}}">{{ year }}-{{ month }}</h2>
-      <ul class="posts">
-    {% else %}
-      {% capture nyear %}{{ post.next.date | date: '%Y' }}{% endcapture %}
-      {% if year != nyear %}
-        </ul>
-        <h2 id="{{year}}{{nmonth}}">{{ year }}-{{ month }}</h2>
-        <ul class="posts">
-      {% endif %}
-    {% endif %}
-    <li>
-      <span class="post-date">{{ post.date | date: date_format }}</span>
-      <a href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a>
-    </li>
-  {% endunless %}
-{% endfor %}
+<ul>
+  <li><a href="{% link archive/2020.html %}">2020 年</a></li>
+  <li><a href="{% link archive/2021.html %}">2021 年</a></li>
+  <li><a href="{% link archive/2022.html %}">2022 年</a></li>
 </ul>

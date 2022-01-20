@@ -77,9 +77,16 @@ minima:
 defaults:
   -
     scope:
-      path: _posts
-      type: posts
+      path: "_posts"
+      type: "posts"
     values:
-      author: showa-yojyo
-      categories: diary
-      layout: diary
+      author: "showa-yojyo"
+      categories: "diary"
+      layout: "diary"
+  -
+    scope:
+      path: "archive"
+      type: "pages"
+    values:
+      layout: "archive"
+      permalink: /archive/:basename.html
