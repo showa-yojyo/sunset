@@ -76,6 +76,10 @@
 		"prefix": "glMatrix",
 		"body": "${1|[glMatrix],[glMatrix]: https://glmatrix.net/|}"
 	},
+	"mermaid": {
+		"prefix": "mermaid",
+		"body": "${1|[Mermaid.JS],[Mermaid.JS]: https://mermaid-js.github.io/mermaid/|}"
+	},
 	"metal": {
 		"prefix": "metal",
 		"body": "[metal]: http://metal.the-ninja.jp/$0"
