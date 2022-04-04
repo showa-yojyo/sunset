@@ -86,7 +86,7 @@
 	},
 	"note": {
 		"prefix": "note",
-		"body": "${1|読書ノート,[note]: https://showa-yojyo.github.io/notebook/|}$0"
+		"body": "${1|[読書ノート][note],[note]: https://showa-yojyo.github.io/notebook/|}$0"
 	},
 	"pytube": {
 		"prefix": "pytube",
