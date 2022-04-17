@@ -4,9 +4,12 @@
   <meta name="robots" content="noindex">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   {% seo %}
+  <script src="{{ "/assets/js/navigation.js" | relative_url }}" defer></script>
   {% if page.mathjax %}
   <script src="{{ "/assets/js/load-mathjax.js" | relative_url }}" async></script>
   {% endif %}
+  {% if page.previous.url %}<link rel="prev" href="{{ page.previous.url | prepend: site.baseurl }}">{% endif %}
+  {% if page.next.url %}<link rel="next" href="{{ page.next.url | prepend: site.baseurl }}">{% endif %}
   <link rel="icon" href="{{ "/assets/images/favicon/favicon.ico" | relative_url }}" />
   <link rel="stylesheet" href="{{ "/assets/main.css" | relative_url }}" />
   {% feed_meta %}
