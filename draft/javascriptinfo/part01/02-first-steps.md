@@ -329,32 +329,289 @@ C/C++ と同様。
 
 ## Comparisons
 
-`false == 0` が `true` に評価されるのが怖いので `===` のようなものが用意されているのだろう。
-`null == 0` や `undefined == 0` は `false` に評価される。
+数値の比較は他の言語と同様の比較演算子が JavaScript にもある。
+
+### Boolean is the result
+
+比較演算のすべてが `Boolean` 型の値に評価される。
+
+### String comparison
+
+文字列型の値に対して比較演算子を作用させることができる。評価は lexicographical 順序に基づく。
+
+* 本文の記述からは、各文字の値は Unicode のコードポイントの値であると考えられる。
+
+### Comparison of different types
+
+異なる型の値を比較すると、数でないほうが数に変換され、それから評価される。
+
+### Strict equality
+
+JavaScript では演算子 `==` に難がある。
+`null == 0` や `undefined == 0` が `false` に評価される。
+上に述べた評価手順が本質的に不便なのだ。
+
+* 比較演算子 `===` は型の暗黙的変換を生じないで値を比較する。したがって、
+  オペランド同士の型が異なるだけで、この式は `false` に評価される。
+* 比較演算子 `!==` はその否定を返す。
+
+### Comparison with null and undefined
+
+`null` や `undefined` が他の値と比較されたときに直感的でない動作をする。
+
+* `null === undefined` は `false` に評価される。両辺の型が異なるからだ。
+* `null == undefined` は `true` に評価される。これは例外的な動作だと覚えておく必要がある。
+* `null` と `undefined` が数に暗黙的に変換されるときには、0 と `NaN` にそれぞれ評価される。
+
+#### Strange result: null vs 0
+
+`null` は自身と `undefined` を除き、何に対しても等しくないと評価される。
+
+それゆえ、例えば `null == 0` は `false` と評価される。
+
+#### An incomparable undefined
+
+`undefined` は、自身と `null` を除いて、何に対しても等しくなく、大きくなく、小さくないと評価される。
+
 怖いのだが、変数を `null`, `undefined`, 0 と比較することはめったにない。
+
+#### Avoid problems
+
+これらの問題を回避する確実な方法。
+
+* 等号 `===` を除き、`undefined` や `null` との比較は慎重に扱う。
+* これらの値である可能性がある変数で `>`, etc. は使わない。
+* これらの値である可能性がある変数については、個別にチェックする。
+
+### Tasks
+
+#### Comparisons
+
+次のは特に理解を確認しておくこと：
+
+```javascript
+undefined == null
+undefined === null
+null == "\n0\n"
+null === +"\n0\n"
+```
 
 ## Conditional branching: if, '?'
 
-やるなら `alert()` の実引数に書くことだ。
+`if` 文は C/C++ と同様の構文だ。JavaScript には条件演算子やその派生形が妙に豊富にある。
+
+### The "if" statement
+
+C/C++ と同様。
+
+### Boolean conversion
+
+自動変換のコツのところで見たように評価される。
+
+### The "else" clause
+
+C/C++ と同様。
+
+### Several conditions: "else if"
+
+C/C++ と同様。
+
+### Conditional operator '?'
+
+C/C++ と同様。
+
+### Multiple '?'
+
+C/C++ と同様だと思うが、やったことがない。
+
+### Non-traditional use of '?'
+
+このようなコードは書かない。
+
+### Tasks
+
+#### if (a string with zero)
+
+"0" が Boolean に自動変換されると、この文字列は空でないので `true` に評価される。
+
+#### The name of JavaScript
+
+素直な問題。
+
+#### Show the sign
+
+ユーザーが必ず数を入力してくれるという前提なので、
+
+* 関数 `prompt()` で得られる文字列を数に明示的に変換する必要はない。
+* 題意のとおりの条件分岐を書く。
+
+#### Rewrite 'if' into '?'
+
+素直な問題。
+
+#### Rewrite 'if..else' into '?'
+
+素直でない問題のような気がする。
 
 ## Logical operators
 
-`2 && 3` が `3` に評価されるのは本当に怖い。書き間違いではない。
-A value is returned in its original form, without the conversion.
+古典的な C/C++ などの言語と同様の演算子と、そうでない演算子がある。
+まずは前者を見ていく。
+
+### || (OR)
+
+* オペランドが両方とも `Boolean` ならば、C/C++ などの言語と同様に評価される。
+* オペランドが `Boolean` でないものについては、JavaScript の流儀で `Boolean` 値に暗黙的に変換される。
+
+### OR "||" finds the first truthy value
+
+* OR 演算評価が `Boolean` になるとは限らない。最初の例は文字列にしかならないことに注意。
+* よその言語と同様に short-circuit 評価がなされる。
+
+### && (AND)
+
+* オペランドが両方とも `Boolean` ならば、C/C++ などの言語と同様に評価される。
+* オペランドが `Boolean` でないものについては、JavaScript の流儀で `Boolean` 値に暗黙的に変換される。
+
+### AND "&&" finds the first falsy value
+
+* OR と同様に AND 演算評価が `Boolean` になるとは限らない。
+  `2 && 3` が `3` に評価されるのは本当に怖い。書き間違いではない。
+* よその言語と同様に short-circuit 評価がなされる。
+
+### ! (NOT)
+
+基本用途は他の言語と同様。
+
+* 値を明示的に `Boolean` に変換する手段として、`!!value` のように書くことがある。
+  これは `Boolean(value)` と書くよりも早い。
+
+### Tasks
+
+演習問題が異様に多い。怖い問題もあるが、面倒なので省略。
 
 ## Nullish coalescing operator '??'
 
-`??` と `||` / `&&` の共用はさすがに禁止されている。
+二項演算子 `??` の定義。
+
+* 式 `a ?? b` は、`a` が `null` でも `undefined` でもなければ `a` と評価される。
+* そうでなければ、つまり `a` が `null` または `undefined` であれば `b` と評価される。
+
+```javascript
+(a !== null && a !== undefined) ? a : b;
+```
+
+演算子 `??` の主な用途はデフォルト値を与えることだ。
+
+### Comparison with ||
+
+演算子 `||` とは評価基準が異なる。例えば上のコードで `a` が 0 や `false` の場合を考えろ。
+
+### Precedence
+
+演算子 `??` の優先度は演算子 `||` と同じとされている。
+
+#### Using ?? with && or ||
+
+`??` と `||` / `&&` の共用は、安全上の理由により禁止されている。
 
 ## Loops: while and for
 
-ラベルの仕様はいにしえの言語のそれと同じか？
+### The "while" loop
+
+C/C++ と同様。
+
+### The "do...while" loop
+
+C/C++ と同様。
+
+### The "for" loop
+
+`for` 文は括弧の中の書き方が複数あるが、いちばん初歩的な記法は C/C++ のそれと同様。
+
+#### Skipping parts
+
+これも同様。初歩的な `for` 文の括弧の中のパーツは適宜省略可能だ。
+
+### Breaking the loop
+
+他言語と同じ意味の `break` 命令も用意されている。
+
+### Continue to the next iteration
+
+他言語と同じ意味の `continue` 命令も用意されている。
+
+### Labels for break/continue
+
+* ループ周辺に限定して、ラベルを定義することができる。
+* ループ中からそのラベルにジャンプするときに `break` または `continue` を使える。
+  それぞれの命令の「引数」にラベルを書く。要するに C 言語の `goto` 文だ。
+
+### Tasks
+
+#### Last loop value
+
+最後の反復時の `i` の値は 1 であることはすぐにわかる。
+したがって `i--` の評価である 1 を `alert()` 呼び出しは表示する。
+
+#### Which values does the while loop show?
+
+類題。ループの理解というより、ウンクリメント演算子の理解テストだ。
+
+#### Which values get shown by the "for" loop?
+
+この場合にはどちらのループも同じ挙動を示す。
+
+#### Output even numbers in the loop
+
+個人的には `i += 2` としたい。
+
+#### Replace "for" with "while"
+
+ループカウンターをループでしか使わないコードだから、意味がない演習のように見えてしまう。
+実際にはこれを覚えておくと何かと有用だ。
+
+#### Repeat until the input is correct
+
+ユーザー入力をループ終了条件に用いる場合には、かなりの注意を要することが窺える。
+
+#### Output prime numbers
+
+まだ関数の定義方法を学習していないので、二重ループで書くことを余儀なくされる。
+ものすごく効率の悪いアルゴリズムであるが、それは問わない。
 
 ## The "switch" statement
 
+JavaScript の `switch` 文は、型チェックの違いからか、C 言語のそれよりも複雑になっている。
+
 * 関数定義のスコープは前方にも届く。これについては後ほどの lexical environment の議論で繰り返される。
-* `switch` に与えた値と各 `case` の値とのマッチングは `===` で評価されるようだ。
-  したがって値の型が問題になる。
+
+### The syntax
+
+構文自身は C 言語のものと同じだが、`case` のオペランドの値の型に制約がないようだ。
+`switch` に与えた値と各 `case` の値との比較は演算 `===` で評価される。
+
+### An example
+
+C 言語と同じように、`break` を抜かすと、次の `case` の最初の文が実行される。
+
+### Grouping of "case"
+
+`break` を書かない時の挙動を活かして、複数の `case` 文をまとめる手法がある。
+
+### Type matters
+
+`case` での評価が `===` でによるということは、文の実行時には、値が型まで一致していることが期待されるということだ。
+
+### Tasks
+
+#### Rewrite the "switch" into an "if"
+
+基本的な理解を試す問題。
+
+#### Rewrite "if" into "switch"
+
+上の逆問題。
 
 ## Functions
 
@@ -362,18 +619,115 @@ A value is returned in its original form, without the conversion.
 引数リスト、デフォルト引数、呼び出し時に足りない引数が `undefined` で補充されること、
 戻り値などの基本概念が述べられている。
 
+### Function Declaration
+
+関数定義の基本形式は次のとおり。
+
+```javascript
+function functionName(parameterList) {
+    statements;
+}
+```
+
+### Local variables
+
+局所変数。関数内で宣言された変数は、関数の中からしかアクセスできない。
+
+### Outer variables
+
+関数の内部から、その外側のスコープで宣言された変数にアクセスすることができる。
+ここは Python とはかなり異なる。
+
+### Parameters
+
+関数引数は、シンプルな型の値は値渡しとなる。
+
+### Default values
+
+C++ と同様。
+
+#### Alternative default parameters
+
+呼び出し時に足りない実引数は、関数内部で値が `undefined` になる。
+
+### Returning a value
+
+他の言語と同様に `return` 文が存在する。
+
+### Naming a function
+
+関数の名前の付け方の流儀は MDN や仕様書を眺めていれば感じられる。
+
+### Functions == Comments
+
+どういう関数が良い関数なのかを述べている。これは言語に依らない。
+
+### Tasks
+
+気が向いたらやればいい。
+
+#### Is "else" required?
+
+不要。
+
+#### Rewrite the function using '?' or '||'
+
+こういう状況では条件演算子を使えないという感覚がある。
+
+#### Function min(a, b)
+
+初学者以外はやらなくていい。
+
+#### Function pow(x, n)
+
+初学者以外はやらなくていい。前章のループの復習にはなる。
+
 ## Function expressions
 
 関数は値の一種であり、適当な変数に割り当てることができる。Python のように処理できる。
+
+### Function is a value
+
+関数を `let` 変数などに代入したり、関数の引数として扱ったりできる。
+
+### Callback functions
+
+特に、関数の引数であるような関数であって、その内部で呼び出されるものをコールバックと呼ぶ。
+
+### Function Expression vs Function Declaration
+
+`let` や `const` などの変数で宣言されたものとは対照的に、
+通常の形式で定義された関数は、定義前の行からそれを参照することができる。
+これは "use strict" モードにおいても可能だ。
 
 ## Arrow functions, the basics
 
 他言語で言うラムダ式に相当する関数だ。JavaScript の記法はきわめて単純でありがたい。
 
 ```javascript
-(arg1, arg2, ..., argN) => expression;
+(parameterList) => expression
 ```
+
+* 引数がない場合には `() => ` から始める。
+* 引数が一つの場合には、関数リストを宣言する丸括弧を省略することもできる。
+* 式が単一の `return` 文の場合には、戻り値自体を書くだけとすることもできる。
+
+### Multiline arrow functions
+
+中括弧で複文を与えることもできる。こうなると普通の関数とほとんど変わらない：
+
+```javascript
+(parameterList) => {
+    statements;
+}
+```
+
+### Tasks
+
+#### Rewrite with arrow functions
+
+簡単なためか、重要度が与えられていない。
 
 ## JavaScript specials
 
-ここまでのまとめ。
+ここまでのまとめ。ノート省略。
