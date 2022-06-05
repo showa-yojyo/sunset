@@ -586,3 +586,220 @@ a "witch" and her "broom" is one
 #### Find HTML tags
 
 キャレットあり集合を使うパターンと不精モードは、正規表現一つの中では本質的には共存しない気がする。
+
+## Capturing groups
+
+正規表現の意味を変えずに、パターンの一部を丸括弧で囲むことができる。これを捕捉グループと呼ぶ。
+これには効果が二つある：
+
+1. マッチした部分を別の項目として結果配列に取り込むことができる。
+2. `( )` の後に量指定子を置くと、それは括弧全体に適用される。
+
+### Examples
+
+#### Example: gogogo
+
+```javascript
+'Gogogo now!'.match(/(go)+/ig) ); // "Gogogo"
+```
+
+#### Example: domain
+
+```javascript
+"site.com my.site.com".match(/(\w+\.)+\w+/g); // ["site.com", "my.site.com"]
+```
+
+#### Example: email
+
+ドメインのパターンが構築できたので、メールアドレスのパターンも行ける。
+名前部分は `-` や `.` も使用可能であるから、正規表現では `[-.\w]+` あたりになる。
+ドメインも若干手直しする。
+
+```javascript
+"my@mail.com @ his@site.com.uk".match(/[-.\w]+@([\w-]+\.)+[\w-]+/g); // ["my@mail.com", "his@site.com.uk"]
+```
+
+### Parentheses contents in the match
+
+パターン内の丸括弧は左から右へ番号が割り当てられている。正規表現エンジンは
+それぞれにマッチした内容を記憶し、結果に示すことができる。
+
+メソッド `str.match(regexp)` は `regexp` にフラグ `g` がない場合、最初のマッチを探し、
+配列として返す。中身は次のような具合だ：
+
+* `result[0]`: 完全マッチ
+* `result[1]`: 最初の丸括弧の中身
+* `result[2]`: 二番目の丸括弧の中身
+
+例えば、HTML タグ `<.*?>` を見つけて処理したい。タグの内容を別の変数に格納する。
+
+```javascript
+let str = '<h1>Hello, world!</h1>';
+let tag = str.match(/<(.*?)>/);
+
+tag[0]; // "<h1>"
+tag[1]; // "h1"
+```
+
+#### Nested groups
+
+捕捉グループを入れ子にすることもできる。番号はやはり左から右へと割り当てられる。
+
+```javascript
+let result = '<span class="my">'.match(/<(([a-z]+)\s*([^>]*))>/);
+result[0]; // '<span class="my">'
+result[1]; // 'span class="my"'
+result[2]; // 'span'
+result[3]; // 'class="my"'
+```
+
+#### Optional groups
+
+グループがオプショナルであって、マッチに存在しない場合がある。
+`( )?` とか `( )*` のようなものがある場合だ。
+それでも、対応する結果配列の項目は存在し、値は `undefined` に等しい。
+
+```javascript
+let match = 'a'.match(/a(z)?(c)?/);
+
+match.length; // 3
+match[0]; // "a"
+match[1]; // undefined
+match[2]; // undefined
+```
+
+マッチするグループとしないグループがある例：
+
+```javascript
+let match = 'ac'.match(/a(z)?(c)?/)
+
+match.length; // 3
+match[0]; // "ac"
+match[1]; // undefined
+match[2]; // "c"
+```
+
+### Searching for all matches with groups: matchAll
+
+フラグ `g` でマッチ全てを検索する場合、メソッド `match` はグループに対する内容を返さない。
+捕捉グループが無視されて、たんにマッチを全て含む配列が返る。
+
+メソッド `matchAll` は捕捉グループに対応した全検索機能だ。
+
+1. 配列ではなく、反復可能なオブジェクトを返す。
+2. フラグ `g` がある場合、すべてのマッチをグループを含む配列として返す。
+3. マッチがない場合、空の反復可能なオブジェクトを返す。
+
+マッチを `for...of` ループで得たり、次のように変数に代入したりする。
+
+```javascript
+let [tag1, tag2] = '<h1> <h2>'.matchAll(/<(.*?)>/gi);
+
+tag1[0]; // "<h1>"
+tag1[1]; // "h1"
+tag1.index; // 0
+tag1.input; // "<h1> <h2>"
+```
+
+### Named groups
+
+Python のように、捕捉グループに名前を付けることもできる。`(?<name> )` の形式も同じだ。
+メソッド `match` の戻り値のプロパティー `groups` から、指定した `name` でマッチそれぞれを参照する。
+
+```javascript
+let dateRegexp = /(?<year>[0-9]{4})-(?<month>[0-9]{2})-(?<day>[0-9]{2})/;
+
+let groups = "2019-04-30".match(dateRegexp).groups;
+groups.year; // "2019"
+groups.month; // "04"
+groups.day; // "30"
+```
+
+メソッド `matchAll` の場合には、個々のマッチにプロパティー `groups` がある。
+
+```javascript
+let results = "2019-10-30 2020-01-01".matchAll(dateRegexp);
+for(let result of results) {
+    let {year, month, day} = result.groups;
+    // ...
+}
+```
+
+### Capturing groups in replacement
+
+置換メソッド `str.replace(regexp, replacement)` では、置換文字列に捕捉グループの内容を
+使用することができる。
+
+その参照には、ドルマークと番号を組み合わせて指定する。
+
+```javascript
+"John Bull".replace(/(\w+) (\w+)/, '$2, $1'); // "Bull, John"
+```
+
+名前付きグループを使った場合には、ドルマークと名前を組み合わせて指定する。
+
+```javascript
+let regexp = /(?<year>[0-9]{4})-(?<month>[0-9]{2})-(?<day>[0-9]{2})/g;
+let str = "2019-10-30, 2020-01-01";
+str.replace(regexp, '$<day>.$<month>.$<year>'); // ["30.10.2019", "01.01.2020"]
+```
+
+### Non-capturing groups with ?:
+
+量指定子は使いたいが、照合結果としては要しないこともある。
+そういう場合には `(?: )` を指定することで捕捉グループを除外する。
+
+### Tasks
+
+#### Check MAC-address
+
+量指定子を含むグループに対して量指定子を付けることができることに注意。
+
+「文字列が～にマッチするか」という問いに対しては `^ $` でメインの正規表現を挟むこと。
+
+#### Find color in the format #abc or #abcdef
+
+この解答例だと RGB 成分が個別に取れない。
+
+最後に `\b` を付けるのを忘れないようにする。そうしないと 4 桁にも 5 桁にもマッチする。
+
+#### Find all numbers
+
+整数、浮動小数点、負の数を含む、すべての十進数を検索する正規表現。
+すべて 0 の場合にはその部分を省略しても許されるバージョンも考えられる。
+
+#### Parse an expression
+
+算術二項演算を表す文字列 `expr` を入力とし、第一オペランド、第二オペランド、演算子から
+なる配列を出力とする関数 `parse(expr)` を実装する。
+
+* オペランドに対する正規表現は直前の問いの結果を利用する。
+* 演算子の集合は `[-+*/]` のように、マイナスを先頭に持ってくるのがコツとなる。
+* 演算子の前後には空白文字がいくつあってもよいから `\s*` を入れる。
+
+メソッド `match` の結果をそのまま返すことはたぶんできない。マッチを選り抜いて
+新しく配列を作って返す。
+
+## Backreferences in pattern: \N and \k&lt;name&gt;
+
+<https://javascript.info/regexp-backreferences>
+
+捕捉グループ `( )` の内容は、結果や置換文字列だけでなく、パターン自体にも利用することができる。
+
+### Backreference by number: \N
+
+番号 1, 2, 3, ... の捕捉グループの内容を `\1`, `\2`, `\3`, ... で参照できる。
+
+番号が振られていない `(?: )` は参照されない。
+
+```javascript
+`He said: "She's the one!".`.match(/(['"])(.*?)\1/g); // "She's the one!"
+```
+
+### Backreference by name: \k&lt;name&gt;
+
+名前付きグループ `(?<name> )` を使った場合には `\k<name>` で参照できる。
+
+```javascript
+`He said: "She's the one!".`.match(/(?<quote>['"])(.*?)\k<quote>/g); // "She's the one!"
+```
