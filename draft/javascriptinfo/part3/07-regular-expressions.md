@@ -1125,3 +1125,167 @@ Script を省いて残りのパターンにマッチさせることもある。
 ```regexp
 /^((?=(?<word>\w+))\k<word>\s?)*$/
 ```
+
+## Sticky flag "y", searching at position
+
+<https://javascript.info/regexp-sticky>
+
+フラグ `y` は、文字列の指定された位置で検索を実行する。
+指定された位置の何かを読み取るときに用いる。
+
+例えばコード `let varName = "value"` の変数名を得たい。
+
+メソッド `regexp.exec(str)` を使うやり方がある。
+フラグ `g` と `y` がない正規表現では、このメソッドは最初にマッチするものしか探さない。
+フラグ `g` があるときに限り、プロパティー `regexp.lastIndex` に格納された位置から、
+`str` の検索をする。そして、マッチした場合は、マッチ直後のインデックスを
+`regexp.lastIndex` に代入する。つまり、`regexp.lastIndex` は検索の出発点であり、
+`regexp.exec(str)` を呼ぶたびに新しい値にリセットされる。
+
+したがって、`regexp.exec(str)` を連続して呼び出すと、次々とマッチが返される。
+メソッド `str.matchAll` がない場合には代わりになる。
+
+次のようにすると、変数名を得ることだけができる：
+
+```javascript
+let str = 'let varName = "value"';
+let regexp = /\w+/g;
+regexp.lastIndex = 4;
+regexp.exec(str); // ["value"]
+```
+
+ここからフラグ `y` の説明になる。
+フラグ `y` は `regexp.exec` が `lastIndex` の位置から厳密に検索するようにする。
+上の例は実は `lastIndex = 3` でも同じ結果となった。
+
+```javascript
+let str = 'let varName = "value"';
+let regexp = /\w+/y;
+regexp.lastIndex = 3;
+regexp.exec(str); // null
+
+regexp.lastIndex = 4;
+regexp.exec(str); // ["varName"]
+```
+
+フラグ `y` を使用することで性能向上がある。
+長いテキストがあり、その中にマッチするものが全くないとする。
+フラグ `g` を使った検索では、テキストの最後まで行っても何も見つからない。
+正確な位置だけをチェックするフラグ `y` を使う検索よりも時間がかなりかかってしまう。
+
+## Methods of RegExp and String
+
+<https://javascript.info/regexp-methods>
+
+### str.match(regexp)
+
+メソッド `str.match(regexp)` はいわばモードが三つある。
+
+1. 正規表現がフラグ `g` を持たない場合、最初のマッチだけを、捕捉グループの配列として返す。
+   また、この配列にはプロパティー `index` と `input` がある。
+2. 正規表現がフラグ `g` を持つ場合、グループやその他の詳細を捕捉せず、すべての
+   マッチを文字列とした配列を返す。
+3. マッチするものがなければ、フラグ `g` があろうがなかろうが `null` を返す。
+   空の配列ではなく `null` であることを忘れないようにする。
+
+いつでも配列として結果を扱いたい場合には、次のように書くといい：
+
+```javascript
+let result = str.match(regexp) ?? [];
+```
+
+### str.matchAll(regexp)
+
+メソッド `str.matchAll(regexp)` は `str.match` の上位互換バージョンのようなものだ。
+これはすべてのグループとのすべてのマッチを検索するために主に用いられる。
+元となった `str.match` との三つの違い：
+
+1. 配列ではなく、マッチからなる反復可能なオブジェクトを返す。
+2. すべてのマッチは、捕捉グループからなる配列として返される。
+   フラグ `g` なし `str.match` 形式だ。
+3. 結果がない場合は空の反復可能オブジェクトを返す。今度は `null` ではない。
+
+### str.split(regexp&#x7c;substr, limit)
+
+正規表現または部分文字列で区切り方を指定して文字列を分割する。
+
+```javascript
+'12-34-56'.split('-'); // ['12', '34', '56']
+
+'12, 34, 56'.split(/,\s*/); // ['12', '34', '56']
+```
+
+### str.search(regexp)
+
+メソッド `str.search(regexp)` は最初にマッチした位置を返す。何もない場合は -1 を返す。
+
+### str.replace(str&#x7c;regexp, str&#x7c;func)
+
+メソッド `str.replace` は汎用文字列置換機能だ。
+
+第一引数が文字列の場合、最初にマッチしたものしか置換されない。
+すべてのマッチを見つけるには、文字列、フラグ `g` を伴う正規表現を使用する必要がある。
+
+第二引数が文字列の場合、特別な文字列を指定することで特別な置換をする。その表はすでに示した。
+
+賢い置換を必要とする状況では、第二引数に関数を指定することができる。
+この関数はマッチするたびに呼び出され、返された値が置換として挿し込まれる。
+
+その関数の引数リストは `(match, p1, p2, ..., pn, offset, input, groups)` のようなものだ。
+正規表現に括弧がない場合は `(str, offset, input)` となる。
+
+* `match`: 正規表現のマッチ
+* `p1`, ..., `pn`:捕捉グループの内容
+* `offset`: マッチの位置
+* `input`: `replace` 呼び出しの `this` に相当する文字列
+* `groups`: 名前付きグループがあるオブジェクト
+
+### str.replaceAll(str&#x7c;regexp, str&#x7c;func)
+
+メソッド `str.replaceAll` は、基本的には `str.replace` と同じだ。大きな違いが二つある。
+
+1. 第一引数が文字列の場合、その文字列のすべての出現箇所を置換する。
+2. 第一引数が正規表現の場合、フラグ `g` がないとエラーになる。
+   フラグを付けると `replace` と同じように動作する。
+
+```javascript
+'12-34-56'.replaceAll("-", ":"); // 12:34:56
+```
+
+### regexp.exec(str)
+
+これはさっきやったばかり。
+
+以前、JavaScript にメソッド `str.matchAll` が追加されるまでは、ループ内で
+`regexp.exec` を呼び出して、グループを持つすべてのマッチを取得していたらしい。
+
+```javascript
+let str = 'More about JavaScript at https://javascript.info';
+let regexp = /javascript/ig;
+
+let result;
+while (result = regexp.exec(str)) {
+    `Found ${result[0]} at position ${result.index}`;
+}
+```
+
+### regexp.test(str)
+
+メソッド `regexp.test(str)` は一致するものを探し、それが存在するかどうかを返す。
+
+正規表現がフラグ `g` を持つ場合は `regexp.exec` 同様にプロパティー `regexp.lastIndex`
+から検索し、このプロパティーを更新する。
+
+同じグローバル正規表現を異なる入力に適用すると、間違った結果になることがある。
+`regexp.test` は `regexp.lastIndex` を進めるので、別の文字列での検索がゼロ以外の
+位置から始まることがあるからだ。
+
+```javascript
+let regexp = /javascript/g;
+// regexp.lastIndex == 0
+
+regexp.test("javascript"); // true
+// regexp.lastIndex == 10
+
+regexp.test("javascript"); // false
+```
