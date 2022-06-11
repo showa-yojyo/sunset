@@ -164,18 +164,76 @@ GitHub のログイン名の配列を入力とし、GitHub からユーザーを
 
 <https://javascript.info/formdata> のノート。
 
+HTML フォームの送信について習う。`FormData` から始める。フォームデータを表すオブジェクトだ。
+
+```javascript
+let formData = new FormData([form]);
+```
+
+`FORM` 要素 `form` が与えられると、そのフィールドを自動的に取り込む。
+
+`FormData` の特別な点は、`fetch` などのネットワークメソッドが `FormData`
+オブジェクトを本文として受け取ることができることにある。これは符号化されて
+`Content-Type: multipart/form-data` で送信される。
+
+サーバーからはこれが通常の提出と同じように見える。
+
 ### Sending a simple form
+
+単純なフォームを POST で送信するコード例。
+
+* ハンドラーは `FORM` 要素の `onsubmit` に実装する。この関数は `async` であるはずだ。
+* おそらく `e.preventDefault()` 呼び出しは必須。
+* メソッド `fetch` の呼び出しで `options.body` の値を上述のように指定する。
 
 ### FormData Methods
 
+`FormData` のフィールドをメソッドで変更することができる。
+GUI 以外の手段でもフォームの内容を操作できるということだ。
+
+| Method | Behavior |
+|--------|----------|
+| `append(name, value)` | フィールドを追加する |
+| `append(name, blob, fileName)` | あたかも `<input type="file">` であるかのようなフィールドを追加する |
+| `delete(name)` | フィールドを削除する |
+| `get(name)` | フィールドの値を得る |
+| `has(name)` | フィールドがあるかどうかを得る |
+
+フォームには同じ名前のフィールドをいくつも持つことが技術的には許されているので、
+メソッド `append` を何度も呼び出すと同じ名前のフィールドがどんどん追加される。
+引数リストが `append` と同じであるメソッド `set` もある。
+与えられた名前のフィールドをすべて削除し、新しいフィールドを追加する。
+
+本書のコードは、無からフォームデータを生成する例だろう。
+
 ### Sending a form with a file
 
+フォームはいつでも `Content-Type: multipart/form-data` として送信され、この符号
+化によってファイルを送信することができる。したがって、
+`<input type="file">` フィールドも通常のものと同じように送信される。
+
+ハンドラー部分のコードがさっきのものと同じであることに注意する。
+
 ### Sending a form with Blob data
+
+画像など、動的に生成されるバイナリーデータを `Blob` として送信するのは前章で見た
+ように簡単だ。 `fetch` 呼び出しで引数 `body` として直接与えることができる。実際
+には、画像を個別に送信するのではなく、名前などの追加フィールドやメタデータととも
+に、フォームの一部として送信するのが便利な場合が多い。また、サーバーは通常、生の
+バイナリーデータよりも multipart 符号化されたフォームを受け入れるのに適してい
+る。
+
+```javascript
+formData.append("image", imageBlob, "image.png");
+```
+
+これで、フォームに `<input type="file" name="image">` があり、訪問者がファイルシステムから
+image.png という名前のファイルと `imageBlob` というデータを送信したのと同じことになる。
+サーバーは、通常のフォーム提出と同じように、フォームデータとファイルを読み取る。
 
 ## Fetch: Download progress
 
 <https://javascript.info/fetch-progress> のノート。
-
 
 
 ## Fetch: Abort
