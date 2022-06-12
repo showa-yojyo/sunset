@@ -235,6 +235,53 @@ image.png という名前のファイルと `imageBlob` というデータを送
 
 <https://javascript.info/fetch-progress> のノート。
 
+メソッド `fetch` では、ダウンロードの進捗を追跡することができる。
+戻り値オブジェクト `response` のプロパティー `body` を使用する。
+これは `ReadableStream` 型で、ボディーを塊単位で供給する特殊なオブジェクトだ。
+`response.text()` や `response.json()` などとは異なり、
+`response.body` では読み込み処理を完全に制御でき、どれだけ消費されたかをどんな瞬間にも数えることができる。
+
+出力 `response` を得た後に次のようにすることができるとある：
+
+```javascript
+const reader = response.body.getReader();
+while(true) {
+    // done is true for the last chunk
+    // value is Uint8Array of the chunk bytes
+    const {done, value} = await reader.read();
+    if (done) {
+        break;
+    }
+    console.log(`Received ${value.length} bytes`);
+}
+```
+
+このコードだけ見ると `reader` は反復可能オブジェクトを備えていないのかと疑問に思うが、
+事実、用意されているらしい。本書ではその機能が広くサポートされていないから、
+あえて素のループを採用したと述べている。
+
+勝手に調べてみたところ、次のように書けるはずらしい（手許の Chrome では動かず）：
+
+```javascript
+for await (const value of response.body) {
+    console.log(`Received ${value.length} bytes`);
+}
+```
+
+読み込みが終了するまで、すなわち `done` が真になるまで、ループ内で応答の塊を受信する。
+進捗を記録するには、受信した欠片の値ごとに、その長さをカウンターに追加する。
+
+本書では `response.headers.get('Content-Length')` などを利用した実用的なコードを実装している。
+
+* `response.headers.get('Content-Length')` でダウンロードするデータ量を得る（数に変換すること）。
+* `value` を作業用の配列に `push` しておき、あとで `Uint8Array` オブジェクトに復元する。
+  この処理がやや泥臭い。
+* このバイナリーデータは実はテキストなので、`TextDecoder` を利用して文字列に変換する。
+  * `new TextDecoder(encoding)` でオブジェクト生成。符号は UTF-8 などを指定する。
+  * メソッド `decode()` で変換。
+
+受信バイト数は必ずチェックする。一定の限界に達したらループを打ち切るなどして、
+メモリーが枯渇することを防止することだ。
 
 ## Fetch: Abort
 
