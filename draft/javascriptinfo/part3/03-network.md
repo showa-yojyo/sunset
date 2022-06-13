@@ -287,23 +287,147 @@ for await (const value of response.body) {
 
 <https://javascript.info/fetch-abort> のノート。
 
+`Promise` には「中止する」という概念が一般的にはない。進行中の `fetch` を中止す
+るにはどうすればよいか。このような目的のために `AbortController` が使える。これ
+は `fetch` の他にも、非同期タスクを中断させることができる。
+
 ### The AbortController object
+
+`AbortController` は構造が単純だ。
+メソッド `abort()` と、イベントリスナーを設定するためのプロパティー `signal` がある。
+
+```javascript
+let controller = new AbortController();
+```
+
+`controller.abort()` すると、`controller.signal` がイベント "abort" を放つ。
+プロパティー `controller.signal.aborted` が `true` になる。
+
+キャンセル可能な操作を行う側は、`controller.signal` のリスナーを設定する。
+`controller.signal.addEventListener("abort", ...)` による。
+キャンセルする側は、必要な時に `controller.abort()` を呼び出す。
 
 ### Using with fetch
 
+`fetch` 呼び出しのオプションに `signal` を指定することで中止可能になる。
+次のように書いておき、適当なタイミングで `controller.abort()` を呼び出すことになる：
+
+```javascript
+let controller = new AbortController();
+fetch(url, {
+    signal: controller.signal
+});
+```
+
+`fetch` が中止されると、その promise は `AbortError` を送出して reject する。
+`try..catch` などで処理する必要がある。
+
 ### AbortController is scalable
+
+`AbortController` は複数の非同期タスクを一度に中止することができる。
+
+```javascript
+let urls; // a list of urls to fetch in parallel
+
+let controller = new AbortController();
+
+let fetchJobs = urls.map(url => fetch(url, {
+    signal: controller.signal
+}));
+
+let results = await Promise.all(fetchJobs);
+
+// if controller.abort() is called from anywhere,
+// it aborts all fetches
+```
 
 ## Fetch: Cross-Origin Requests
 
 <https://javascript.info/fetch-crossorigin> のノート。
 
+もし他のウェブサイトに `fetch` 要求を送ると、まず失敗するだろう。
+
+核となる概念は domain/port/protocol の三つ組からなる origin だ。
+
+Origin をまたぐ要求はリモート側から特別なヘッダーを要求される。
+そのような方針は CORS: Cross-Origin Resource Sharing と呼ばれる。
+
 ### Why is CORS needed? A brief history
+
+CORS は邪悪なハッカーからインターネットを保護するために存在する。
+
+あるサイトのスクリプトが他のサイトの内容にアクセスすることはできない。古のこの単
+純かつ強力な規則は、インターネット安全保障の基礎だった。例えば、ウェブサイト
+hacker.com の悪質なスクリプトは、ウェブサイト gmail.com の利用者のメールボックス
+にアクセスできない。
+
+また、JavaScript には当時、ネットワークへの要求を実行するための特別な手段がな
+かった。しかし、ウェブ開発者はもっと強力なものを求めた。そこで、この制約を回避
+し、他のWeb サイトに要求するためのさまざまな小細工を考案した。
 
 #### Using forms
 
+他のサーバーと通信する方法の一つは、そこに FORM を送信することだった。人々は、現
+在のページにとどまるために、IFRAME にそれを submit した。
+
+そのため、ネットワークメソッドがなくても、フォームはどこにでもデータを送ることが
+できるため、他のサイトに GET/POST 要求をすることは可能だった。しかし、IFRAME の
+内容に他のサイトからアクセスすることは禁じられているため、応答を読むことはできな
+かった。
+
+正確には、そのための仕掛けがあったが、それは IFRAME とページの両方で特別なスクリ
+プトを必要とした。つまり、IFRAME との通信は技術的には可能だった。
+
 #### Using scripts
 
+もう一つの方法は SCRIPT タグを使うことだ。スクリプトは
+
+```html
+<script src="http://another.com/...">
+```
+
+のように、任意の `src` とドメインを持てる。どのウェブサイトからでもスクリプトを実行できる。
+
+ウェブサイト、例えば another.com がこのようなアクセスのためにデータを公開しようとする場合、
+いわゆる JSONP (JSON with padding) プロトコルが使われた。
+
+詳しい説明は本書のとおりで、リモート側で JavaScript コードを動的に生成することが急所になっている。
+生成コードはクライアント側で定義された JavaScript 関数を呼び出すようなものらしい。
+
+両者がこの方法でデータを渡すことに合意しているので、うまくいくし、安全保障に違反もしない。
+そして、双方が同意している場合、それは間違いなくハッキングではない。
+古いブラウザーでも動作するため、このようなアクセスを供与するサービスはまだ存在する。
+
+やがて、ブラウザーの JavaScript にネットワーク方式が登場した。
+
+当初、origin をまたぐ要求は禁じられていたが、長い議論の結果、それが許可されました。
+新しい機能は、特別なヘッダーで表現された、サーバーによる明示的な許可が必要だ。
+
 ### Safe requests
+
+オリジン横断要求には安全な要求とそれ以外に分類できる。前者は作るのがより簡単なの
+で、まずはそれから始める。
+
+要求は次の二つの条件を満たすと安全だ：
+
+1. メソッドが安全であること：GET, POST, HEAD のいずれかである。
+2. ヘッダーが安全であること：カスタムヘッダーとして認められるのは次のいずれかだ：
+   * Accept
+   * Accept-Language
+   * Content-Language
+   * Content-Type であり、その値が次のいずれかであるもの：
+     * application/x-www-form-urlencoded
+     * multipart/form-data
+     * text/plain
+
+上記以外の要求は「安全でない」とみなされる。本質的な違いは、安全な要求は特別なメ
+ソッドなしに FORM や SCRIPT で行なえるということだ。したがって、古いサーバーでも
+安全な要求を受け入れることができるはずだ。それとは逆に、非標準のヘッダーや、例え
+ば DELETE メソッドを持つ要求を、この方法で作成することはできない。
+
+安全でない要求を行おうとすると、ブラウザーは特別な preflight 要求を送信し、この
+ようなオリジン横断的要求を受け入れることに同意するかどうかをサーバーに問う。そし
+て、サーバーがヘッダーで明示的に確認しない限り、安全でない要求は送信されない。
 
 ### CORS for safe requests
 
