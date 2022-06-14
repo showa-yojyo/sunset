@@ -431,29 +431,240 @@ hacker.com の悪質なスクリプトは、ウェブサイト gmail.com の利�
 
 ### CORS for safe requests
 
+要求がオリジンを横断する場合はいつでも、ブラウザーは `Origin` ヘッダーを追加する。
+例では `https://javascript.info/page` から `https://anywhere.com/request を要求するときのヘッダーを示している。
+
+```text
+GET /request
+Host: anywhere.com
+Origin: https://javascript.info
+...
+```
+
+`Origin` ヘッダーには要求側の domain/protocol/port すなわち origin を含むことに注意する。
+これはパスを含まない。
+
+サーバーは `Origin` を検査することができ、要求を受け入れることに同意すれば、特別なヘッダー
+`Access-Control-Allow-Origin` を応答に追加する。そのヘッダーは、許可された origin または
+星印 `*` を含むべきである。そうなれば応答は成功であり、下記のような応答がサーバーから得られる。
+そうでない場合は失敗だ。本書ではこの説明を Sequence diagram で表現している。
+
+```text
+200 OK
+Content-Type:text/html; charset=UTF-8
+Access-Control-Allow-Origin: https://javascript.info
+```
+
 ### Response headers
+
+オリジン横断的要求では、JavaScript はいわゆる「安全な」応答ヘッダーにしかアクセスすることができない。
+次の六つしかないようだ：
+
+* `Cache-Control`
+* `Content-Language`
+* `Content-Type`
+* `Expires`
+* `Last-Modified`
+* `Pragma`
+
+それ以外の応答ヘッダーへのアクセスはエラーとなる。
+
+JavaScript に他の応答ヘッダーへのアクセスを許可するには、サーバーは
+`Access-Control-Expose-Headers` ヘッダーを送信する必要がある。これには、
+アクセスしたいヘッダー名をカンマで区切ったリストが入っている。
+
+```text
+200 OK
+Content-Type:text/html; charset=UTF-8
+Content-Length: 12345
+API-Key: 2c9de507f2c54aa1
+Access-Control-Allow-Origin: https://javascript.info
+Access-Control-Expose-Headers: Content-Length,API-Key
+```
+
+このような `Access-Control-Expose-Headers` ヘッダーを得て、要求側のスクリプトが応答の
+`Content-Length` および `API-Key` ヘッダーを読み取ることを許される。
 
 ### "Unsafe" requests
 
+GET, POST, PATCH, DELETE など、あらゆる HTTP method を利用することができる。
+
+少し前までは、ウェブページがそのような要求をするという想定がなかった。そのため、
+非標準のメソッドを「それはブラウザーではない」と警戒して扱うウェブサービスがまだ
+存在する可能性がある。アクセス権をチェックするときに、それを考慮することができ
+る。
+
+そこで、サービスからの誤解を避けるために、「安全でない」どんな要求でも、ブラウ
+ザーはそのような要求をすぐにはしない。まず、予備的要求を送り、許可を得る。
+
+予備要求では、HTTP method OPTIONS を使用し、主文はなく、ヘッダーを三つ使用する：
+
+* `Access-Control-Request-Method`: 安全でない要求の HTTP method
+* `Access-Control-Request-Headers`: それの安全でない HTTP ヘッダーからなるカンマ区切りリスト
+* `Origin`: 要求元であるオリジン
+
+サーバーが要求の処理に同意した場合、空の主文、ステータス 200、次のヘッダーで応答してしかるべきだ：
+
+* `Access-Control-Allow-Origin`: 文字 `*` または許可をする要求しているオリジン
+* `Access-Control-Allow-Methods`: 許可した HTTP method
+* `Access-Control-Allow-Headers`: 許可した HTTP ヘッダーのリスト
+
+さらに、ヘッダー `Access-Control-Max-Age` で、許可をキャッシュする秒数を指定できる。
+そのため、ブラウザーは与えられた許可を満たす後続の要求に対して予備要求を送信する必要がなくなる。
+
+本書では、オリジン横断的 PATCH 要求を例に、その仕組みを順を追って解説している。
+PATCH method というのはデータの更新によく使われる HTTP method とのことだ。
+
+```javascript
+let response = await fetch('https://site.com/service.json', {
+  method: 'PATCH',
+  headers: {
+    'Content-Type': 'application/json',
+    'API-Key': 'secret'
+  }
+});
+```
+
+当要求が安全でない理由は三つある（一つでもある時点でこの仕組を要する）：
+
+* PATCH method それ自体
+* `Content-Type` の値が次のどれでもない：
+  * application/x-www-form-urlencoded
+  * multipart/form-data
+  * text/plain
+* `API-Key` ヘッダーは安全でないとされる
+
 #### Step 1 (preflight request)
+
+このような要求を送信する前に、ブラウザーが独自に次のような予備要求を送信する：
+
+```text
+OPTIONS /service.json
+Host: site.com
+Origin: https://javascript.info
+Access-Control-Request-Method: PATCH
+Access-Control-Request-Headers: Content-Type,API-Key
+```
+
+OPTIONS は要求側のスクリプトのパスからなる。Host は先方のドメイン？
+残り三つは先述のものだ。
 
 #### Step 2 (preflight response)
 
+成功すれば、予備応答は上の残り三つと記したヘッダーを部分的に含む。これをもって将
+来の通信が可能になる。もしサーバーが将来的に他のメソッドやヘッダーを期待するので
+あれば、それらをリストに追加することで事前に許可するのが自然だ。たとえば、次の応
+答例は PUT, DELETE, さらなるヘッダーも許可していると取れる：
+
+```text
+200 OK
+Access-Control-Allow-Origin: https://javascript.info
+Access-Control-Allow-Methods: PUT,PATCH,DELETE
+Access-Control-Allow-Headers: API-Key,Content-Type,If-Modified-Since,Cache-Control
+Access-Control-Max-Age: 86400
+```
+
+以上でブラウザーが本要求を送信することができるようになった。
+
+ヘッダー `Access-Control-Max-Age` に秒数があれば、指定された時間だけ予備要求の許
+可がキャッシュされる。上記の応答では、86400 秒キャッシュされる。この時間枠内であ
+れば、それ以降の予備要求が発生することはない。キャッシュされた許容範囲内であれ
+ば、直接の送信が起こる。
+
 #### Step 3 (actual request)
+
+予備要求が成功したら、今度はブラウザーが主要求を行う。オリジン横断的要求ゆえ、本
+要求には `Origin` ヘッダーがあるが、処理は安全な要求と違いはない。
 
 #### Step 4 (actual response)
 
+サーバーは `Access-Control-Allow-Origin` を主応答に追加することを忘れてはならない。
+予備要求が成立しても、それから解放されるわけではない。
+
+これで `JavaScript` はサーバーの主応答を読むことができる。
+
 ### Credentials
+
+JavaScript コードによって開始されたオリジン横断的要求には、Cookie や HTTP 認証な
+どといった資格証が何もない。それは HTTP 要求では珍しいことだ。通常、あるドメイン
+への要求は、そのドメインからのすべての Cookies を伴う。一方、JavaScript のメソッ
+ドによって行われるオリジン横断的要求は例外だ。たとえば
+`fetch('http://another.com')` はドメイン `another.com` に属するものでさえ、どん
+な Cookie も送らない。
+
+それはなぜかというと、資格証付きの要求ははるかに強力だからだ。もし許可されれば、
+利用者の代理として行動し、その資格証を使って機密情報にアクセスする全権限を
+JavaScript に供与することになる。サーバーはスクリプトを本当にそこまで信頼してい
+るだろうか。ならば、追加ヘッダーで資格証付き要求を明示的に許可しなければな
+らない。
+
+```javascript
+fetch('http://another.com', {
+    credentials: "include"
+});
+```
+
+これで `fetch` は `another.com` から発信された Cookie をそのサイトへの要求と一緒に送る。
+
+サーバーが認証情報を含む要求を受け入れることに同意した場合、
+`Access-Control-Allow-Origin` に加えて、応答に
+
+```text
+Access-Control-Allow-Credentials: true
+```
+
+というヘッダーを追加する必要がある。
+
+注意として、`Access-Control-Allow-Origin` では、資格情報を含むリクエストに星印 `*`
+を使用することは禁止されている。正確なオリジンをそこに記さなければならない。これ
+は追加的な安全対策であって、そのような要求をするために誰が信頼できるかをサーバー
+が本当に知っているかを確認するのが目的だ。
 
 ### Tasks
 
 #### Why do we need Origin?
 
+HTTPS から HTTP のページを取得する場合など、Referer が存在しない場合がある。
+このため Origin が必須となる。
+Content Security Policy で Referer を送ることが禁止されている場合もある。
+
+まさに Referer が信頼できないからこそ Origin が発明された。
+ブラウザーはオリジン横断的要求に対して正しい Origin を保証している。
+
 ## Fetch API
 
 <https://javascript.info/fetch-api> のノート。
 
+ここで学ぶオプションのほとんどはめったに使用されない。それでも、
+`fetch` で何ができるかを知っておくのは良いことだ。
+
+冒頭のコード片は `fetch` の引数 `options` の既定値をすべて列挙している。
+このうち `method`, `headers`, `body`, `signal` はすでに習ったので、残りをここでやる。
+
 ### referrer, referrerPolicy
+
+これらのオプションは HTTP Referer ヘッダーをどのように設定するかを制御する。通
+常、このヘッダーは自動的に設定され、要求元のページの URL が含まれる。ほとんどの
+場合、このヘッダーは重要ではないが、安全保障上、削除したり短くしたりすることが意
+味を持つ場合もある。
+
+オプション `referrer` は（現在のオリジン内で）任意の Referer を設定したり、削除したりできる。
+送信しない場合は空文字列を指定する。
+
+オプション `referrerPolicy` は Referer に関する一般的な規則を設ける。
+要求は三つに分類される：
+
+1. 同じオリジンへの要求
+2. 別のオリジンへの要求
+3. HTTPS から HTTP へのリクエスト（安全なプロトコルから危険なプロトコルへの要求）
+
+正確な Referer 値を設定できる `referrer` とは異なり、
+`referrerPolicy` はブラウザーに各要求分類に対する一般的な規則を伝える。
+設定可能な値は Referrer Policy 仕様書に記述がある。
+
+本書のここにある一覧は、取り得る値と意味の対応だ。
+
+本書のここにある表は、取りうる値と要求分類の有効な組み合わせを示している？
 
 ### mode
 
