@@ -804,13 +804,113 @@ window.onunload = function() {
 
 <https://javascript.info/url> のノート。
 
+組み込みクラス `URL` には URL の作成と解析のための便利なインターフェイスがある。
+ただし、`URL` オブジェクトをまさに必要とするネットワークメソッドはなく、文字列で事足りる。
+
 ### Creating a URL
+
+```javascript
+new URL(url, [base])
+```
+
+* `url`: 完全 URL か、または `base` が与えられている場合にはパスのみ
+* `base`: 相対パスから完全 URL を組み立てるための 基準 URL
+
+既存の URL からの相対パスに基づいて、新しい URL を簡単に作成できる。
+
+```javascript
+let url = new URL('https://javascript.info/profile/admin');
+let newUrl = new URL('tester', url); // "https://javascript.info/profile/tester"
+```
+
+`URL` オブジェクトはすぐにその構成要素にアクセスすることができる。
+
+| Property | Specification |
+|----------|---------------|
+| `href` | 完全 URL に等しい文字列 |
+| `protocol` | プロトコルに等しく、コロンで終わる文字列 |
+| `search` | 引数の文字列に等しく、疑問符記号から始まる文字列 |
+| `hash` | 記号 `#` から始まる文字列 |
+
+HTTP 認証がある場合にはプロパティー `user`, `password` もある。
+
+```text
+`http://login:password@site.com`
+```
+
+`URL` オブジェクトを文字列の代わりにネットワーク（および他のほとんどの）メソッドに渡すことができる。
+`fetch` や `XMLHttpRequest` など、URL 文字列が期待される場所のほどんとで使用できる。
+一般に、`URL` オブジェクトは文字列の代わりにどのようなメソッドにも渡すことができる。
+ほとんどのメソッドは文字列変換を行い、`URL` オブジェクトを完全な URL を含む文字列に変換する。
 
 ### SearchParams "?..."
 
+<https://google.com/search?query=JavaScript> のような、検索引数を指定した
+URL を 作成したい。`URL` の引数でそれらを直接指定してもいいが、
+引数に空白や非ラテン文字などが含まれている場合は、符号化する必要がある。
+そこで、そのためのプロパティー `url.searchParams` がある。
+このプロパティーは `URLSearchParams` という型のオブジェクトを値に取る。
+これには、検索引数用の便利なメソッドが用意されている。
+
+| Method | Parameters | Behavior |
+|--------|------------|----------|
+| `append` | `name, value` | 引数を `name` によって加える |
+| `delete` | `name` | 引数を `name` によって除く |
+| `get` | `name` | 引数を `name` によって得る |
+| `getAll` | `name` | 同じ名前の引数すべてを得る |
+| `has` | `name` | 引数が存在するかどうかを `name` によって確かめる |
+| `set` | `name, value` | 引数を割り当てるか上書きする |
+| `sort` | | 引数を `name` によって並び替える |
+
+`URLSearchParams` は `Map` と同様に反復可能だ。
+
+本書の Google に検索クエリーを送信する例は実用的だ。
+
 ### Encoding
 
+RFC3986 という規格があり、URL で利用が許される文字が定義されている。
+例えば、非ラテン文字や空白は UTF-8 コードに置き換えられ、
+`%20` のように記号 `%` で始まる（歴史的な理由から記号 `+` で符号化できる）。
+`URL` はこれらすべてを自動的に処理する。すべての引数を生で与え、`URL` を文字列に変換すればよい。
+
+```javascript
+let url = new URL('https://ru.wikipedia.org/wiki/Тест'); // "https://ru.wikipedia.org/wiki/%D0%A2%D0%B5%D1%81%D1%82"
+```
+
+UTF-8 ではキリル文字が 2 バイトで表現されるため、
+`%xx` が一文字に対して二つ存在することになり、文字列が長くなる。
+
 #### Encoding strings
+
+`URL` が登場する前は、文字列が使われていた。
+現在でも文字列もまだ使うことができる。文字列を使った方が多くの場合コードが短くなる。
+文字列を使う場合、特殊文字を手動で符号化、復号化する必要がある。そのための組み込み関数：
+
+* `encodeURI`
+* `decodeURI`
+* `encodeURIComponent`
+* `decodeURIComponent`
+
+`encodeURI` は URL で完全に禁止されている文字だけを符号化する。
+`encodeURIComponent` は、同じ文字に加えて、`#`, `$`, `&`, `+`, `,`, `/`, `:`,
+`;`, `=`, `?`, `@` を符号化する。
+
+つまり、URL 全体に対しては `encodeURI` を使うことができるが、URL 引数に対しては
+`encodeURIComponent` を代わりに使用するべきなのだ。
+
+```javascript
+let music = encodeURIComponent('Rock&Roll');
+let url = `https://google.com/search?q=${music}`; // "https://google.com/search?q=Rock%26Roll"
+```
+
+クラス `URL` と `URLSearchParams` は、最新の URI 仕様に基づいている。一方、
+`encode` 系関数は廃止された規格 RFC2396 に基づいている。
+1998 年当時存在しなかった IPv6 アドレスの符号化が異なるなど、相違点がいくつかある。
+このような場合はまれで、`encode` 系関数はほとんどの場合うまく動作する。
+
+### Comments
+
+このページのコメント欄は面白い。
 
 ## XMLHttpRequest
 
