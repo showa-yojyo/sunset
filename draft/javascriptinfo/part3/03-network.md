@@ -916,23 +916,196 @@ let url = `https://google.com/search?q=${music}`; // "https://google.com/search?
 
 <https://javascript.info/xmlhttprequest> のノート。
 
+`XMLHttpRequest` は JavaScript で HTTP 要求を行うためのブラウザー組み込み型だ。
+名前に XML という単語を含むが、XML だけでなく、あらゆるデータに対して操作可能だ。
+ファイルのアップロード、ダウンロード、進捗状況の確認など、さまざまなことが可能だ。
+
+現在では `XMLHttpRequest` をやや非推奨とする、より現代的なメソッド `fetch` がもう存在する。
+
+`XMLHttpRequest` が使用される理由は三つ：
+
+1. 歴史的な理由：既存のスクリプトを `XMLHttpRequest` で対応し続ける必要がある。
+2. 古いブラウザーをサポートする必要があり、スクリプトを小さく保ちたいなどの理由で polyfill が欲しくない。
+3. アップロードの進行状況を追跡するなど、`fetch` ではまだできないことをする必要がある。
+
 ### The basics
+
+`XMLHttpRequest` には、動作モードに同期と非同期とがある。
+多くの場合に非同期が使用されるので非同期を先に見ていく。
+
+要求を行うには三段階が必要だ。
+
+1. オブジェクトを生成する。
+2. オブジェクトを初期化する。
+3. 送信する。
+
+```javascript
+let xhr = new XMLHttpRequest();
+xhr.open(method, url, async, user, password);
+xhr.send(body);
+```
+
+コンストラクターは引数を取らない。
+
+メソッド `open` は要求の主要な引数を指定する。後ろ三つは optional だ。
+
+* `method`: ふつうは "GET" か "POST" を指定する。
+* `URL`: 文字列でも、先述のように `URL` オブジェクトをそのまま渡してもいい。
+* `async`: 明示的に `false` を与えた場合には要求は同期的だ。
+* `user`, `password`: 基本的な HTTP 認証のためのログインユーザーとパスワード。
+
+メソッド `open` はその名前に反して接続はしない。要求を設定するだけで、
+ネットワーク活動は `send` の呼び出しによって開始する。
+
+メソッド `send` は接続を開始し、サーバーに要求を送信する。オプション引数 `body` は要求本文だ。
+
+GET のような要求メソッドには本文がないものもある一方、POST のように `body` を使用して
+データをサーバーに送信するものもある。
+
+----
+
+その後の段階としては `xhr` イベントに耳を傾けて応答する。これらのイベントがもっとも広く用いられる：
+
+* `load`: 要求が完了し、HTTP ステータスが 400 や 500 であっても、応答が完全にダウンロードされたとき。
+* `error`: ネットワークダウンや無効な URL など、要求がうまくいかなかった。
+* `progress`: 応答がダウンロードされている間じゅう定期的に呼び出され、ダウンロード量が報告される。
+
+基本的に `xhr.addEventListener('load', ...)` のようにして設定できると思われる。
+
+```javascript
+xhr.onload = function() {
+    if (xhr.status != 200) {
+        alert(`Error ${xhr.status}: ${xhr.statusText}`); // e.g. 404: Not Found
+    } else {
+        alert(`Done, got ${xhr.response.length} bytes`); // response is the server response
+    }
+};
+```
+
+サーバーが応答したら、その結果を次の `xhr` のプロパティーから受け取る：
+
+* `status`: HTTP ステータスコードを表す数値。HTTP 以外の失敗の場合は 0 があり得る。
+* `statusText`: HTTP ステータスメッセージを表す文字列値。404 なら `"Not Found"` のように。
+* `response`: サーバー応答本文。
+
+また、プロパティーを用いてタイムアウトを指定することもできる。
+
+```javascript
+xhr.timeout = 10000; // timeout in ms, 10 seconds
+```
+
+与えられた時間内に要求が成功しない場合、キャンセルされてイベント `timeout` が発生する。
+
+囲み記事については前ページ参照。
 
 ### Response Type
 
+`xhr.responseType` を使用して、応答フォーマットを設定することができる。
+この値を `send` 呼び出しまでに変えると、`xhr.response` の値が対応する内容になる。
+
+| Value | Specification |
+|-------|---------------|
+| "" | 文字列で得る |
+| "text" | 文字列で得る |
+| "arraybuffer" | `ArrayBuffer` として得る |
+| "blob" | `Blob` として得る |
+| "document" | XML 文書または HTML 文書として得る |
+| "json" | JSON として得る |
+
 ### Ready states
+
+`XMLHttpRequest` はその進行に応じて状態が変化する。現在の状態はプロパティー `xhr.readyState` だ。
+状態値は 0 → 1 → 2 → 3 → ... → 3 → 4 の順に移動する。
+ネットワーク上でデータパケットを受信するたびに状態 3 を 反復する。
+
+イベント `readstatechange` を使って追跡することができるが、
+これは古い。現在では `load`/`error`/`progress` ハンドラーがある。
 
 ### Aborting request
 
+要求はいつでも終了させることができる。これにより、`abort` イベントが発生して
+`xhr.status` の値が 0 になる。
+
+```javascript
+xhr.abort(); 
+```
+
 ### Synchronous requests
+
+メソッド `open` には第三の引数 `async` がある。これを `false` とすると、要求が同期的に行われる。
+つまり、JavaScript の実行は `send()` 呼び出しでブロックされ、応答を受信した時点で復帰する。
+
+読み込みが完了するまでページ内の JavaScript をブロックしてしまうので、ほとんど使われない。
+ブラウザーによっては、スクロール不能になるまである。
+同期呼び出しに時間がかかり過ぎる場合、ブラウザーはハングアップしたページを閉じるよう案内することがある。
+
+`XMLHttpRequest` の高度な機能の多くは、同期的要求では使用できない。進行状況の表示もない。
+以上のような理由から、同期的要求はあまり用いられない。
 
 ### HTTP-headers
 
+`XMLHttpRequest` ではカスタムヘッダーの送信と、応答からヘッダーを読み取ることのどちらも可能だ。
+
+| Method | Parameters | Behavior |
+|--------|------------|----------|
+| `setRequestHeader` | `name`, `value` | 指定された `name` と `value` を持つ要求ヘッダーを与える |
+| `getResponseHeader` | `name` | 指定された `name` の応答ヘッダーを得る |
+| `getAllResponseHeaders` | | すべての応答ヘッダーを得る |
+
+`Referer` や `Host` など、ブラウザー専用管理ヘッダーもある。
+`XMLHttpRequest` は利用者の安全と要求の正確さのために、これらを変更することが許されていない。
+
+`setRequestHeader` での設定内容を元に戻すことができないという特徴もある。
+ヘッダーが設定されると、それは設定されたままだ。追加の呼び出しはヘッダーに情報を追加し、上書きはしない。
+
+ここで言う応答ヘッダーには Set-Cookie および Set-Cookie2 は含まれない。
+
+複数ヘッダーは一行で返される。
+
+ヘッダーとヘッダーの間の改行は OS に依らず `\r\n` なので、個々のヘッダーに分割することは容易だ。
+名前と値のセパレーターはコロンの後に空白文字が必ず入る。
+
 ### POST, FormData
+
+POST 要求を行うには `FormData` を用いる。オブジェクト `formData` を用意したら次の手順で：
+
+1. `xhr.open('POST', ...)`
+2. `xhr.send(formData)`
+
+フォームは multipart/form-data 符号様式で送信される。
+
+JSON が好みなら `JSON.stringify` して得られる文字列を送信する。
+ただ、Content-Type: application/json というヘッダーを設定するのを忘れてはいけない。
+サーバーサイドフレームワークの多くは、これで自動的に JSON を復号してくれる。
 
 ### Upload progress
 
+イベント `progress` はダウンロードの段階でだけ発射される。つまり、何かを POST す
+る場合、`XMLHttpRequest` はまずデータ（要求本文）をアップロードし、次に応答をダ
+ウンロードする。何か大きなデータをアップロードする場合、その進行状況を追跡するこ
+とに関心があるはずだ。しかし、`xhr.onprogress` はここで役に立たない。
+
+イベントを追跡するためのメソッドを持たない別のオブジェクト `xhr.upload` がある。
+このオブジェクトは `xhr` と同様にイベントを生成するが、 `xhr.upload` はアップ
+ロード時にだけイベントを発射する。
+
+* `loadstart`: アップロード開始された
+* `progress`: アップロード中に定期的に
+* `abort`: アップロードが中断された
+* `error`: HTTP 以外のエラー
+* `load`: アップロードが正常に終了した
+* `timeout`: アップロードがタイムアウトした
+* `loadend`: 成功またはエラーでアップロードが終了した
+
 ### Cross-origin requests
+
+`XMLHttpRequest` は `fetch` と同じ CORS 方針を使用して、オリジン横断的要求を行うことができる。
+`fetch` 同様に、既定では Cookie と HTTP 認証を別のオリジンに送信しない。
+これらを有効にするには、次のようにする：
+
+```javascript
+xhr.withCredentials = true;
+```
 
 ## Resumable file upload
 
