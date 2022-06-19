@@ -1396,34 +1396,236 @@ A や IMG などのタグと直接統合できるので、既定値としては�
 
 ### Rate limiting
 
+大量のデータを生成して送信しているサービスがあるとする。
+ユーザーはネットワーク接続が遅く、モバイルインターネットや都市部以外の場所にいる可能性がある。
+`socket.send(data)` を何度も何度も呼び出すこともできるが、
+データはメモリーにバッファリング（保存）され、ネットワーク速度が許す範囲でしか送出されない。
+
+プロパティー `socket.bufferedAmount` からは、今現在、何バイトがバッファリングされ、
+ネットワーク上で送信されるのを待っているかを得られる。
+そのソケットが実際に送信可能かどうかを確認できる。
+
+その値が 0 であるならば `send` すればいい。本書では `setInterval` を利用して、
+0.1 秒ごとに値をテストして可能ならば送信するコード片を示している。
+
 ### Connection close
+
+接続を閉じたい側は、数字コードとテキストによる理由を書いた接続終了フレームを送信するのが普通だ。
+
+```javascript
+socket.close([code], [reason]);
+```
+
+引数は全部オプショナル。
+引数 `code` は特別な WebSocket コード。
+引数 `reason` は閉じる理由を述べる文字列。
+
+相手はイベントハンドラー `close` の引数のプロパティーからそれらの値が得られる。
+
+* 1000: 通常の接続終了（コードが提供されない場合に使用）
+* 1006: このようなコードを手動で設定する方法がない。接続が失われた（接続終了フレームがない）。
+
+WebSocket のコードは HTTP のそれとどこか似ているようだが、異なる。
+特に、1000 未満のコードは予約されており、そのようなコードを設定しようとするとエラーになる。
 
 ### Connection state
 
+接続状態を取得するために、さらに、値を持つプロパティー `socket.readyState` がある。
+
+| Code | Value | State |
+|------|-------|-------------|
+| 0 | "CONNECTING" | 接続がまだ確立されていない |
+| 1 | "OPEN" | 通信中 |
+| 2 | "CLOSING" | 接続を閉じている |
+| 3 | "CLOSED" | 接続が閉じた |
+
 ### Chat example
+
+ブラウザーの WebSocket API と Node.js の WebSocketモジュール
+<https://github.com/websockets/ws> を使ったチャットの例。
+ここではクライアント側に主に注目する。
+
+* グローバルに `WebSocket` を wss:// で生成する。
+* `document.forms.publish.onsubmit` ハンドラーでソケットの `send` を呼び出す。
+* `socket.onmessage` ハンドラーでサーバーからの受信メッセージをページ内に追加する。
+
+このデモをダウンロードしてローカルで実行することもできる。`npm install ws` しておくことが必要だ。
 
 ## Server Sent Events
 
 <https://javascript.info/server-sent-events> のノート。
 
+Server-Sent Events 仕様では、サーバーとの接続を維持し、サーバーからのイベントを
+受信することができる組み込みクラス `EventSource` を記述している。
+WebSocket と同様に、接続は永続的だ。しかし、本書の表のように、いくつかの重要な違いがある。
+
+`WebSocket` と比べると `EventSource` はサーバーと通信するための方法としては強力さで劣る。
+なぜそれを使わなければならないのか。
+最大の理由はより単純であることだ。多くのアプリケーションでは `WebSocket` の力はやや過剰だ。
+
+サーバーからデータのストリームを受信する必要がある。
+それはチャットメッセージ、市場価格、その他かもしれない。
+こういうことは `EventSource` が得意とするところだ。
+また、`WebSocket` では手動で実装する必要がある自動再接続も対応している。
+その上、それはれっきとした HTTP であり、新しいプロトコルではない。
+
 ### Getting messages
+
+メッセージの受信を開始するには、新しい `EventSource(url)` を生成する。
+ブラウザは `url` に接続し、接続を開いたままイベントを待つ。
+サーバーはステータス 200 と `Content-Type: text/event-stream` というヘッダーで応答し、
+接続を維持したまま、次のように特別な書式でメッセージを書き込むはずだ：
+
+```text
+data: Message 1
+
+data: Message 2
+
+data: Message 3
+data: of two lines
+```
+
+* メッセージテキストは `data:` の後に続く。コロンの後の空白はオプショナルだ。
+* メッセージの区切りは二重の改行 `\n\n` だ。
+* 単なる `\n` を送るには、すぐにもう一つ `data:` を送る。
+
+実際には、複雑なメッセージは通常 JSON に変換して送信する。改行はその中で `\n`
+として符号化されるので、複数行の `data:` メッセージは必要ではない。
+ゆえに、`data:` 一つがちょうどメッセージ一つを保持していると仮定できる。
+そのようなメッセージごとに、イベント `message` が発生する。
+
+```javascript
+let eventSource = new EventSource("/events/subscribe");
+// or eventSource.addEventListener('message', function(event){ ... })
+eventSource.onmessage = function(event) {
+    console.log("New message", event.data);
+    // will log 3 times for the data stream above
+};
+```
 
 #### Cross-origin requests
 
+`EventSource` は `fetch` やその他のネットワークメソッドのように、オリジン横断的要求を対応している。
+任意の URL を使用できる。
+
+リモートサーバーはヘッダー `Origin`を取得し、処理を続行するには
+ヘッダー `Access-Control-Allow-Origin` で応答しなければならない。
+
+証明証を渡すには、追加オプションの `withCredentials` を設定しなくてはならない。
+
+```javascript
+let source = new EventSource("https://another-site.com/events", {
+    withCredentials: true
+});
+```
+
 ### Reconnection
+
+生成時に、新しい `EventSource` はサーバーに接続し、接続が切れた場合は再接続する。
+これはたいへん便利で、接続切れを気にする必要はない。
+再接続の間にはわずかな遅延があり、既定では 3, 4 秒だ。
+
+サーバーは `retry:` を応答に使って推奨遅延時間を設定できる。
+
+```text
+retry: 15000
+data: Hello, I set the reconnection delay to 15 seconds
+```
+
+ヘッダー `retry:` はデータと一緒に送られてくることもあれば、
+単体メッセージとして送られてくることもある。
+
+ブラウザーは再接続する前に、その時間だけ待たねばならない。
+もっと長い場合もある。たとえば、ブラウザーが現在ネットワーク接続がないことを
+OS から知っている場合、接続が現れるまで待つことができ、それから再試行する。
+
+サーバーがブラウザーに再接続を停止させたい場合は、HTTP ステータス 204 で応答するはずだ。
+ブラウザーが接続を終了させたい場合には、`eventSource.close()` を呼び出すのがいい。
+
+また、応答の `Content-Type` が正しくない場合や、HTTP ステータスが 301, 307, 200,
+204 と異なる場合は、再接続はないはずだ。このような場合、イベント `"error"` が発生し、
+ブラウザーは再接続しようとしない。
+
+----
+
+最終的に接続を閉じた場合、それを再開する方法はない。
+再び接続したいならば新しい `EventSource` を生成するだけだ。
 
 ### Message id
 
+ネットワーク問題で接続が切れた場合、どちらの側もどのメッセージが受信されてどのメッセージが受信されていないのかを確認できない。
+接続を正しく再開するために、メッセージそれぞれには `id` フィールドがあるといい：
+
+```text
+data: Message 1
+id: 1
+
+data: Message 2
+id: 2
+
+data: Message 3
+data: of two lines
+id: 3
+```
+
+`id:` があるメッセージを受信した場合、ブラウザーは
+
+* プロパティー `eventSource.lastEventId` の値をそれにする。
+* 再接続時にヘッダー `Last-Event-ID` をその `id` で送信し、サーバーが次に続くメッセージを再送信できるようにする。
+
+----
+
+メッセージ受信後、`lastEventId` を確実に更新するために、サーバーは `id` をメッセージデータの下に付加する。
+
 ### Connection status: readyState
+
+`EventSource` はプロパティー `readyState` を持ち、その値は三つのうちの一つだ：
+
+```javascript
+EventSource.CONNECTING = 0; // connecting or reconnecting
+EventSource.OPEN = 1;       // connected
+EventSource.CLOSED = 2;     // connection closed
+```
+
+オブジェクトが生成したときや、接続が切れたときは、`EventSource.CONNECTING` につねに等しい。
+このプロパティーを照会することで、`EventSource` の状態を知ることができる。
 
 ### Event types
 
+既定では、`EventSource` オブジェクトはイベント三つを発生させる：
+
+* `message`: 受信したメッセージ。`event.data` として利用可能。
+* `open`: 接続が開いた。
+* `error`: 接続を確立できなかった。例えばサーバーが 500 を返した。
+  
+イベント開始時に、サーバーは `event: ...` で別の型のイベントを指定してもよい。
+たとえば：
+
+```text
+event: join
+data: Bob
+
+data: Hello
+
+event: leave
+data: Bob
+```
+
+カスタムイベントを処理するには、`onmessage` ではなく、`addEventListener` を使用する必要がある。
+
+```javascript
+eventSource.addEventListener('join', event => {
+    alert(`Joined ${event.data}`);
+});
+```
+
 ### Full example
 
-#### Properties of an EventSource object
+これはメッセージ `1`, `2`, `3`, `bye` を送信してから、接続を切断するサーバーだ。
+その後、ブラウザーが自動的に再接続する。
 
-#### Methods
+server.js のコードを見ると、この直前に述べられているように、ヘッダーを定義してい
+るのがなんとかわかる。
 
-#### Events
-
-#### Server response format
+index.html のコードでは `EventSource` を生成して、この直前に述べられているよう
+に、イベントハンドラーを定義していることがわかる。
