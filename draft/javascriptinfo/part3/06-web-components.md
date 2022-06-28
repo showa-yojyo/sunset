@@ -307,17 +307,114 @@ elem.addEventListener('tick', event => console.log(event.detail));
 
 <https://javascript.info/shadow-dom>
 
+Shadow DOM はカプセル化のために機能する。これにより、コンポーネントはそれ自身
+の「影」の DOM 木を持つことができ、主ページから誤ってアクセスされることはないし、
+スタイルに関するハウスルールなどを決めることもできる。
+
 ### Built-in shadow DOM
+
+`<input type="range">` などを、ブラウザーは内部で DOM/CSS を使って描画している。
+この DOM 構造は開発者向けツールで見られる。
+Google Chrome の場合、開発ツールの Show user agent shadow DOM オプションを有効にする必要がある。
+
+※どこにあるのか不明
+
+```html
+<input type="range">
+    #shadow-root (user-agent)
+    <div>
+        <div pseudo="-webkit-slider-runnable-track" id="track"></div>
+        <div id="thumb"></div>
+    </div>
+</input>
+```
+
+この `#shadow-root` の下に表示されるものを shadow DOM と呼ぶ。
+
+通常の JavaScript の呼び出しやセレクターでは、組み込み shadow DOM 要素を取得でき
+ない。これらは通常の子要素ではなく、強力なカプセル化技術なのだ。上の例では、便利
+な属性 `pseudo` があることがわかる。これは非標準的なもので、歴史的な理由から存在
+する。この属性は、CSS で部分要素のスタイルを指定するために用いられる。
+
+```css
+input::-webkit-slider-runnable-track {
+    background: red;
+}
+```
+
+時系列的には、ブラウザーが DOM の内部構造を使ってコントロールを実装する実験を始
+めたのが`pseudo` の嚆矢で、その後、開発者が同様のことを行えるように shadow DOM
+が標準化された。
+
+この先は現代の shadow DOM 標準を使用する。
 
 ### Shadow tree
 
+DOM 要素は、二種類の DOM 部分木があり得る。
+
+1. Light tree: 通常の DOM 部分木であって、HTML の子要素で構成されている。
+   これまでの章で見てきた部分木はすべて light だ。
+2. Shadow tree: HTML に反映されない、のぞき見されない隠れた DOM 部分木。
+
+要素が両方を持つ場合、ブラウザーは shadow tree しか描画しない。しかし、
+shadow tree と light tree の間にある種の合成を設定することも可能だ（詳細は後述）。
+
+Shadow tree をカスタム要素で使用して、コンポーネント内部を隠したり、コンポーネント固有のスタイルを適用したりすることができる。
+たとえば、本書の `<show-hello>` 要素は shadow tree でその内部 DOM を隠蔽する。
+Google Chrome の開発ツールで結果の DOM を見ると、内容物すべてが `#shadow-root` の下にあることがわかる。
+
+```html
+<show-hello name="John">
+    #shadow-root (open)
+    <p>Hello, John</p>
+</show-hello>
+```
+
+最初に `elem.attachShadow({mode: ...})` 呼び出しが shadow tree を生成する。
+制約が二つある：
+
+1. 要素一つにつき shadow root を一つしか生成できない。
+2. `elem` はカスタム要素か、次のうちの一つでなければならない：
+   * article
+   * aside
+   * blockquote
+   * body
+   * div
+   * footer
+   * h1...h6
+   * header
+   * main
+   * nav
+   * p
+   * section
+   * span
+
+オプション `mode` は、カプセル化レベルを設定する。
+
+* "open": shadow root が `elem.shadowRoot` として利用可能。
+  どんなコードでも `elem` の shadow tree にアクセスすることができる。
+* "closed": `elem.shadowRoot` は常に `null` となる。
+
+`attachShadow()` が返す参照によってしか shadow DOM にアクセスできない。
+`<input type="range">` のようなブラウザーネイティブの shadow tree は閉じている。
+それらにアクセスする方法はない。
+
+`attachShadow()` が返す shadow root は要素のようなもので、
+`innerHTML` や `append()` などの DOM メソッドを使用して、shadow root に情報を入力することができる。
+
+Shadow root を持つ要素は shadow tree host と呼ばれ、プロパティー `host`として利用可能だ。
+
 ### Encapsulation
 
-### References
+Shadow DOM はメインドキュメントから強く分離される。
 
-### Summary
+1. Shadow DOM の要素は light DOM の `querySelector` からは見えない。特に、
+   Shadow DOM の要素は light DOM の要素と矛盾する ID を持つ可能性がある。それらは
+   shadow tree の中でのみ一意的でなければならない。
+2. Shadow DOM は独自のスタイルシートを持つ。外部 DOM からのスタイルルールは適用されない。
 
-### Comments
+ドキュメントからのスタイルは shadow tree に影響を与えない。
+Shadow tree の要素を取得するには、木の内側から問い合わせを実行する必要がある。
 
 ## Template element
 
