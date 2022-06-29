@@ -420,11 +420,75 @@ Shadow tree の要素を取得するには、木の内側から問い合わせ�
 
 <https://javascript.info/template-element>
 
+組み込み `<template>` 要素は、HTML マークアップテンプレート置場として機能する。
+ブラウザーはその内容を無視し、構文の妥当性のチェックしかしないが、
+JavaScript でそれにアクセスし、他の要素を作成するのに利用できる。
+
+`<template>` の内容は、通常は適切な囲みタグを必要とするものであっても、有効な
+HTML であれば何でもよい。例えば、テーブルの行 `<tr>` をそこに置くことができる。
+通常、`<tr>` を例えば `<div>` の中に置こうとすると、ブラウザーは無効な DOM 構造
+を検出し、それを「修正」して `<table>` を周囲に追加する。一方、`<template>` は、
+そこに置いたものをそのまま保持する。
+
+`<template>` にはスタイルやスクリプトを入れることもできる。
+
+ブラウザーは `<template>` 内容物を「文書の外にある」と見なす。つまりスタイルは適用さ
+れず、スクリプトは実行されず、`<video autoplay>` は実行されない、など。
+内容物は、ページに挿入された時点で生を受ける（スタイルが適用され、スクリプトが実行され、……）。
+
 ### Inserting template
 
-### Summary
+テンプレートの内容物はプロパティー `content` に DOM ノードの特殊な型である
+`DocumentFragment` として利用可能だ。
+これを他の DOM ノードと同じように扱うことができるが、特別な特性が一つある。
+これをどこかに挿入すると、代わりにその子（複数形）が挿入される。
 
-### Comments
+本書のコードを示す：
+
+```html
+<template id="tmpl">
+  <script>
+    alert("Hello");
+  </script>
+  <div class="message">Hello, world!</div>
+</template>
+
+<script>
+  let elem = document.createElement('div');
+  elem.append(tmpl.content.cloneNode(true));
+  document.body.append(elem);
+</script>
+```
+
+スクリプト部分を読むと、ページ内の `template` 要素への `cloneNode()` 呼び出しがあることがわかる。
+これは `template` ではなく、その子である `script` および `div` の二つを複製するということになる。
+複製を新規作成した `div` の末尾に差し込んでいる。実行ボタンを押せば上の解読が正しそうだと思える。
+
+----
+
+前章の shadow DOM の例（に似たもの）を `template` を使って書き換える。
+Shadow DOM 版はこういう感じ：
+
+```javascript
+elem.attachShadow({mode: 'open'});
+elem.shadowRoot.innerHTML = `
+    <style> p { font-weight: bold; } </style>
+    <p id="message">Hello from the shadows!</p>
+`;
+```
+
+これがこうなる：
+
+```javascript
+elem.attachShadow({mode: 'open'});
+elem.shadowRoot.append(tmpl.content.cloneNode(true));
+elem.shadowRoot.getElementById('message').innerHTML = "Hello from the shadows!";
+```
+
+`tmpl.content` を複製して挿入する行では、その `DocumentFragment` として、
+その子である `style`, `p` が代わりに挿入される。
+
+これらは shadow DOM を形成する。
 
 ## Shadow DOM slots, composition
 
