@@ -494,21 +494,211 @@ elem.shadowRoot.getElementById('message').innerHTML = "Hello from the shadows!";
 
 <https://javascript.info/slots-composition>
 
+タブ、メニュー、イメージギャラリーなど、多くの種類のコンポーネントがレンダリング
+のために中身を必要とする。組み込み `<select>` が `<option>` を期待するように、自
+作 `<custom-tabs>` や `<custom-menu>` は実際のタブ中身やメニュー項目が渡されるこ
+とを期待するだろう。
+
+```html
+<custom-menu>
+  <title>Candy menu</title>
+  <item>Lollipop</item>
+  <item>Fruit Toast</item>
+  <item>Cup Cake</item>
+</custom-menu>
+```
+
+与えられたタイトルとアイテムから、自作メニューを適切に描画したりイベント処理をしたりする必要がある。
+
+どのように実装するのか？
+要素の内容を解析して、DOM ノードを動的にコピーして並べ替えることもできる。
+それでもいいが、要素を shadow DOM に移動する場合、ドキュメントからの CSS スタイル
+はそこに適用されないので、視覚的スタイルが失われる可能性がある。また、その
+ために追加的なコーディングが必要だ。
+
+幸いなことに、その必要はない。Shadow DOM は `<slot>` 要素をサポートしてお
+り、light DOM からの中身で自動的に埋まる。
+
 ### Named slots
+
+簡単な例で、スロットがどのように機能するかを見る。
+本書のコードでは `<user-card>` shadow DOM がスロットを二つ持ち、light DOM から埋められる。
+
+スクリプトコードで `innerHTML` として現れている shadow DOM では、
+`<slot name="X">` が挿入ポイント、つまり `slot="X"` 要素が描画される場所を定義している。
+
+すると、ブラウザーは「合成」をする。HTML コードで現れている Light DOM から要素を
+取得し、shadow DOM の対応するスロットに描画する。最終的には、データを埋めること
+ができるコンポーネントが完成する。
+
+学習者ノート：本書では合成を考慮しないスクリプト実行後の DOM 構造がここに書かれている。
+これは Google Chrome の検証ツールで示されるものと同じだ。
+
+これで、この要素は light と shadow の両方の DOM を持つようになった。
+
+描画するには、shadow DOM の各 `<slot name="...">` に対して、ブラウザーは light
+DOM で同じ名前の`<slot="...">` を見つける。これらの要素はスロットの内部で描画さ
+れる。その結果を平坦化 DOM と呼ぶ。
+
+しかし、平坦化 DOM は描画とイベント処理のためだけに存在する。実際にはドキュメン
+ト内のノードは移動していないのだ。このことは `querySelectorAll()` を実行すれば簡
+単に確認できる。ノードはまだ元の場所にある。
+
+つまり、平坦化 DOM は、スロットを挿入することで shadow DOM から派生したものだ。
+ブラウザーはこれを描画し、スタイル継承やイベント伝達に用いる。しかし JavaScript
+では平坦化前のままのドキュメントを見ている。
+
+----
+
+囲み記事：トップレベルの子しか `slot="..."` 属性を持てない。
+属性 `slot="..."` は、shadow host の直接の子要素に対してしか有効でない。入れ子要素では無視される。
+次の例では二番目の `<span>` は `<user-card>` の最上位の子ではないので無視される。
+
+```html
+<user-card>
+  <span slot="username">John Smith</span>
+  <div>
+    <span slot="birthday">01.01.2001</span>
+  </div>
+</user-card>
+```
+
+----
+
+Light DOM 内に同じスロット名を持つ要素が複数ある場合、それらは順番にスロットに追加される。
 
 ### Slot fallback content
 
+`<slot>` の中に何かを入れると、それが既定の中身になる。
+対応する中身に相当するものが light DOM にない場合、ブラウザーはその `<slot>` の中の何かを表示する。
+たとえば、この shadow DOM の断片で light DOM に `slot="username"` がない場合、Anonymous が表示される：
+
+```html
+<div>Name:
+  <slot name="username">Anonymous</slot>
+</div>
+```
+
 ### Default slot: first unnamed
+
+Shadow DOM の `<slot>` で名前を持たない最初のものが既定スロットだ。
+これは、他の場所でスロット化されていない light DOM のノードすべてを得る。
+
+例えば shadow DOM を次のようにする：
+
+```html
+<div>Name:
+  <slot name="username"></slot>
+</div>
+<div>Birthday:
+  <slot name="birthday"></slot>
+</div>
+<fieldset>
+  <legend>Other information</legend>
+  <slot></slot>
+</fieldset>
+```
+
+ノート：この `<slot></slot>` が既定スロットとなる。
+
+対応する light DOM を次のようにしてみる：
+
+```html
+<user-card>
+  <div>I like to swim.</div>
+  <span slot="username">John Smith</span>
+  <span slot="birthday">01.01.2001</span>
+  <div>...And play volleyball too!</div>
+</user-card>
+```
+
+スロットされていない light DOM の中身である `<div>` 要素二つは、すべて Other
+information の次要素として入る（本書の平坦化 DOM 参照）。要素は次々とスロットに
+追加されるので、スロットされていない両方の情報が一緒に既定スロットに入る。
 
 ### Menu example
 
+本章冒頭の `<custom-menu>` を考える。スロットを使って、要素を分散させることがで
+きる。`<custom-menu>` を次のように定義する：
+
+```html
+<custom-menu>
+  <span slot="title">Candy menu</span>
+  <li slot="item">Lollipop</li>
+  <li slot="item">Fruit Toast</li>
+  <li slot="item">Cup Cake</li>
+</custom-menu>
+```
+
+これに対応する、適切なスロットを持つ shadow DOM テンプレートをこうする：
+
+```html
+<template id="tmpl">
+  <style> /* menu styles */ </style>
+  <div class="menu">
+    <slot name="title"></slot>
+    <ul><slot name="item"></slot></ul>
+  </div>
+</template>
+```
+
+1. `<span slot="title">` は `<slot name="title">` に入る。
+2. `<li slot="item">` が複数あるが、`<slot name="item">` は一つしかない。そのよ
+   うな `<li slot="item">` はすべて `<slot name="item">` に次々と追加され、リス
+   トを形成する。
+
+本書の平坦化 DOM の模式図を参照。
+有効な DOM において、`<li>` は `<ul>` の直接の子でなければならない。
+しかし、これは平坦化 DOM であり、コンポーネントがどのように描画されるかを記述するもので、
+ここではそのようなことは自然に起こる。
+
+あとは、リストを開閉するためのクリックハンドラーを追加して `<custom-menu>` が完成する
+（本書で実装例を示している）。イベントやメソッドなど、より多くの機能を追加することも可能だ。
+
 ### Updating slots
+
+外側のコードでメニュー項目を動的に追加削除したければどうするだろうか。ブラウザー
+はスロットを監視し、スロットの要素が追加削除された場合に描画を更新する。ま
+た、light DOM ノードはコピーされず、スロットに描画されるだけなので、その内部の変
+更はすぐに顕在化する。
+
+そのため、描画を更新するために何かする必要はない。しかし、コンポーネントコードが
+スロットの変更について知りたい場合は、イベント `slotchange` を利用できる。
+
+本書では、メニュー項目を一秒後に動的に挿入し、タイトルを二秒後に変更するコードを示している。
+ここでイベント `slotchange` が二つある。
+
+1. 初期化時
+
+   light DOM から `slot="title"` が対応するスロットに入ったときにすぐに発射する。
+
+2. 一秒後
+
+   新しい `<li slot="item">` が追加されたときに発射する。
+
+なお、二秒後 `slot="title"` の内容が変更されるが、イベント `slotchange` は発射しない。
+スロットが変更されないから。スロットされた要素内の中身を変更するのだが、別のことだ。
+
+JavaScript から light DOM の内部変更を追跡したい場合、より汎用的な
+`MutationObserver` の仕組みを利用することもできる。
 
 ### Slot API
 
-### Summary
+前に見たように、JavaScript は平坦化せずに実際の DOM を見る。しかし、shadow tree
+が `{mode: 'open'}` を持っていれば、どの要素がスロットに割り当てられている
+か、逆に、その中の要素によってスロットを把握することができるのだ。
 
-### Comments
+* `slot.assignedNodes({flatten: true/false})`: スロットに割り当てられた DOM ノー
+  ドを返す。オプション `flatten` は `false` が既定値だ。明示的に `true` に設定す
+  ると、平坦化 DOM をより深く調べ、入れ子コンポーネントの場合は入れ子スロットを
+  返し、ノードが割り当てられていない場合はフォールバック用の値を返す。
+* `slot.assignedElements({flatten: true/false})`: スロットに割り当てられた DOM
+  要素。ただし要素ノード限定。
+
+これらのメソッドは、スロットされたコンテンツを表示するだけでなく、JavaScript で
+それを追跡する必要がある場合に便利だ。例えば `<custom-menu>` コンポーネントが何
+を表示しているかを知りたい場合、イベント `slotchange` を追跡し、
+`slot.assignedElements()` から項目を得られる。
 
 ## Shadow DOM styling
 
