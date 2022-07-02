@@ -704,19 +704,176 @@ JavaScript から light DOM の内部変更を追跡したい場合、より汎�
 
 <https://javascript.info/shadow-dom-style>
 
+Shadow DOM は `<style>` タグと `<link rel="stylesheet" href="...">` タグの両方を
+含んでも構わない。後者の場合、スタイルシートが HTTP キャッシュされるので、同じテ
+ンプレートを使用するコンポーネントのためにまたぞろダウンロードされることはない。
+
+一般的な規則として、ローカルスタイルは shadow tree 内部でのみ機能し、ドキュメントスタイルはその外部で機能する。
+しかし、例外がいくつかある。
+
 ### :host
+
+セレクター `:host` は shadow host すなわち shadow tree を含む要素を選択するものだ。
+
+例えば、`<custom-dialog>` 要素を中央揃えで作成したいとする。そのためには、
+`<custom-dialog>` 要素自体にスタイルを設定する必要がある。
+
+学習者ノート：本書のコードを観察すると、
+`<template>` で `:host` スタイルを中央揃えとなるように設定していることがわかる。
 
 ### Cascading
 
+Shadow host（ここでは `<custom-dialog>` 自体が相当する）は light DOM に存在する
+ため、ドキュメントの CSS 規則の影響を受ける。
+ローカルに `:host` でスタイル付けされたプロパティーと、ドキュメントでスタイル付けされたプロパティーがある場合、後者が優先される。
+
+これはたいへん便利で、その `:host` 規則で既定のコンポーネントスタイルを設定し、ドキュメントでそれを容易に上書きできる。
+例外は、ローカルプロパティーが `!important` とラベル付けされている場合だ。
+このようなプロパティーではローカルスタイルが優先される。
+
 ### :host(selector)
+
+`:host(selector)` は `:host` と同じだが、与えられたセレクター `selector` に
+shadow host がマッチする場合にしか適用されない。
+
+例えば、`<custom-dialog>` が属性 `centered` を持っている場合にのみ、中央寄せにしたい場合は次でいい：
+
+```html
+<template id="tmpl">
+  <style>
+    :host([centered]) {
+      position: fixed;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      border-color: blue;
+    }
+
+    :host {
+      display: inline-block;
+      border: 1px solid red;
+      padding: 10px;
+    }
+  </style>
+  <slot></slot>
+</template>
+
+...
+
+<script>
+customElements.define(...);
+</script>
+
+<custom-dialog centered>
+  Centered!
+</custom-dialog>
+
+<custom-dialog>
+  Not centered.
+</custom-dialog>
+```
+
+これで、中央寄せ用スタイルが最初のダイアログ `<custom-dialog centered>` に
+のみ適用されるようになる。
+
+セレクターの `:host` 一族を利用して、コンポーネントの主要な要素にスタイルを設定できる。
+これらのスタイルを、`!important` でない限り、ドキュメントによって上書きできる。
 
 ### Styling slotted content
 
+スロットの状況を考えてみる。
+スロットされた要素は light DOM から来るので、ドキュメントスタイルを使用する。
+ローカルスタイルはスロットされた中身に影響しない。
+
+本書の例では、スロット付き `<span>` はドキュメントスタイルに従って太字になり、
+ローカルスタイルから `background` を得ることはない。
+結果は太字であって、赤にはならない。
+
+コンポーネント内のスロット要素にスタイルを設定したい場合、選択肢が二つある。
+
+一つ目は、`<slot>` 自身にスタイルを設定し、CSS の継承の仕組みに頼ることだ。ここ
+では `<span>John Smith</span>` が太字になるが、これは `<slot>` とその中身の間で CSS の継承が
+有効であるからだ。しかし、CSS 自体では、プロパティーすべてが継承されるわけではな
+い。
+
+```javascript
+this.shadowRoot.innerHTML = `
+  <style>
+  slot[name="username"] { font-weight: bold; }
+  </style>
+  Name: <slot name="username"></slot>
+`;
+```
+
+二つ目の選択肢は `::slotted(selector)` 疑似クラスを使うことだ。これは二つの条件
+に基づいて要素をマッチングする。
+
+1. それはスロットされた要素であり、light DOM から来たものであること。スロットの
+   名前は問題にならない。ただ、どんなスロット付き要素であれ、その要素自身だけで
+   あって、その子要素は含まれない。
+2. その要素が `selector` にマッチする。
+
+本書の例では `::slotted(div)` は `<div slot="username">` を厳密に選択するので
+あって、その子要素は選択しない。
+
+```javascript
+this.shadowRoot.innerHTML = `
+  <style>
+  ::slotted(div) { border: 1px solid red; }
+  </style>
+  Name: <slot name="username"></slot>
+`;
+```
+
+`::slotted` はスロットの中にそれ以上降りることができない。そのようなセレクターは無効となる。
+また、`::slotted` は CSS でしか使えない。例えば `querySelector()` では使えない。
+
 ### CSS hooks with custom properties
 
-### Summary
+メインドキュメントからコンポーネントの内部要素にスタイルを設定するにはどうすればよいだろう。
+`<custom-dialog>` や `<user-card>` には `:host` などのセレクターが規則を適用するが、
+その内部の shadow DOM 要素にはどのようにスタイルを設定するのだろうか。
+ドキュメントから直接 shadow DOM スタイルに影響を与えられるセレクターはない。
 
-### Comments
+しかし、コンポーネントと対話するためのメソッドを公開するのと同じように、
+スタイルを設定するための CSS 変数を公開することは可能だ。
+
+カスタム CSS プロパティーは、light と shadow の両方のすべてのレベルに存在する。
+たとえば、shadow DOM では `--user-card-field-color` CSS 変数を使用してフィールドのスタイルを設定でき、
+外側のドキュメントでその値を設定できる。
+そして、このプロパティーを `<user-card>` の外部文書で宣言すればよい。
+
+カスタム CSS プロパティーは shadow DOM を貫通し、どこでも見えるので、内側の
+`.field` 規則はそれを利用することになる。
+
+```html
+<style>
+  user-card {
+    --user-card-field-color: green;
+  }
+</style>
+
+<template id="tmpl">
+  <style>
+    .field {
+      color: var(--user-card-field-color, black);
+    }
+  </style>
+  <!-- slot を含む user-card 型の定義がここに来る -->
+</template>
+
+<script>
+customElements.define('user-card', class extends HTMLElement {
+  connectedCallback() {
+    // 自作要素をいつものように実装する
+  }
+});
+</script>
+
+<user-card>
+  <!-- span slot="X" 要素群からなる user-card データの定義がここに来る -->
+</user-card>
+```
 
 ## Shadow DOM and events
 
