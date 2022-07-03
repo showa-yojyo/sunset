@@ -879,12 +879,144 @@ customElements.define('user-card', class extends HTMLElement {
 
 <https://javascript.info/shadow-dom-events>
 
+Shadow tree の背後にある考え方とは、コンポーネントの内部実装の詳細をカプセル化す
+ることだ。例えば、クリックイベントが `<user-card>` コンポーネントの shadow DOM
+の内部で発生したとする。しかし、メインドキュメントのスクリプトは、特にコンポーネ
+ントが第三者ライブラリーから来ている場合、 shadow DOM の内部について知るよしもな
+い。
+
+そこで、詳細をカプセル化しておくために、ブラウザーはイベントを標的し直す。
+Shadow DOM で発生したイベントは、コンポーネントの外側で捕捉された場合、ホスト要素を標的としている。
+
+本書で示している簡単な例では、次のハンドラーをイベント源のタグ名をダイアログボックスに表示するように定義している。
+
+* `customElements` に対する `this.shadowRoot.firstElementChild.onclick`
+* `document.onclick`
+
+前者と後者をそれぞれ内部標的、外部標的と呼んでいるようだ。
+ボタンをクリックすると、メッセージが次のように表示される：
+
+1. 内部標的では `BUTTON` と出る。内部イベントハンドラーは、正しい標的である shadow DOM 内の要素を得る。
+2. 外部標的では `USER-CARD` と出る。文書イベントハンドラーは、標的として shadow host を得る。
+
+イベント再標的があることはたいへん素晴らしいことだ。外部ドキュメントがコンポーネント内部について知る必要がない。
+イベントは、その観点からは `<user-card>` 上で起こった。
+
+Light DOM に物理的に存在するスロット要素においてイベントが起きた場合、最標的は発生しない。
+
+たとえば、下の例でユーザーが `<span slot="username">` をクリックした場合、イベント
+の対象は shadow ハンドラーと light ハンドラーの両方で、まさにこの `span` 要素だ。
+
+```html
+<user-card id="userCard">
+  <span slot="username">John Smith</span>
+</user-card>
+
+<script>
+customElements.define('user-card', class extends HTMLElement {
+  connectedCallback() {
+    this.attachShadow({mode: 'open'});
+    this.shadowRoot.innerHTML = `<div>
+      <b>Name:</b> <slot name="username"></slot>
+    </div>`;
+
+    this.shadowRoot.firstElementChild.onclick = ...
+  }
+});
+
+userCard.onclick = ...;
+</script>
+```
+
+John Smith をクリックすると、内側と外側の両方のハンドラーで、標的は
+`<span slot="username">` だ。これは light DOM の要素であることから再標的はない。
+
+一方、クリックが shadow DOM に由来する要素、たとえば `<b>Name</b>` で発生した場合、
+shadow DOM から bubble out すると、その `event.target` は `<user-card>` にリセットされる。
+
 ### Bubbling, event.composedPath()
+
+イベントバブリングの目的のために、平坦化 DOM が用いられる。
+つまり、スロット付きの要素があり、その内部のどこかでイベントが起こると、
+`<slot>` まで泡が浮き、さらに上へと泡が浮く。
+
+オリジナルのイベント対象への完全パスを、すべての shadow 要素を含めて
+`event.composedPath()` で得られる。メソッド名が示すように、合成後にそのパスが得られる。
+
+前述の例の平坦化 DOM はこうなっている：
+
+```html
+<user-card id="userCard">
+  #shadow-root
+  <div>
+    <b>Name:</b>
+    <slot name="username">
+      <span slot="username">John Smith</span> <!-- ここをクリックする -->
+    </slot>
+  </div>
+</user-card>
+```
+
+`<span slot="username">` をクリックすると、`event.composedPath()` は配列
+
+```javascript
+[span, slot, div, shadow-root, user-card, body, html, document, window]
+```
+
+を返す。これはまさに、合成後の平坦化 DOM における、対象要素を起点とする親子関係に関する昇鎖だ。
+
+囲み記事：
+Shadow tree の詳細は `{mode: 'open'}` である木に対してしか供されない。
+Shadow tree が `{mode: 'closed'}` で生成された場合、構成パスはホスト `user-card` から開始されて上がっていく。
+これは shadow DOM を扱う他のメソッドと同様の原則だ。閉じた木の内部は完全に隠蔽されている。
 
 ### event.composed
 
+イベントのほとんどが shadow DOM 境界を正常に通り抜けるが、そうでないイベントもわ
+ずかに存在する。これは `composed` イベントオブジェクトプロパティーによって制御される。
+これが `true` の場合、そのイベントは境界を通り抜ける。
+そうでない場合は、shadow DOM の内部からしか捕捉できない。
+
+仕様 UI Events を見てみると、イベントのほとんどが `composed: true` となっている。
+
+タッチイベントとポインタイベントもすべて `composed: true` だが、
+`composed: false` であるイベントもある。
+
+* `mouseenter`, `mouseleave`: 元々 bubble up をまったくしないイベントだ。
+* `load`, `unload`, `abort`, `error`,
+* `select`,
+* `slotchange`.
+
+これらのイベントは、イベント対象が存在する同じ DOM 内の要素上でしか捕捉することができない。
+
 ### Custom events
 
-### Summary
+自作イベントをディスパッチする場合、
+`bubbles` と `composite` の両方のプロパティーを `true` にして、
+コンポーネントの bubble up と bubble out を行う必要がある。
 
-### Comments
+たとえば、ここでは `div#inner` を `div#outer` の shadow DOM 内に作成し、それに対
+してイベントを二つ発射させている。`composed: true` を指定したイベントだけが、ド
+キュメントの外に出て来る。
+
+```javascript
+/*
+div(id=outer)
+  #shadow-dom
+    div(id=inner)
+*/
+
+document.addEventListener('test', event => alert(event.detail));
+
+inner.dispatchEvent(new CustomEvent('test', {
+  bubbles: true,
+  composed: true,
+  detail: "composed"
+}));
+
+inner.dispatchEvent(new CustomEvent('test', {
+  bubbles: true,
+  composed: false,
+  detail: "not composed"
+}));
+```
