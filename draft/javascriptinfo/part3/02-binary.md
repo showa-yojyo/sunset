@@ -366,22 +366,210 @@ URL から `Blob` への写像を内部に保存する。そのため、その�
 
 ### Blob to base64
 
+`URL.createObjectURL()` の代わりに、`Blob` を base64 符号文字列に変換することもできる。
+この文字符号形式は、バイナリーデータを 0 から 64 までの ASCII コードを使った超安全な「読み取り可能」文字列として表す。
+さらに重要なのは、この符号化形式をデータ URL で使用できることだ。
+
+データ URL は次のような形式をとる。
+
+```text
+data:[<mediatype>][;base64],<data>
+```
+
+このような URL は通常の URL と同じように、どこでも使用できる。
+
+```html
+<img src="data:image/png;base64,R0lGODlhDAAMAKIFAF5LAP/zxAAAANyuAP/gaP///wAAAAAAACH5BAEAAAUALAAAAAAMAAwAAAMlWLPcGjDKFYi9lxKBOaGcF35DhWHamZUW0K4mAbiwWtuf0uxFAgA7">
+```
+
+![Smiley](data:image/png;base64,R0lGODlhDAAMAKIFAF5LAP/zxAAAANyuAP/gaP///wAAAAAAACH5BAEAAAUALAAAAAAMAAwAAAMlWLPcGjDKFYi9lxKBOaGcF35DhWHamZUW0K4mAbiwWtuf0uxFAgA7)
+
+ブラウザーはこの文字列を復号し、画像を描画する。
+`Blob` を base64 に変換するために、組み込み `FileReader` オブジェクトを用いる。
+これは、複数の形式の `Blob` からデータを読み取ることができる。
+
+本書のデモでは `Blob` を base64 でダウンロードする。
+要点をかいつまむと、
+
+* `A` タグを動的に生成し、属性 `download` にファイルパスを指定する。
+* `Blob` オブジェクトを生成する。引数は文字列配列と text/plain を指定するオプション。
+* `FileReader` オブジェクトを生成する。
+* メソッド `readAsDataURL()` を呼び出し、引数に `Blob` オブジェクトを渡す。
+* イベントハンドラー `onload` を次のように実装する：
+  先のリンクの属性 `href` に `FileReader` の結果を代入し、
+  `click()` を発動する。
+
+`Blob` の URL を作成する方法はどちらも使用可能だ。通常は `URL.createObjectURL(blob)`
+の方がより単純かつ高速だ。
+
+`URL.createObjectURL(blob)` を用いる方法：
+
+* メモリーを大切にするならば、それを消去する必要がある。
+* `Blob` へは直接アクセスする。符号処理をしない。
+
+`Blob` をデータ URL に変換する方法：
+
+* 何も無効化する必要なない。
+* 符号化処理に、大きな `Blob` オブジェクト性能、メモリー損失を生じる。
+
 ### Image to blob
+
+画像や画像部分の `Blob` を作成したり、ページのスクリーンショットを撮ることもできる。
+これはどこかにアップロードするのに便利だ。
+
+画像の操作は `<canvas>` 要素で行う。
+
+1. `canvas.drawImage()` を使って画像をキャンバスに描画する。
+2. `Blob` を生成し、終了時にコールバックを実行するメソッド
+   `canvas.toBlob(callback, format, quality)` を呼び出す。
+
+本書の例では画像をコピーしている。
+`blob` を作る前に画像から切り取り、またはキャンバス上で変形することが可能だ。
+
+ノート：ここでは `getContext('2d')` しているのでこういう処理になっているが、
+`getContext('webgl2')` で WebGL 描画をしたものをコピーするようなこともできるだろう。
+
+コールバックではなく、非同期呼び出しも対応している：
+
+```javascript
+let blob = await new Promise(resolve => canvasElem.toBlob(resolve, 'image/png'));
+```
+
+ページのスクリーンショットを行うにはライブラリーを利用するのが普通らしい。
+そのようなライブラリーは、ページをスキャンしてキャンバスに描画する。
+そして、上記と同じ方法でその `Blob` を得る、といった具合だ。
 
 ### From Blob to ArrayBuffer
 
+`Blob` コンストラクターで `BufferSource` を含むほとんどすべてのものからオブジェクトを生成できる。
+低水準処理を行う必要があるならば、非同期メソッド `blob.arrayBuffer()` で最低水準の `ArrayBuffer` を得られる。
+
 ### From Blob to stream
 
-### Summary
+2GB を超える `Blob` を読み書きする場合、`arrayBuffer()` を使用するとより多くのメ
+モリーを消費するようになる。この場合、`blob` をストリームに直接変換することがで
+きる。
 
-### Comments
+ストリームとは、部分ごとに読み取むか、または書き込むことができる特別なオブジェクト
+だ。断片的な処理に適したデータに対して便利だ。
+
+`Blob` のメソッド `stream()` は `ReadableStream` を返し、これを読み込むと
+`Blob` に含まれるデータが返される。
+
+```javascript
+// get readableStream from blob
+const readableStream = blob.stream();
+const stream = readableStream.getReader();
+
+while (true) {
+    // for each iteration: value is the next blob fragment
+    let { done, value } = await stream.read();
+    if (done) {
+        // no more data in the stream
+        break;
+    }
+
+    // do something with the data portion we've just read from the blob
+}
+```
+
+ノート：おそらくこのループはもっと現代的な書き方がある。
 
 ## File and FileReader
 
 <https://javascript.info/file> の学習ノート。
 
+`File` オブジェクトは `Blob` を継承し、ファイルシステム関連の機能を拡張したものだ。
+まず、コンストラクターだ：
+
+```javascript
+new File(fileParts, fileName, [options])
+```
+
+* `fileParts`: `Blob`/`BufferSource`/`String` 値の配列。
+* `fileName`: ファイル名である文字列。
+* `options`
+  * `lastModified`: 最終更新のタイムスタンプ値。整数。
+
+次に、`<input type="file">` やドラッグ＆ドロップなど、ブラウザーのインターフェース
+からファイルを取得する場合、ファイルは OS からこの情報を取得する。
+
+`File` には `Blob` と同じプロパティーがある。それ以外にもある：
+
+* `name`: ファイル名、
+* `lastModified`: 最終更新のタイムスタンプ。
+
+`<input type="file">` から `File` オブジェクトを取得する方法：
+
+```html
+<input type="file" onchange="showFile(this)">
+
+<script>
+function showFile(input) {
+    let file = input.files[0];
+
+    alert(`File name: ${file.name}`); // e.g my.png
+    alert(`Last modified: ${file.lastModified}`); // e.g 1552830408824
+}
+</script>
+```
+
+`<input>` は複数のファイルを選択することができるので、`input.files` はそれらの
+ファイルを含む配列風オブジェクトだ。
+
 ### FileReader
 
-### Summary
+`FileReader` は `Blob` オブジェクトからデータを読み取ることだけを目的としたオブジェクトだ。
+ディスクからの読み込みに時間がかかることがあるため、イベントを使用してデータを届ける。
 
-### Comments
+```javascript
+let reader = new FileReader(); // no arguments
+```
+
+主要メソッド：
+
+* `readAsArrayBuffer(blob)`: バイナリー形式 `ArrayBuffer` にデータを読み込む。
+* `readAsText(blob, [encoding])`: 与えられた符号形式でテキスト文字列としてデータを読み込む。
+* `readAsDataURL(blob)`: バイナリデータを読み取り、base64 データ URL として符号化する。
+* `abort()`: 操作をキャンセルする。
+
+これらの `read*()` メソッドの選択は、どの形式を好むか、データをどのように使うかによる。
+
+* `readAsArrayBuffer`: バイナリーファイル用で、低水準操作を実行する。スライス操
+  作のような高水準操作については、`File` は `Blob` であるので、読み込まずに直接呼
+  び出せる。
+* `readAsText`: テキストファイルに対して、文字列を取得したい場合。
+* `readAsDataURL`: `img` または他のタグの `src` でこのデータを使用する場合。ファ
+  イルを `URL.createObjectURL(file)` で読み込むという方法もある。
+
+読み込みが進むとイベントが起こる。最も広く使われているのは `load` と `error` だ。
+
+* `loadstart`: 読み込み開始
+* `progress`: 読み込み中
+* `load`: エラーなしで読み込み完了
+* `abort`: `abort()` 呼び出し発生
+* `error`: エラー発生
+* `loadend`: 読み込み終了（成功でも失敗でも）
+
+読み取りが終了したら、その結果を参照できる：
+
+* `reader.result`
+* `reader.error`
+
+本書のコード例をよく見ておく。
+
+----
+
+`FileReader` は `File` というより `Blob` を読み込む機能なので、
+これを利用して、`Blob` オブジェクトを別の形式に変換できる。
+
+* `readAsArrayBuffer`: `ArrayBuffer`
+* `readAsText`: 文字列
+* `readAsDataURL`: base64 データ URL
+
+----
+
+Web Workers には、`FileReaderSync` と呼ばれる `FileReader` の同期型も存在する。
+その読み込みメソッド `read*()` はイベントを生成せず、通常の関数と同じように結果
+を返す。なぜなら、Web Workers では、ファイルからの読み取り中に発生する同期呼び出
+しの遅延がほとんど重要ではないからだ。ページには影響しない。
