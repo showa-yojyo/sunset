@@ -396,15 +396,131 @@ document.domain = 'site.com';
 
 ### The "sandbox" iframe attribute
 
+`<iframe>` の属性 `sandbox` では、信頼できないコードの実行を防ぐために、フレーム内の特定のアク
+ションを除外することを可能にする。
+`iframe` が別の場所から来たものとして扱ったり、他の制限を適用することによって、
+`iframe` を砂箱に置くものだ。
+
+`<iframe sandbox src="...">` に適用される制限の既定値（の集合）はある。しかし、例えば次のように、
+適用すべきでない制限を空白文字区切りリストを属性の値として指定すると、制限を緩和することができる：
+
+```html
+<iframe sandbox="allow-forms allow-popups">
+```
+
+言い換えれば、空の `sandbox` は、可能な限り厳しい制限をするが、解除したい制限を空白文字区切りリストで指定できる。
+
+TODO: Sphinx で DL に置き換える：
+
+`allow-same-origin`:
+通常は `sandbox` は `iframe` に対して異なるオリジン政策を強制する。
+ブラウザーは `iframe` の `src` が同じサイトを指していても、別のオリジンから来たものとして扱う。
+スクリプトに対するすべての暗黙の制限だ。このオプションはそれを取り除く。
+
+制限オプションの一部を次に示す：
+
+`allow-top-navigation`:
+`iframe` が `parent.location` を変更できるようにする。
+
+`allow-forms`:
+`iframe` からフォームを提出できるようにする。
+
+`allow-scripts`:
+`iframe` からスクリプトを実行できるようにする。
+
+`allow-popups`
+`iframe` から `window.open()` でポップアップを表示できるようにする。
+
+本書のここにある例では、`sandbox` に何も指定しない `iframe` を示している。
+Google に入力テキストを送りつける JavaScript とフォームがあるものの、何も動作しない。
+ボタンのイベントハンドラーすら走らない。既定値は本当に厳しい。
+
+属性 `sandbox` の目的は、制限を追加することしかない。取り除くことはできない。
+特に、`iframe` が他のオリジンから来た場合、同一オリジンの制限を緩和することはできない。
+
 ### Cross-window messaging
+
+`postMessage()` は、ウィンドウ同士がどのオリジンから来たものであっても通話できるよ
+うにするものだ。つまり、同一政策を回避する。john-smith.com のウィンドウが
+gmail.com と会話し、情報を交換することを可能にする。ただし、両者が同意し、対応す
+る JavaScript 関数を呼び出した場合だけだ。そのため、利用者にとって安全だ。
+
+インターフェースは二つの部分から構成されている。
 
 #### postMessage
 
+メッセージを送りたいウィンドウは、受信側のウィンドウのメソッド `postMessage()`
+を呼び出す。`win` にメッセージを送りたいとすると、
+
+```javascript
+win.postMessage(data, targetOrigin);
+```
+
+を呼び出す必要がある。
+
+TODO: DL にする。
+
+`data`:
+送信するデータ。任意のオブジェクトを指定でき、データは「構造化直列化アルゴリズ
+ム」を使って複製される。 IE は文字列しか対応していないので、複雑なオブジェク
+トを`JSON.stringify()` する必要がある。
+
+`targetOrigin`:
+到達ウィンドウのオリジンを指定し、指定されたオリジンからのウィンドウのみが
+メッセージを受け取るようにする。
+
+`targetOrigin` は安全策だ。到達ウィンドウが他のオリジンから来た場合、送信者ウィ
+ンドウの位置を読み取ることができないので、目的のウィンドウで今どのサイトが開いて
+いるかを確認することはできない。利用者は移動することができ、送信者ウィンドウはそ
+れについて何もわからない。 `targetOrigin` を指定することで、ウィンドウがデータを
+受け取るのは、それがまだ正しいサイトにいる場合だけであることを保証する。データの
+機密性が高い場合に重要だ。
+
+```html
+<iframe src="http://example.com" name="example">
+
+<script>
+  let win = window.frames.example;
+
+  win.postMessage("message", "http://example.com");
+  // If we don’t want that check, we can set targetOrigin to *.
+  //win.postMessage("message", "*");
+</script>
+```
+
 #### onmessage
 
-### Summary
+メッセージを受信するには、受信側ウィンドウにイベント `message` のハンドラーを設定する。
+これは、`postMessage() `が呼ばれたとき、および `targetOrigin` のチェックが成功したときに発生する。
 
-### Comments
+イベントオブジェクトは特別なプロパティーがある：
+
+TODO: DL
+
+`data`:
+`postMessage()` から受け取ったデータ。
+
+`origin`:
+送信側のオリジン。URL 文字列だと思うといい。
+
+`source`:
+送信側ウィンドウへの参照。そうしたければ、`source.postMessage()` 返しがすぐにできる。
+
+ハンドラーは、`addEventListener()` でしか割り当てられない。`onmessage` への代入ではダメだ。
+
+例：
+
+```javascript
+window.addEventListener("message", function(event) {
+    if (event.origin != 'http://javascript.info') {
+      // something from an unknown domain, let's ignore it
+      return;
+    }
+    // ...
+
+    // can message back using event.source.postMessage(...)
+});
+```
 
 ## The clickjacking attack
 
