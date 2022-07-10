@@ -526,22 +526,144 @@ window.addEventListener("message", function(event) {
 
 <https://javascript.info/clickjacking> ノート。
 
+クリックジャック攻撃は、悪質なページが訪問者に代わって被害サイトをクリックするものだ。
+現在は修正済みであるが、Twitter, Facebook, Paypal など、多くのサイトがこの方法でハックされたことがある。
+
 ### The idea
+
+Facebook を使ったクリックジャッキングのやり方はこうだ：
+
+1. 方法は問わないので、訪問者を悪いページにおびき寄せる。
+2. そのページには無害そうなリンクを置く。
+3. そのリンクの上に `src` が facebook.com からのものであるような `<iframe>` を配置し、
+   そのリンクの真上に「いいね」ボタンが来るようにする。通常、これは `z-index` で実現する。
+4. リンクをクリックしようとした訪問者は、実際にそうしてしまう。
 
 ### The demo
 
+悪いページのデモコード。要点をかいつまむと：
+
+* `iframe` のスタイルシートで `opatity: 0`　および `z-index: 1` のようなものを指定する。
+  また、かなり不自然な寸法を与える。
+* `iframe` の属性 `src` に上述のような URL を指定する。
+
+ここでは、透明の `<iframe src="facebook.html">` があり、この例では、ボタンの上に浮かんで見える。
+ボタンをクリックすると、実際には `iframe` がクリックされますが、それが透明であるため、閲覧者には見えない。
+その結果、訪問者が Facebook で認証されている場合「いいね」が追加される。
+Twitter ならばフォローボタンが追加される。
+
+悪人たちがするべきことは、リンクのすぐ上にボタンが来るように、`<iframe>` を悪いページに
+配置することだ。そうすれば、閲覧者がリンクをクリックすると、本当にボタンがクリックされる。
+これは通常、CSS でできる。
+
+----
+
+クリックジャッキングは、キーボードではなく、クリックに対して行われる。この手の攻
+撃は、マウス操作（またはモバイルでのタップのような類似の操作）にしか効果がない。
+キーボード入力は、転送するのがひじょうに困難だ。技術的には、ハックするテキスト欄
+があれば、テキスト欄同士が重なるように`iframe` を配置できる。そうすれば、訪問者
+がページ上に表示されている入力に神経を集中しようとしたとき、実際には `iframe` 内
+の入力に集中することになるのだ。しかし、そこで問題が発生する。`iframe` が見えな
+いので、訪問者が入力したものはすべて隠されてしまう。新しい文字が画面にエコーされ
+るのが見えなくなると、人は入力するのをやめてしまう。
+
 ### Old-school defences (weak)
+
+最も古い防御策は、次のようにしてフレーム内でページを開くことを禁止するものだ：
+
+```javascript
+if (top != window) {
+    top.location = window.location;
+}
+```
+
+つまり、ウィンドウは自分が一番上でないことを知ると、自動的に自分を一番上にするというものだ。
+これは確実な防御策ではない。これを回避する方法はたくさんある。
 
 #### Blocking top-navigation
 
+イベントハンドラー `beforeunload` で `top.location` を変更することによって、ページ遷移を阻止できる。
+トップページ（ハッカーのもの）では、阻止ハンドラーをこのように設定する：
+
+```javascript
+window.onbeforeunload = function() {
+    return false;
+};
+```
+
+`iframe` が `top.location` を変更しようとするときに、訪問者は退出するかどうか尋ねるメッセージを受け取る。
+ほとんどの場合、訪問者は `iframe` のことを知らないので、否定的な答えをするだろう。
+つまり、`top.location` は変更されない。
+
+ノート：デモコードが意図通りに動作しないようだ。
+
 #### Sandbox attribute
+
+属性 `sandbox` で制限されるものの一つにナビゲーションがある。
+サンドボックス化された `iframe` は `top.location` を変更できない。
+
+そこで、`sandbox="allow-scripts allow-forms"` である `iframe` を追加できる。
+そうすると、制限が緩和され、スクリプトとフォームが許可される。しかし、
+`allow-top-navigation` を省略し、`top.location` を変更することを禁止している。
+
+```html
+<iframe sandbox="allow-scripts allow-forms" src="facebook.html"></iframe>
+```
+
+この単純なプロテクトを回避する方法もまた（複数）ある。
 
 ### X-Frame-Options
 
+サーバー側ヘッダー `X-Frame-Options` は、ページをフレーム内に表示することを許可または禁止することができる。
+これは HTTP-header として正確に送信されなければならない。
+ブラウザーは、HTMLの `<meta>` タグで見つけた場合、これを無視する。
+つまり、`<meta http-equiv="X-Frame-Options" ...>` と書いても何もしない。
+
+ヘッダーにある値は三つあり得る：
+
+* `DENY`: ページをフレーム内に表示しない。
+* `SAMEORIGIN`: 親ドキュメントが同じオリジンから来た場合、フレーム内を許可する。
+* `ALLOW-FROM domain`: 親ドキュメントが与えられたドメインから来た場合、フレーム内を許可する。
+
+例えば、Twitter は `X-Frame-Options: SAMEORIGIN` を採用している。
+`<iframe src="https://twitter.com"></iframe>` を書こうものなら、本書のように接続拒否エラー表示になる。
+
 ### Showing with disabled functionality
+
+ヘッダー `X-Frame-Options` には副作用がある。他のサイトが、たとえそうする
+正当な理由があったとしても、当方のページをフレーム内に表示することができなくなる。
+
+たとえば、`height: 100%; width: 100%;` というスタイルの `<div>` でページを覆って、
+すべてのクリックを阻止できるようにする。この `<div>` は、
+`window == top` の場合か、または保護が不要と判断された場合に削除される。
+
+```javascript
+// protector がページ全体を覆う div ノード
+
+// there will be an error if top window is from the different origin
+// but that's ok here
+if (top.document.domain == document.domain) {
+    protector.remove();
+}
+```
 
 ### Samesite cookie attribute
 
-### Summary
+また、cookie 属性 `samesite` は、クリックジャック攻撃を防げる。このような属性を
+持つ cookie は、フレーム経由などではなく、直接ウェブサイトが開かれた場合にのみ送
+信される。
 
-### Comments
+Facebook のように、サイトがその認証 cookie に属性 `samesite` を有する場合、
+Facebook が他のサイトから `iframe` で開かれたときに、そのような cookie は送られ
+ないだろう。だから攻撃は失敗する。
+
+```text
+Set-Cookie: authorization=secret; samesite
+```
+
+Cookie 属性 `samesite` は、cookie が使用されていない場合は効果がない。これによ
+り、他のウェブサイトが当方の公開された未認証のページを`iframe` で簡単に表示する
+ことができるようになるかもしれない。ただし、この場合、一部の限られた場合にクリッ
+クジャック攻撃が機能する可能性もある。例えば、IP アドレスをチェックすることで重
+複投票を防止している匿名投票サイトは、 cookie を使って利用者を認証していないた
+め、クリックジャッキングの脆弱性が依然としてある。
