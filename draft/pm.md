@@ -667,12 +667,84 @@ WBS を、最終目的から出発し、それをサイズ、期間、責任の�
 
 ### Project portfolio management
 
+適切なプロジェクトを選択し、その成果を実行する公共、民間、非営利組織への利益とい
+う形で提供する手段として、プロジェクトポートフォリオマネジメント (PPM) と呼ばれ
+る手法を用いる組織が増えつつある。
+
+ポートフォリオとは、類似するプロジェクトの集合体だ。ポートフォリオマネジメント
+は、プロジェクトマネジメントの専門家のグループが共通のツールや知識を共有し、ポー
+トフォリオ内のすべてのプロジェクトに同様の標準化された技術を適用することで、規模
+の効率化、成功率の向上、プロジェクト危機の低減を支援する。このように、PPMは通
+常、企業内プロジェクトマネジメント事務所 (PMO) 内に組織されたマネージャーの専門
+チームによって行われ、通常は組織内に拠点を置き、PMO 指導者またはプロジェクト主席
+が率いる。組織の戦略的決断力が PPM の大部分を形成する場合、PPM の責任者は最高決
+断責任者と称されることもある。
+
 ### Project management software
+
+プロジェクト管理ソフトウェアとは、資源プールを計画、整理、管理することを助け、資
+源の見積もりを作成し、計画を実行するために使用するソフトウェアだ。ソフトウェアの
+精巧さにもよるが、機能としては、見積もりと計画、日程策定、費用管理と予算管理、資
+源配分、協力ソフトウェア、情報交換、意思決定、ワークフロー、危機、品質、文書、管
+理システムなどがある。
 
 ### Virtual project management
 
+仮想プログラムマネジメント (VPM) は、仮想環境で実施するプロジェクトを指すことは
+少ないが、仮想的チームで行うプロジェクトのマネジメントだ。仮想プロジェクト
+のマネジメントは、リモートワークやグローバル協力（文化、タイムゾーン、言語）の懸念が重なり、
+従来のプロジェクトマネジメントとは根本的に異なると指摘されている。
+
 ### See also
+
+Related fields
+
+* Agile Construction
+* Architectural engineering
+* Construction management
+* Cost engineering
+* Facilitation (business)
+* Industrial engineering
+* Project Production Management
+* Project management software
+* Project portfolio management
+* Project workforce management
+* Software project management
+* Systems engineering
+
+Related subjects
+
+* Collaborative project management
+* Decision-making
+* Game theory
+* Earned value management
+* Human factors
+* Kanban (development)
+* Operations research
+* Process architecture
+* Program management
+* Project accounting
+* Project governance
+* Project management simulation
+* Small-scale project management
+* Software development process
+* Systems Development Life Cycle (SDLC)
+
+Lists
+
+* Comparison of project management software
+* Glossary of project management
+* List of collaborative software
+* List of project management topics
+* Timeline of project management
 
 ### References
 
+多過ぎる。
+
 ### External links
+
+実質的に「外部」であるものは次の二つ：
+
+* Guidelines for Managing Projects from the UK Department for Business, Enterprise and Regulatory Reform (BERR)
+* PM Foundation PM BLOG
