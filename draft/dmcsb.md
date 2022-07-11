@@ -5,9 +5,9 @@ title: Chaos Strikes Back cheet sheet
 ## 新呪文
 
 OH GOR KU: 敵ハイライト
-OH GOR ROS: ニセ壁ハイライト
-ZO IR NETA: ？
-OH GOR DAIN: 火炎弾などをハイライト
+OH GOR ROS: ニセ壁や視認性の悪いピットをハイライト
+ZO IR NETA: 地図表示が詠唱位置に固定される？
+OH GOR DAIN: 火炎弾やゾーキャスラーなどをハイライト
 
 ## 深い落とし穴
 
@@ -19,13 +19,13 @@ OH GOR DAIN: 火炎弾などをハイライト
 ### Level 7 のヘルス 1 のギグラーが配備するもの
 
 Level 7 のヘルス 1 のギグラーリスト。穴に落ちてテレポート。
-ランダム性はほとんどないと考えられる。
+ランダム性はほとんどないと考えられる。と思ったら普通にずれる。
 
 * DIAMOND EDGE, WATER, PLATE OF RA: レベル 0 北西の四方アルコーブ
-* KU POTION, DRAGON PLATE, TOPAZ KEY: レベル 4 ピット奥の隠し部屋
-* SIDE SPLITTER, POLEYN OF RA, GLEAVE OF RA: レベル 4 ピットの間の四方アルコーブ
-* DRAGON HELM, DRAGON POLEYN, DRAGON GLEAVE: レベル 1 西部四方アルコーブ
+* DRAGON HELM, DRAGON POLEYN, DRAGON GREAVE: レベル 1 西部四方アルコーブ
 * GOLD KEY, FLAMITT, STORM: レベル 3 南部四方アルコーブ
+* KU POTION, DRAGON PLATE, TOPAZ KEY: レベル 4 ピット奥の隠し部屋
+* SIDE SPLITTER, POLEYN OF RA, GREAVE OF RA: レベル 4 ピットの間の四方アルコーブ
 * WAND, MAGIX BOX, RA BLADE: レベル 6 南部四方アルコーブ
 
 ### レベル 7 のアイテムシューターが配備するもの
@@ -43,13 +43,16 @@ Level 7 のヘルス 1 のギグラーリスト。穴に落ちてテレポート
 
 配備される可能性のある場所：
 
+* (26, 26, 0): 最上階、KEY OF B 通路先の行き止まり。
+* (7, 15, 2): DDD 内 ROS 後半エントランス正面の突き当り。
 * (5, 3, 2): ROS 後半、高速地帯北西の行き止まり。
 * (20, 13, 3): NETA 後半、SKELETON を追う部屋の脇の行き止まり。
 * (17, 10, 5): DAIN 前半、火炎弾部屋と蛇部屋の中間休憩所。
 * (25, 1, 8): ROS 前半、MUMMY 部屋。
-* (26, 26, 0): 最上階、KEY OF B 通路先の行き止まり。
 * (3, 26, 9): KU 前半、南西隅の爆弾部屋。
-* (7, 15, 2): DDD 内 ROS 後半エントランス正面の突き当り。
+* ギグラー部屋内に死蔵される。
+
+すべてのアイテムが一箇所にまとまって配備されるはずだ。
 
 ### レベル 7 のギグラー操作室による配備
 
@@ -84,3 +87,29 @@ Level 7 のヘルス 1 のギグラーリスト。穴に落ちてテレポート
 
 鳩の巣原理により、発射されたすべてのアイテムがどこかへいちおう配備されるようだ。
 シューター通路に放置されたままということにはならなそうだ。
+
+### チェックリスト
+
+* DIAMOND EDGE, WATER, PLATE OF RA: レベル 0 北西の四方アルコーブ: OK
+* DRAGON HELM, DRAGON POLEYN, DRAGON GREAVE: レベル 1 西部四方アルコーブ: OK
+* GOLD KEY, FLAMITT, STORM: レベル 3 南部四方アルコーブ: OK
+* KU POTION, DRAGON PLATE, TOPAZ KEY: レベル 4 ピット奥の隠し部屋: OK
+* SIDE SPLITTER, POLEYN OF RA, GREAVE OF RA: レベル 4 ピットの間の四方アルコーブ: OK
+* WAND, MAGIX BOX, RA BLADE: レベル 6 南部四方アルコーブ: OK
+
+* (26, 26, 0): 最上階、KEY OF B 通路先の行き止まり：チェック済み
+* (7, 15, 2): DDD 内 ROS 後半エントランス正面の突き当り：チェック済み
+* (5, 3, 2): ROS 後半、高速地帯北西の行き止まり：チェック済み
+* (20, 13, 3): NETA 後半、SKELETON を追う部屋の脇の行き止まり：チェック済み
+* (17, 10, 5): DAIN 前半、火炎弾部屋と蛇部屋の中間休憩所：チェック済み
+* (25, 1, 8): ROS 前半、MUMMY 部屋：チェック済み
+* (3, 26, 9): KU 前半、南西隅の爆弾部屋：チェック済み
+
+* (16, 19, 0): 最上階大広間
+* (21, 17, 0): 最上階大広間
+* (17, 10, 5): 方向感覚が狂う大広間
+* (25, 1, 8): ドラゴンのいる大広間：チェック済みのはず
+* (15, 20, 8): KU 前半 NO FIREBALL の間中央：チェック済み
+* (4, 2, 7): DAIN 前半テレポート迷路、さらには THE CISTERN 南側
+* (16, 28, 7): NETA 前半、SCREAMER 部屋と MUNCHER 部屋の中間：チェック済み
+* (16, 0, 6): ROS 前半、ニセ壁通路：チェック済みのはず
