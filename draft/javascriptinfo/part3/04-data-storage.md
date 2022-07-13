@@ -428,31 +428,284 @@ GDPR は cookie だけでなく、他のプライバシー関連の問題につ�
 
 <https://javascript.info/localstorage> ノート。
 
+ウェブストレージオブジェクト `localStorage` および `sessionStorage` により、ブラウザーにキー
+と値のペアを保存することができる。
+これらのオブジェクトの面白いところは、データがページの更新 (`sessionStorage`)
+やブラウザーの完全な再起動 (`localStoregae`) にも影響を受けないことにある
+
+Cookie がすでにありながら、さらなるオブジェクトがなぜ必要なのだろうか：
+
+* Cookie とは異なり、ウェブストレージオブジェクトは要求ごとにサーバーに送信され
+  るわけではない。そのため、データをより多く保存することができる。
+* これもまた cookie とは異なり、サーバーは HTTP ヘッダーを介してストレージオブ
+  ジェクトを操作することができない。すべては JavaScript で行われる。
+* ストレージはオリジン拘束性がある。つまり、異なるプロトコルやサブドメインは、異
+  なるストレージオブジェクトを割り出し、互いにデータにアクセスすることはできな
+  い。
+
+どちらのストレージオブジェクトも同じメソッドとプロパティを備えている：
+
+* `setItem(key, value)`: キーと値のペアを格納する。
+* `getItem(key)`: キーで値を取得する。
+* `removeItem(key)`: - キーとその値を削除する。
+* `clear()`: すべて削除する。
+* `key(index)`: 任意の位置のキーを取得する。
+* `length`: 保存する項目の数。
+
+`Map` に似ていると憶えればいい。それに `key(index)` が付いたものだと考えられる。
+
 ### localStorage demo
+
+`localStorage` の主な機能：
+
+* 同じオリジンのすべてのタブとウィンドウで共有される。
+* データに有効期限がない。ブラウザーの再起動はもちろん、OS の再起動後もデータが残る。
+
+例えば、次のコードをまず実行する：
+
+```javascript
+localStorage.setItem('test', 1);
+```
+
+そしてブラウザーを閉じたり開いたり、あるいは同じページを別のウィンドウで開くだけ
+で、このようにして値を取得できる：
+
+```javascript
+localStorage.getItem('test'); // 1 
+```
+
+同じオリジンであればよく、URL パスは異なっていてもよい。 `localStorage` は同じオ
+リジンを持つすべてのウィンドウで共有されるので、あるウィンドウでデータを設定する
+と、その変更は別のウィンドウからも見えるようになる。
 
 ### Object-like access
 
+また、普通のオブジェクトの方法でキーを取得、設定することもできる。
+これは歴史的な理由で認められており、ほとんど機能しているが、一般的には推奨されない。
+
+1. もしキーが利用者によって生成されたものであれば、どんなものでもあり得る。
+   `length` や `toString` あるいは `localStorage` の他の組み込みメソッドでも。
+   この場合、`{get,set}Item()` は問題なく動作するが、オブジェクト風アクセスは失敗する。
+2. イベント `storage` があり、データを変更したときに起こる。
+   そのイベントは、オブジェクト風アクセスでは起こらない。
+
 ### Looping over keys
+
+ストレージオブジェクトは概念としてはコレクションであるものの、反復可能機能を提供していない。
+いちおう `for in` ループを書けるが、必要のない組み込みフィールドもキーとして出てくる。
+なので、本書では `Object.keys(localStorage)` を反復処理することを推奨している。
 
 ### Strings only
 
+ストレージオブジェクトはキーと値の両方が文字列でなければならない。
+数値やオブジェクトなど他の型であった場合は、自動的に文字列に変換される。
+
+オブジェクトを保存したければ JSON がある。
+また、デバッグ用にストレージオブジェクトを JSON にすることもある：
+
+```javascript
+JSON.stringify(localStorage, null, 2);
+```
+
 ### sessionStorage
+
+`sessionStorage` は `localStorage` に比べると使用頻度が低い。
+プロパティーやメソッドは同じだ、より限定的だ。
+
+* `sessionStorage` は現在のブラウザータブ内にしか存在しない。
+  * 同じページを表示する別のタブでは、別のストレージを持つ。
+  * しかし、同じタブ内の `iframe` 間では共有される（同じオリジンから来たとする）。
+* データはページの更新には耐えるが、タブを閉じたり開いたりするのには耐えられない。
+
+```javascript
+sessionStorage.setItem('test', 1);
+```
+
+このコードを実行して、画面を更新すると
+
+```javascript
+sessionStorage.getItem('test');
+```
+
+で値がまだ得られる。しかし、同じページを別のタブで開き、そこでもう一度試してみる
+と、上記のコードは `null` を返す。これはまさに、`sessionStorage` がオリジンだけ
+でなく、ブラウザーのタブにも束縛されているためだ。そのため、`sessionStorage` の
+使用は控えられる。
 
 ### Storage event
 
-### Summary
+`localStorage` や `sessionStorage` のデータが更新されると、イベント `storage` が起こる。
+そのときのイベントのプロパティーは次のとおり：
+
+* `key`: 変更されたキー。`clear()` が呼び出された場合は `null`.
+* `oldValue`: 古い値。キーが新しく追加された場合は `null`.
+* `newValue`: 新しい値。キーが削除された場合は `null`.
+* `url`: 更新が発生したドキュメントの URL.
+* `storageArea`: 更新が発生した `localStorage` または `sessionStorage` オブジェクト。
+
+重要なのは、このイベントは、ストレージにアクセス可能なすべてのウィンドウオブ
+ジェクトで発生するということだ（イベントを発生させたオブジェクト自身以外で）。
+
+ウィンドウが二つあり、同じサイトであるとする。そのため、`localStorage` はそれら
+の間で共有される。
+
+（以下のコードをテストするために、このページを二つのブラウザウィンドウで開くといいだろう）
+
+両方のウィンドウが `window.onstorage` を listen していれば、それぞれのウィンドウ
+はもう一方のウィンドウで発生した更新に反応する。
+
+イベントは `event.url` として、データが更新されたドキュメントの URL を含むことに注意。
+イベントは `sessionStorage` と `localStorage` の両方に対して同じなので、
+`event.storageArea` は変更された方を参照する。変更に「応答」するために、
+そこに何かを設定し直したいと思うこともあるかもしれない。
+
+これにより、同じオリジンからの異なるウィンドウでメッセージを交換できる。
+
+最近のブラウザーは Broadcast channel API という同一生成元ウィンドウ間通信のため
+の特別な API も対応しており、こちらはより充実した機能を備えているが、あまり充実
+していない。 `localStorage` を基本にした、この API を polyfill するライブラリー
+があり、どこでも利用できるようになっている。
 
 ### Tasks
 
 #### Autosave a form field
 
-### Comments
+変更するたびにその値を自動保存するテキストエリア欄を作れ。
+利用者が誤ってページを閉じてしまい、再び開いたときに、未完成の入力が所定の位置にあるようにしろ。
+
+ノート：
+Clear ボタンの存在がヒントになっている。`onclick` でもストレージを更新する必要がある。
+「変更するたびに」をチェックするイベントハンドラーは `oninput` に仕込む。
 
 ## IndexedDB
 
 <https://javascript.info/indexeddb> ノート。
 
+IndexedDB はブラウザーに組み込まれたデータベースであり、`localStorage` よりもはるかに強力だ。
+
+* ほとんどの種類の値をキーで保存でき、キーの型は複数対応。
+* 信頼性の高いトランザクションをサポート。
+* キーレンジクエリー、インデックスをサポート。
+* `localstorage` よりはるかに大きなデータ量を保存できる。
+
+その力は、従来のクライアントサーバーアプリケーションでは過剰だ。 IndexedDB はオ
+フラインのアプリケーションを想定しており、ServiceWorkers や他の技術と組み合わせ
+ることを想定している。
+
+仕様書 <https://www.w3.org/TR/IndexedDB> に記載されている IndexedDB のネイティブイ
+ンターフェースは、イベントベースだ。
+
+また、<https://github.com/jakearchibald/idb> のような `Promise` ベースのラッパー
+の助けを借りて、async/await を利用することもできる。これはかなり便利だが、ラッ
+パーは完璧ではなく、すべての状況でイベントを置き換えることはできない。そこで、ま
+ずはイベントから始めて、IndexedDB を理解した後に、ラッパーを使うことにする。
+
+----
+
+技術的には、データは通常、ブラウザーの設定や拡張機能などとともに、訪問者のホーム
+ディレクトリーに保存される。
+ブラウザーや OS レベルの利用者によって、それぞれ独立した格納領域を持っている。
+
 ### Open database
+
+IndexedDB を使い始めるには、まずデータベースを開く（接続する）。
+
+```javascript
+let openRequest = indexedDB.open(name, version);
+```
+
+* `name`: データベースの名前を示す文字列
+* `version`: 正の数で示されるバージョン値
+
+異なる名前のデータベースを多数持つことができるが、それらはすべて現在のオリジン内
+に存在する。異なるウェブサイトが互いのデータベースにアクセスすることはできない。
+
+この呼び出しが返すオブジェクトを `openRequest` とする。そのイベントをなるべく listen する。
+
+* `success`: データベースが準備できた。データベースオブジェクト `openRequest.result` を今後の呼び出しに使用する。
+* `error`: 接続失敗。
+* `upgradeneeded`: データベースの準備はできているが、バージョンが古い。
+
+IndexedDB には、サーバーサイドデータベースにはない「スキーマのバージョン管理」と
+いう機構が組み込まれている。サーバーサイドのデータベースとは異なり、IndexedDB は
+クライアントサイドで、データはブラウザーに保存されるため、開発者はそれにフルタイ
+ムでアクセスすることができない。そのため、私たちがアプリケーションの新バージョン
+を公開し、利用者が私たちのウェブページにアクセスしたとき、データベースを更新する
+必要が生じることがある。ローカルのデータベースのバージョンが `open()` で指定され
+たものより小さい場合、特別なイベント `upgradeneeded` が発生し、必要に応じてバー
+ジョンを比較し、データ構造をアップグレードすることができる。
+
+イベント `upgradeneeded` は、データベースがまだ存在しない（バージョンが 0 であ
+る）場合にも起こされるので、初期化を実行できる。例えば、アプリケーションの最初の
+バージョンを公開したとする。そして、バージョン 1 のデータベースを開
+き、`upgradeneeded` ハンドラーで次のように初期化できる：
+
+```javascript
+let openRequest = indexedDB.open("store", 1);
+
+openRequest.onupgradeneeded = function() {
+    // triggers if the client had no database
+    // ...perform initialization...
+};
+
+openRequest.onerror = function() {
+    console.error("Error", openRequest.error);
+};
+
+openRequest.onsuccess = function() {
+    let db = openRequest.result;
+    // ...
+};
+```
+
+そして後日、バージョン 2 を公開します。次ようにアップグレードを実行することができる：
+
+```javascript
+let openRequest = indexedDB.open("store", 2);
+
+openRequest.onupgradeneeded = function(event) {
+    // the existing database version is less than 2 (or it doesn't exist)
+    let db = openRequest.result;
+    switch(event.oldVersion) {
+    case 0:
+        // version 0 means that the client had no database
+        // perform initialization
+    case 1:
+        // client had version 1
+        // update
+    }
+};
+```
+
+現在のバージョンは 2 なので、`onupgradeneeded` ハンドラーには、
+
+* 初めてアクセスする利用者で、データベースがない場合に適したバージョン 0 用と、
+* アップグレードのためのバージョン 1 用の
+
+コード分岐を用意することに注意。
+そして、`onupgradeneeded` ハンドラーがエラーなく終了した場合に限り、
+イベント `openRequest.onsuccess` が起動し、データベースは正常に開かれたとみなされる。
+
+データベースを削除するには次のようにする：
+
+```javascript
+indexedDB.deleteDatabase(name);
+```
+
+----
+
+古い `open()` 呼び出しバージョンを使ってデータベースを開くことはできない。現在の
+ユーザーデータベースのバージョンが `open()` 呼び出しのものより新しい場合、例えば
+既存の DB のバージョンが 3 で `open(..., 2)` をしようとすると、失敗して
+`openRequest.onerror` が発動する。
+
+レアケースだが、例えば代理キャッシュから古い JavaScript コードを読み込んだ場合、
+このようなことが起こり得る。つまり、コードは古くても、データベースは新しいという
+ことだ。
+
+エラーから守るために、`db.version` をチェックし、ページの再読み込みを提案する必
+要がある。古いコードを読み込まないように、適切な HTTP キャッシュヘッダーを使用す
+れば、このような問題が発生することはないだろう。
 
 #### Parallel update problem
 
