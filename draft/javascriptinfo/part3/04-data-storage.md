@@ -709,34 +709,472 @@ indexedDB.deleteDatabase(name);
 
 #### Parallel update problem
 
+バージョン管理について話しながら、関連する小さな問題に取り組もう。
+例えば、次のような場合です。
+
+1. ある訪問者がブラウザーのタブでデータベースのバージョン 1 のサイトを開いたとする。
+2. その後、アップデートが行われ、コードが新しくなった。
+3. そして、同じ訪問者が別のタブでこのサイトを開く。
+
+つまり、DB バージョン 1 への接続を開いているタブがあり、別のタブはその
+`upgradeneeded` ハンドラーでバージョン 2 に更新しようとする状況だ。
+
+問題は、同じサイト、同じオリジンなので、データベースが両方のタブで共有されている
+ことだ。そして、データベースはバージョン 1 と 2 の両方であることはできない。
+バージョン 2 への更新を実行するには、最初のタブの接続も含めて、バージョン 1 への接続を
+すべて閉じなければならない。
+
+それを整理するために、イベント `versionchange` は古くなったほうのデータベースオブジェク
+ト上で引き起こる。私たちはそれを listen して、古いデータベース接続を閉じなければならない。
+そしておそらく、更新されたコードを読み込むために、ページの再読み込みを利用者に促す。
+
+もし、イベント `versionchange` を listen せず、古い接続を閉じないのであれば、二
+回目の新しい接続は行われないでしょう。オブジェクト `openRequest` は `success` で
+はなく、イベント `blocked`を発生させる。そのため、二つ目タブは機能しない。
+
+以下は、並列更新を正しく処理するためのコードだ。`onversionchange` ハンドラーを導
+入し、現在のデータベース接続が古くなった場合 (他の場所で DB バージョンが更新され
+た場合) に引き起こして、接続を閉じる。
+
+```javascript
+let openRequest = indexedDB.open("store", 2);
+
+// Implement appropriately.
+openRequest.onupgradeneeded = ...;
+openRequest.onerror = ...;
+
+openRequest.onsuccess = function() {
+    let db = openRequest.result;
+
+    db.onversionchange = function() {
+        db.close();
+        alert("Database is outdated, please reload the page.")
+    };
+
+    // ...the db is ready, use it...
+};
+
+openRequest.onblocked = function() {
+    // As described in the book.
+};
+```
+
+言い換えれば、ここでは二つのことを行っている：
+
+1. `db.onversionchange` は、現在のデータベースのバージョンが古くなった場合、並行
+   して行われる更新を通知する。
+2. `openRequest.onblocked` は、その逆の状況、つまり、他の場所に古いバージョンへ
+   の接続があり、それが閉じないため、新しい接続ができないことを通知する。
+
+`db.onversionchange` では、より優雅に処理し、接続が閉じられる前にデータを保存す
+るように訪問者に促したりすることができる。あるいは、`db.onversionchange` でデー
+タベースを閉じずに、（新しいタブの） `onblocked` ハンドラーを使って訪問者に警告
+し、他のタブを閉じるまで新しいバージョンを読み込むことができないことを伝えるとい
+う方法もある。
+
+このような更新の衝突はめったに起こらないが、少なくともスクリプトが黙して死なぬよ
+うに、`onblocked` ハンドラーでなるべく何らかの処理をする。
+
 ### Object store
+
+IndexedDB に何かを保存するには、オブジェクトストアが必要だ。オブジェクトストアは
+IndexedDB の核となる概念だ。他のデータベースにおけるテーブルまたはコレクションに
+相当する。データが保存されている場所だ。データベースには、利用者用、商品用など、
+複数のストアが存在する場合がある。 「オブジェクト」ストアという名前だが、プリミ
+ティブも格納できる。
+
+複雑なオブジェクトを含む、ほとんどすべての値を格納することができる。
+IndexedDB は標準的なシリアライズアルゴリズムを使用して、オブジェクトを複製して保存する。
+これは `JSON.stringify()` のようなものだ、より強力で、より多くのデータ型を格納できる。
+保存できないオブジェクトの例として、循環参照を持つオブジェクトがある。
+このようなオブジェクトはシリアライズできない。
+`JSON.stringify()` もこのようなオブジェクトに対しては失敗する。
+
+ストア内のすべての値に対して、一意のキーが必要だ。
+キーは、数値、日付、文字列、バイナリー、配列のいずれかでなければならない。
+これは一意的な識別子なので、キーによって値の検索、削除、更新を行える。
+
+ノート：このオブジェクトストアの概念図に見覚えがないだろうか。
+
+すぐにわかるように、`localStorage` と同様に、値をストアに追加するときにキーを与
+えることができる。しかし、オブジェクトを保存する場合、IndexedDB ではオブジェクト
+のプロパティーをキーとして設定することができ、より便利だ。あるいは、キーを自動生
+成することもできる。しかし、まずはオブジェクトストアを作成する必要がある。
+
+```javascript
+db.createObjectStore(name[, keyOptions]);
+```
+
+この操作は同期的であり、`await` は無用であることに注意。
+
+* `name`: ストアの名前
+* `keyOptions`
+  * `keyPath`: IndexedDB がキーとして使用するオブジェクトプロパティーへのパス。
+  * `autoIncrement`: もし `true` なら、新しく保存されるオブジェクトのキーは、増
+    加し続ける数値として自動的に生成される。
+
+もし `keyOptions` を指定しないなら、オブジェクトを保存する際に、後でキーを明示的
+に指定する必要がある。例えば、このオブジェクトストアでは、キーとして `id` 
+プロパティーを用いる：
+
+```javascript
+db.createObjectStore('books', {keyPath: 'id'});
+```
+
+オブジェクトストアの作成も変更も、DB のバージョンを更新しながら `upgradeneeded`
+ハンドラーでしか行えない。
+
+これは技術的な制限だ。ハンドラーの外ではデータの追加、削除、更新ができるようになる
+が、オブジェクトストアはバージョン更新中にしか作成、削除、変更することができない。
+
+データベースのバージョンをアップグレードするには、主な方法が二つある。
+
+1. 1 から 2 へ、2 から 3 へ、3 から 4 へなど、バージョンごとのアップグレード機能
+   を実装することができる。 `upgradeneeded` でバージョンを比較し、中間バージョン
+   ごとに段階的にバージョンごとのアップグレードが可能だ。
+2. あるいは、データベースを調べることもできる。既存のオブジェクトストアの一覧を
+   `db.objectStoreNames` として得る。このオブジェクトは`DOMStringList` 型で、メ
+   ソッド `contains(name)` で存在するかどうかをチェックできる。そして、何が存在
+   して、何が存在しないかによって、更新できる。
+
+小規模なデータベースでは、後者の方法がより単純かもしれない。デモ：
+
+```javascript
+let openRequest = indexedDB.open("db", 2);
+
+// create/upgrade the database without version checks
+openRequest.onupgradeneeded = function() {
+    let db = openRequest.result;
+    if (!db.objectStoreNames.contains('books')) { // if there's no "books" store
+        db.createObjectStore('books', {keyPath: 'id'}); // create it
+    }
+};
+```
+
+ノート：データベースというか、データ一般でのバージョン差異の吸収処理？
+
+オブジェクトストアを削除するにはこうする：
+
+```javascript
+db.deleteObjectStore('books');
+```
 
 ### Transactions
 
+トランザクションという用語は一般的なもので、多くの種類のデータベースで用いられている。
+トランザクションはオールオアナッシングである一連の操作だ。
+例えば、ある人が何かを買うと、次のような処理が必要だ：
+
+1. 彼の口座から代金ぶんの金額を差し引く。
+2. 品物を彼の持ち物に追加する。
+
+もし、操作 1 を完了させた後、消灯などの理由で操作 2 に失敗したらかなりまずい。
+両方とも成功するか、両方とも失敗するかでなければならない。
+失敗しても、少なくとも彼には所持金が維持されているので、再施行できる。
+
+トランザクションはそれを保証する。
+
+IndexedDB では、すべてのデータ操作はトランザクション内で行う必要がある。
+トランザクションを開始するには：
+
+```javascript
+db.transaction(store[, type]);
+```
+
+TODO...
+
+また、`versionchange` トランザクション型もある。このようなトランザクションは、何
+でもできるが、手動で作成できない。 IndexedDB はデータベースに接続する際に、アッ
+プグレードが必要なハンドラーのために、 `versionchange` トランザクションを自動的
+に作成する。そのため、データベースの構造を更新したり、オブジェクトストアを作成し
+たり削除したりすることができる単一の場所となる。
+
+トランザクションに読み取り専用と読み取り書き込みのラベルを付ける理由は、性能にあ
+る。多くの読み取り専用トランザクションは、同じストアに同時にアクセスできるが、読
+み書きトランザクションはそうはできない。読み書きトランザクションは、書き込みのた
+めにストアをロックする。次のトランザクションは、同じストアにアクセスする前に、前
+のトランザクションが終了するのを待たねばならない。
+
+トランザクションが作成されたら、ストアに商品を追加できる：
+
+```javascript
+let transaction = db.transaction("books", "readwrite"); // (1)
+
+// get an object store to operate on it
+let books = transaction.objectStore("books"); // (2)
+
+let book = {
+    id: 'js',
+    price: 10,
+    created: new Date()
+};
+
+let request = books.add(book); // (3)
+
+// ... (4)
+```
+
+ここに段階が四つある：
+
+1. トランザクションを作成し、アクセスするすべてのストアを指定する。
+2. トランザクションを使用してストアオブジェクトを得る。
+3. オブジェクトストアへの要求 `books.add(book)` を実行する。
+4. 要求の成功・失敗を処理し、必要であれば他の要求などもできる。
+
+オブジェクトストアには、値を格納するためのメソッドが二つある。
+
+* `put(value, [key])`: ストアに `value` を追加する。`key` は、オブジェクトストア
+  が `keyPath` または `autoIncrement` オプションを持っていない場合に限って与えられる。
+  同じ `key` である値がすでにあれば、それは置き換えられる。
+* `add(value, [key])`: `put()` と同じだ、同じ `key` である値がすでにある場合、
+  要求は失敗し、`"ConstraintError"` というエラーが発生する。
+
+データベースを開くのと同様に、`books.add(book)` という要求を送信し、イベント `success`/`failure` を待機できる。
+
+* `add()` に対する `request.result` は新しいオブジェクトのキーだ。
+* もしあれば、エラーは `request.error` で参照できる。
+
 ### Transactions' autocommit
+
+上の例では、トランザクションを開始し、要求を追加した。
+しかし、トランザクションには関連する要求が複数あり、それらはすべて成功するか、
+すべて失敗するかのどちらかでなければならないと述べた。
+では、トランザクションを終了することを、これ以上要求ないことを示すにはどうすればよいだろうか。
+
+簡単に言うと「しない」。
+仕様の次のバージョン 3.0 では、トランザクションを明示的に終了する方法があるだろうが、今の 2.0 ではそれがない。
+すべてのトランザクション要求が終了し、マイクロタスクキューが空になると、自動的にコミットされる。
+
+通常、トランザクションはそのすべての要求が完了し、現在のコードが終了したときにコミットされると考えられる。
+したがって、上記の例では、トランザクションを終了するための特別な呼び出しが必要ない。
+
+トランザクションの自動コミット原則には、重要な副作用がある。
+トランザクションの途中で `fetch()` や `setTimeout()` のような非同期操作を挿入することはできない。
+IndexedDB はこれらが完了するまでトランザクションを待機させるようなことはない。
+
+以下のコードでは、(*) 行の `request2` が失敗する。なぜなら、トランザクションは
+すでにコミットされており、その中ではいかなる要求も行えないからだ。
+
+```javascript
+let request1 = books.add(book);
+
+request1.onsuccess = function() {
+    fetch('/').then(response => {
+        let request2 = books.add(anotherBook); // (*)
+        request2.onerror = function() {
+            console.log(request2.error.name); // TransactionInactiveError
+        };
+    });
+};
+```
+
+それは、`fetch()` が非同期処理であり、マクロタスクであるからだ。トランザクション
+は、ブラウザーがマクロタスクを開始する前に閉じられる。
+
+IndexedDB は、主に性能上の理由から、トランザクションは短命であるべきだという設計思想だ。
+
+注目すべきは、`readwrite` トランザクションがストアを書き込み用にロックすること
+だ。つまり、もしアプリケーションのある部分が `book` オブジェクトストアに対して
+`readwrite`を開始したら、同じことをしたい他の部分は待たなければならない。新しい
+トランザクションは、最初のものが完了するまで固まっているのだ。これは、トランザク
+ションが長い時間かかる場合、奇妙な遅延につながる可能性がある。
+
+では、どうすればいいのか。上の例では、新しい要求の直前に新しい `db.transaction`
+を作ることができる (*)。しかし、IndexedDB トランザクションと他の非同期処理を分割
+して、一つのトランザクションでまとめて処理したい場合は、もっと良い方法だろう。
+
+まず、`fetch()` を行い、必要ならデータを準備し、その後、トランザクションを作成し、
+すべてのデータベース要求を実行する。それからそれが動作する。
+
+成功の瞬間を検出するには、イベント `transaction.oncomplete` を listen すればよい。
+
+トランザクションが全体として保存されることを保証するのはイベント `complete` しかない。
+個々の要求は成功するかもしれないが、最終的な書き込み操作は I/O エラーなどでうまくいかないかもしれない。
+
+手動でトランザクションを中止するには、次のようにする：
+
+```javascript
+transaction.abort();
+```
+
+これにより、トランザクション中の要求が行ったすべての変更が取り消され、イベント
+`transaction.onabort` が引き起こされる。
 
 ### Error handling
 
+書き込み要求は失敗するかもしれない。これは予想されることで、我々の過失の可能性だ
+けでなく、トランザクション自体に関連しない理由によることもある。したがって、その
+ような場合に対処できるように準備しておく必要がある。
+
+失敗した要求は自動的にトランザクションを中止し、すべての変更を取り消す。
+
+状況によっては、既存の変更を取り消すことなく、失敗を処理してトランザクションを続
+行したいと思うかもしれません。ハンドラー `request.onerror` は
+`event.preventDefault()` を呼び出すことで、トランザクションの中断を防ぐことがで
+きる。
+
+以下の例では、新しい本が既存の本と同じキー `id` で追加されている。このとき、メ
+ソッド `store.add()` は `"ConstraintError "` を引き起こす。トランザクションを取
+り消すことなく、このエラーを処理する。
+
+```javascript
+let transaction = db.transaction("books", "readwrite");
+
+let book = { id: 'js', price: 10 };
+
+let request = transaction.objectStore("books").add(book);
+
+request.onerror = function(event) {
+    if (request.error.name == "ConstraintError") {
+        // ... handle the error
+        event.preventDefault(); // don't abort the transaction
+        // use another key for the book?
+    } else {
+      // unexpected error, can't handle it
+      // the transaction will abort
+    }
+};
+
+transaction.onabort = function() {
+    console.log("Error", transaction.error);
+};
+```
+
 #### Event delegation
+
+すべての要求に対して `onerror`/`onsuccess` を設ける必要があるだろうか。
+毎回そうすることはない。代わりにイベント委譲を使えばいい。
+
+IndexedDB のイベントは `request`, `transaction`, `database` の順に bubble する。
+
+イベントはすべて DOM イベントであり、捕捉と bubbling を行うが、通常は bubbling 段階しか用いられない。
+そのため、ハンドラー `db.onerror` を使ってすべてのエラーを捕捉し、報告やその他の目的に利用できる。
+
+```javascript
+db.onerror = function(event) {
+    let request = event.target; // the request that caused the error
+    console.log("Error", request.error);
+};
+```
+
+しかし、エラーが完全に処理された場合は報告したくない。
+`request.onerror` の中で `event.stopPropagation()` を使うことで、bubbling を停止して
+`db.onerror` を停止できる。
+
+```javascript
+request.onerror = function(event) {
+    if (request.error.name == "ConstraintError") {
+        console.log("Book with such id already exists"); // handle the error
+        event.preventDefault(); // don't abort the transaction
+        event.stopPropagation(); // don't bubble error up, "chew" it
+    } else {
+        // do nothing
+        // transaction will be aborted
+        // we can take care of error in transaction.onabort
+    }
+};
+```
+
+ノート：どうも ConstraintError が生じる仕組みを理解しておく必要がありそうだ。
 
 ### Searching
 
+オブジェクトストアでの検索には、類型が主に二つある：
+
+1. キー値またはキー範囲による検索。`books` ストレージでは `book.id` の値または値
+   の範囲だ。
+2. `book.price` など、別のオブジェクトフィールドによる検索。これには、"index" と
+   いう名前の追加的データ構造が必要だ。
+
 #### By key
+
+まず、検索の最初の類型であるキーによる検索を扱う。
+
+検索メソッドは正確なキー値と、いわゆる「値の範囲」の両方をサポートしている。
+オブジェクト `IDBKeyRange` は許容される「キーの範囲」を指定する。
+
+次の呼び出しでオブジェクト `IDBKeyRange` を生成する：
+
+* `IDBKeyRange.lowerBound(lower, [open])`
+* `IDBKeyRange.upperBound(upper, [open])`
+* `IDBKeyRange.bound(lower, upper, [lowerOpen], [upperOpen])`
+* `IDBKeyRange.only(key)`
+
+ノート：メソッドの意味と引数の意味は、オプション引数が Boolean であることさえわかれば、残りは直観的にわかる。
+
+実際の検索を行うには以下のメソッドがある。
+これらのメソッドでは引数 `query` に完全一致のキーか、キー範囲を指定する：
+
+* `store.get(query)`: 最初の値をキーまたは範囲指定で検索する。
+* `store.getAll([query], [count])`: 値をすべて検索し、与えられた場合は `count`
+  で制限する。
+* `store.getKey(query)`: 問い合わせ（通常は範囲）を満たす最初のキーを検索する。
+* `store.getAllKeys([query], [count])`: 問い合わせ（通常は範囲）を満たすキーを全
+  てを、与えられた場合は `count` までを検索する。
+* `store.count([query])`: 問い合わせ（通常は範囲）を満たすキーの総数を得る。
+
+オブジェクトストアは常にソートされている。オブジェクトストアは内部的にキーで値を
+ソートする。そのため、多くの値を返す要求では、常にキーでソートされた状態で値が返
+される。
 
 #### By a field using an index
 
 ### Deleting from store
 
+deleteメソッドは、クエリによって削除する値を検索するもので、呼び出し形式はgetAllに似ています。
+
+delete(query) - クエリにマッチした値を削除します。
+
+もし、価格や他のオブジェクトフィールドに基づいて書籍を削除したいのであれば、まずインデックスでキーを見つけ、それからdeleteを呼び出す必要があります。
+
+```javascript
+books.clear(); // clear the storage.
+```
+
 ### Cursors
+
+getAll/getAllKeys のようなメソッドは、キー/値の配列を返します。
+
+しかし、オブジェクトストレージは巨大で、利用可能なメモリよりも大きい場合があります。その場合、getAll はすべてのレコードを配列として取得することに失敗します。
+
+どうすればいいのでしょうか？
+
+カーソルは、それを回避する手段を提供する。
+
+カーソルは、クエリによってオブジェクトストレージを走査し、一度に一つのキー/値を返す特別なオブジェクトであるため、メモリを節約できる。
+
+オブジェクトストアは内部的にキーでソートされているので、カーソルはキー順にストアを走査します（デフォルトでは昇順）。
+
+```javascript
+let request = store.openCursor(query, [direction]);
+```
 
 ### Promise wrapper
 
+すべてのリクエストにonsuccess/onerrorを追加するのは、かなり面倒な作業です。イベントデレゲーション、例えばトランザクション全体にハンドラを設定することで、生活を楽にできることもありますが、async/awaitの方がずっと便利です。
+
+この章のさらに先で、薄いプロミスラッパー https://github.com/jakearchibald/idb を使ってみましょう。これは、プロミス化された IndexedDB のメソッドを持つグローバルな idb オブジェクトを作成します。
+
+すると、onsuccess/onerror の代わりに、次のように書くことができます。
+
+...
+
+そのため、「プレーンな非同期コード」と「try...catch」という甘いものがあります。
+
 #### Error handling
+
+もし、エラーをキャッチしなければ、最も近い外側の try.catch まで落ちます。
+
+捕捉されなかったエラーは、windowオブジェクトの "unhandled promise rejection "イベントとなる。
+
+このようなエラーは、次のように処理できます。
 
 #### "Inactive transaction" pitfall
 
 #### Getting native objects
 
-### Summary
+内部的には、ラッパーはネイティブなIndexedDBリクエストを実行し、それにonerror/onsuccessを追加し、その結果で拒否/解決するプロミスを返します。
 
-### Comments
+ほとんどの場合、これで問題なく動作します。サンプルは lib ページにあります。https://github.com/jakearchibald/idb.
+
+まれに、元のリクエストオブジェクトが必要な場合は、プロミスの promise.request プロパティとしてアクセスすることができます。
