@@ -1119,62 +1119,263 @@ request.onerror = function(event) {
 
 #### By a field using an index
 
-### Deleting from store
-
-deleteメソッドは、クエリによって削除する値を検索するもので、呼び出し形式はgetAllに似ています。
-
-delete(query) - クエリにマッチした値を削除します。
-
-もし、価格や他のオブジェクトフィールドに基づいて書籍を削除したいのであれば、まずインデックスでキーを見つけ、それからdeleteを呼び出す必要があります。
+他のオブジェクトフィールドで検索するには、インデックスというデータ構造を追加的に作成する必要がある。
+インデックスは、与えられたオブジェクトフィールドを追跡するストアの追加機能だ。
+そのフィールドの値それぞれに対して、その値を持つオブジェクトのキーのリストを格納する。
 
 ```javascript
-books.clear(); // clear the storage.
+objectStore.createIndex(name, keyPath, [options]);
+```
+
+* `name`: 作成するインデックスの名前。
+* `keyPath`: インデックスが跡を追うべきオブジェクトフィールドを指すパス。このフィールドで検索することになる。
+* `option`: 次のプロパティーからなるオプショナルなオブジェクト。
+  * `unique`: 値が `true` の場合、`keyPath` に指定した値を持つオブジェクトはストアにひとつしかないかもしれない。
+    重複したものを追加しようとすると、インデックスがエラーを発生させるようにする。
+  * `multiEntry`: `keyPath` の値が配列である場合に限り用いられる。この場合、既定
+    では、インデックスが配列全体をキーとして扱う。しかし、もし `multiEntry` が
+    `true` ならば、インデックスはその配列の要素それぞれに対してストアオブジェク
+    トのリストを保持する。つまり、配列の要素がインデックスのキーになる。
+
+本書よりも先にコードを示す：
+
+```javascript
+openRequest.onupgradeneeded = function() {
+    // we must create the index here, in versionchange transaction
+    let books = db.createObjectStore('books', {keyPath: 'id'});
+    let index = books.createIndex('price_idx', 'price');
+};
+```
+
+この例では、キーは `id` であり、本を保存する。
+ここで、`price` で検索したいとする。
+まず、インデックスを作成する必要がある。オブジェクトストアと同様に `upgradeneed` ハンドラーで行う。
+
+* インデックスはフィールド `price` を追跡する。
+* フィールド `price` は一意的ではなく、同じ価格の本が複数存在する可能性があるので、オプション `unique` は設定しない。
+* フィールド `price` は配列ではないので、フラグ `multiEntry` も指定しない。
+
+ここで在庫に本が四冊あるとする。`index` が何であるかを示すとこうなる：
+
+| price | list |
+|------:|------|
+| 3     | `['html']` |
+| 5     | `['css']` |
+| 10    | `['js', 'nodejs']` |
+
+このように、`createIndex()` 呼び出しの `price` の値ごとのインデックスには、
+その `price` を持つ `key` のリストが保持される。
+このインデックスは自動的に更新される。
+
+ある価格を検索したいときは、同じ検索方法をインデックスに適用するだけでよい：
+
+```javascript
+let transaction = db.transaction("books"); // readonly
+let books = transaction.objectStore("books");
+let priceIndex = books.index("price_idx");
+
+let request = priceIndex.getAll(10);
+
+request.onsuccess = function() {
+    if (request.result !== undefined) {
+        console.log("Books", request.result); // array of books with price=10
+    } else {
+        console.log("No such books");
+    }
+};
+```
+
+ノート：先に `books.createIndex()` を済ませているので `books.index()` でそれを得られる。
+
+`IDBKeyRange` を用いて安い本/高い本を探すこともできる。
+次の例では `price` が 5 またはそれ未満の本を検索する：
+
+```javascript
+let request = priceIndex.getAll(IDBKeyRange.upperBound(5));
+```
+
+インデックスは、内部的には追跡されたオブジェクトのフィールドで
+ソートされている。この場合、検索を行うと結果も `price` によってソートされる。
+
+### Deleting from store
+
+メソッド `delete()` は、問い合わせによって削除する値を検索するもので、呼び出し形式は
+`getAll()` に似ている。
+
+* `delete(query)`: 問い合わせにマッチする値を削除する。
+
+```javascript
+// delete the book with id='js'
+books.delete('js');
+```
+
+もし `price` や他のオブジェクトフィールドに基づいて本を削除したいのであれば、
+まずインデックスでキーを見つけ、それから `delete()` を呼び出す必要がある。
+
+```javascript
+let request = priceIndex.getKey(5);
+
+request.onsuccess = function() {
+    let id = request.result;
+    let deleteRequest = books.delete(id);
+};
+```
+
+全削除をするにはメソッド `clear()` を呼ぶ：
+
+```javascript
+books.clear();
 ```
 
 ### Cursors
 
-getAll/getAllKeys のようなメソッドは、キー/値の配列を返します。
+メソッド `getAll()`, `getAllKeys()` などは配列を返すが、場合によってはメモリーに
+収まらないほど巨大な結果となり得る。その場合にはメソッド呼び出しは失敗する。この
+事態を回避するためにカーソルという手段が用意されている。
 
-しかし、オブジェクトストレージは巨大で、利用可能なメモリよりも大きい場合があります。その場合、getAll はすべてのレコードを配列として取得することに失敗します。
-
-どうすればいいのでしょうか？
-
-カーソルは、それを回避する手段を提供する。
-
-カーソルは、クエリによってオブジェクトストレージを走査し、一度に一つのキー/値を返す特別なオブジェクトであるため、メモリを節約できる。
-
-オブジェクトストアは内部的にキーでソートされているので、カーソルはキー順にストアを走査します（デフォルトでは昇順）。
+カーソルは特別なオブジェクトであり、問い合わせを与えるとオブジェクト格納域を走査し、
+一度に一つのキーや値を返すため、メモリーを節約することができる。
+オブジェクトストアは内部的にキーでソートされているので、カーソルはキー順に走査する。
+未指定時は昇順。
 
 ```javascript
 let request = store.openCursor(query, [direction]);
 ```
 
+* `query` は `getAll()` と同様にキーまたはキー範囲だ。
+* `direction` はオプションナル引数で、どの順番で使用するかを指定する：
+  * `"next"`: 既定値で、カーソルは最も低いキーを持つレコードから上に向かって歩く。
+  * `"prev"`: 逆順。キーが大きいレコードから下へ向かって歩く。
+  * `"nextunique"`, `"prevunique"`: 上記それぞれと同じだ、同じキーを持つレコードを飛ばす。
+    例えば `price=5` の複数の本に対しては最初の一冊のみが返される。
+
+カーソル処理では `request.onsuccess` が各結果に対して一度ずつ、複数回引き起こされる。
+
+The main cursor methods are:
+
+advance(count) – advance the cursor count times, skipping values.
+continue([key]) – advance the cursor to the next value in range matching (or immediately after key if given).
+
+主なカーソルメソッドは以下の通りです。
+
+* `advance(count)`: カーソルを `count` 回進め、値を飛ばす。
+* `continue([key])`: 範囲一致の次の値か、キーが指定されている場合はキーの直後にカーソルを進める。
+
+カーソルに一致する値がさらにあるかどうかにかかわらず `onsuccess` が呼び出され、
+その結果、カーソルが次のレコードを指すか、`undefined` であるかになる。
+
+```javascript
+let transaction = db.transaction("books");
+let books = transaction.objectStore("books");
+
+let request = books.openCursor();
+
+// called for each book found by the cursor
+request.onsuccess = function() {
+    let cursor = request.result;
+    if (cursor) {
+        let key = cursor.key; // book key (id field)
+        let value = cursor.value; // book object
+        console.log(key, value);
+        cursor.continue();
+    } else {
+        console.log("No more books");
+    }
+};
+```
+
+上記の例では、オブジェクトストアに対してカーソルを作成したが、インデックスに対す
+るカーソルを作成することもできまる。インデックス上のカーソルは、オブジェクトスト
+ア上のカーソルと全く同じように、一度に値を一つ返すことでメモリーを節約する。
+インデックスに対するカーソルでは、`cursor.key` はインデックスキーであり、
+オブジェクトキーには `cursor.primaryKey` プロパティーを用いる必要がある。
+
+コード略。
+
 ### Promise wrapper
 
-すべてのリクエストにonsuccess/onerrorを追加するのは、かなり面倒な作業です。イベントデレゲーション、例えばトランザクション全体にハンドラを設定することで、生活を楽にできることもありますが、async/awaitの方がずっと便利です。
+すべての要求に `onsuccess`/`onerror` を追加するのはかなり面倒な作業だ。イベント
+委譲、例えばトランザクション全体にハンドラーを設定することで楽にできることもある
+が、 `async`/`await` の方がずっと便利だ。
 
-この章のさらに先で、薄いプロミスラッパー https://github.com/jakearchibald/idb を使ってみましょう。これは、プロミス化された IndexedDB のメソッドを持つグローバルな idb オブジェクトを作成します。
+この章のさらに先で、薄い `Promise` ラッパー <https://github.com/jakearchibald/idb> を
+使ってみる。これは `Promise` 化された IndexedDB のメソッドを持つグローバルなオブジェクト `idb` を生成する。
+すると `onsuccess`/`onerror` の代わりに、次のように書ける：
 
-すると、onsuccess/onerror の代わりに、次のように書くことができます。
+```javascript
+let db = await idb.openDB('store', 1, db => {
+    if (db.oldVersion == 0) {
+        // perform the initialization
+        db.createObjectStore('books', {keyPath: 'id'});
+    }
+});
 
-...
+let transaction = db.transaction('books', 'readwrite');
+let books = transaction.objectStore('books');
 
-そのため、「プレーンな非同期コード」と「try...catch」という甘いものがあります。
+try {
+    await books.add(...);
+    await books.add(...);
+
+    await transaction.complete;
+
+    console.log('jsbook saved');
+} catch(err) {
+    console.log('error', err.message);
+}
+```
+
+コメント：ラッパーの実装を見ないと何も言えない。
 
 #### Error handling
 
-もし、エラーをキャッチしなければ、最も近い外側の try.catch まで落ちます。
+もし、エラーを捕捉しなければ、最も近くに囲まれている `try...catch` まで落ちる。
+捕捉されなかったエラーは、オブジェクト `window` の "unhandled promise rejection" イベントになる。
+このようなエラーは、次のように処理できる。
 
-捕捉されなかったエラーは、windowオブジェクトの "unhandled promise rejection "イベントとなる。
-
-このようなエラーは、次のように処理できます。
+```javascript
+window.addEventListener('unhandledrejection', event => {
+    let request = event.target; // IndexedDB native request object
+    let error = event.reason; //  Unhandled error object, same as request.error
+    // ...report about the error...
+});
+```
 
 #### "Inactive transaction" pitfall
 
+トランザクションはブラウザーが現在のコードとマイクロタスクを終了するとすぐに自動
+コミットされる。`fetch()` のようなマクロタスクをトランザクションの途中に置くと、
+トランザクションはその終了を待機するようなことはない。自動コミットするだけだ。そ
+のため、次の要求は失敗する：
+
+`Promise` ラッパーと `async`/`await` の場合も状況は同じだ。
+次のものはトランザクションの途中で `fetch()` する例だ：
+
+```javascript
+let transaction = db.transaction("inventory", "readwrite");
+let inventory = transaction.objectStore("inventory");
+
+await inventory.add({ id: 'js', price: 10, created: new Date() });
+
+await fetch(...); // (*)
+
+await inventory.add({ id: 'js', price: 10, created: new Date() }); // Error
+```
+
+`fetch()` (*) 後の次の `inventory.add()` は "inactive transaction" エラーで失敗する。
+その時点ではトランザクションがすでにコミットされ閉じているからだ。
+
+回避策は、ネイティブの IndexedDB で作業するときと同じだ。
+新しいトランザクションを作成するか、物事を分割することだ。
+
+1. まずデータを準備し、必要なものをすべて取得する。
+2. データベースに保存する。
+
 #### Getting native objects
 
-内部的には、ラッパーはネイティブなIndexedDBリクエストを実行し、それにonerror/onsuccessを追加し、その結果で拒否/解決するプロミスを返します。
+内部的には、ラッパーはネイティブ IndexedDB 要求を実行し、それに
+`onerror`/`onsuccess` を追加し、その結果で拒否か解決をする `Promise` を返す。
 
-ほとんどの場合、これで問題なく動作します。サンプルは lib ページにあります。https://github.com/jakearchibald/idb.
+ほとんどの場合、これで問題なく動作する。<https://github.com/jakearchibald/idb>
 
-まれに、元のリクエストオブジェクトが必要な場合は、プロミスの promise.request プロパティとしてアクセスすることができます。
+まれに、元の `request` オブジェクトが必要な場合は、`promise.request` プロパティーでアクセスできる。
