@@ -128,17 +128,125 @@ $$
 
 <https://javascript.info/css-animations> ノート。
 
+CSS では、JavaScript を全く使わずに簡単なアニメーションを行える。
+さらに、JavaScript を使って CSS アニメーションを制御することで、少ないコードでより良いアニメーションを作れる。
+
 ### CSS transitions
+
+CSS 遷移の考え方は単純だ。あるプロパティーを記述し、その変化をどのようにアニメーションさせるかを記述する。
+プロパティーが変化すると、ブラウザーがそのアニメーションを描画する。
+つまり、プロパティーを変更するだけで、ブラウザーが流動的な遷移を行うのだ。
+例えば、次の CSS は `background-color` の変化を 3 秒間アニメーションさせる。
+これで、要素に `.animated` クラスがあれば 3 秒間の背景色の変化がアニメーションで表示される：
+
+```css
+.animated {
+    transition-property: background-color;
+    transition-duration: 3s;
+}
+```
+
+ノート：値が CSS のプロパティー名となるプロパティーは初めて見ると思う。
+本書のデモでは、ボタンをクリックすると背景がアニメーションで赤へと変化していく。
+ボタンの `onclick` で `this.style.backgroundColor = 'red';` としている。これが最終状態だ。
+
+CSS 遷移を記述するプロパティーは四つある：
+
+* `transition-property`
+* `transition-duration`
+* `transition-timing-function`
+* `transition-delay`
+
+差し当たり、共通 `transition` プロパティーによって、property duration
+timing-function delay の順番でまとめて宣言できることと、複数のプロパティーを一度に
+アニメーションさせることができることを押さえておく。
+
+```html
+<style>
+#growing {
+    transition: font-size 3s, color 2s;
+}
+</style>
+
+<script>
+growing.onclick = function() {
+    this.style.fontSize = '36px';
+    this.style.color = 'red';
+};
+</script>
+```
+
+ノート：組 (property duration timing-function delay) をカンマ区切りで列挙できるのだろう。
 
 ### transition-property
 
+プロパティー `transition-property` には、アニメートさせたいプロパティーのリストを記述する。
+また、`all` と書くと、すべてのプロパティーをアニメートすることになる。
+一般的に使われているプロパティーのほとんどはアニメート可能だが、できないプロパティーもある。
+
 ### transition-duration
+
+プロパティー `transition-duration` でアニメーション時間を指定できる。
+CSS 時間書式で指定する。秒なら `s`, ミリ秒なら `ms` だ。
 
 ### transition-delay
 
+プロパティー `transition-delay` には、アニメーションを開始するまでの遅延時間を指定できる。
+例えば、`transition-delay: 1s` で `transition-duration: 2s` の場合、
+アニメーションは当該プロパティーの変化から 1 秒後に始まり、全体の継続時間は 2 秒となる。
+
+負の値も許される。その場合、アニメーションはすぐに表示されるが、アニメーション
+の開始点は与えられた値（時間）後になる。例えば、`transition-delay: -1s` で
+`transition-duration: 2s` の場合、アニメーションは中間点から始まり、全体の継続時間は 1 秒となる。
+
+コメント：デモのスクリプトに注意。`onclick` で CSS クラスを与える方法を採っている。
+
+また、`transition-delay` を負の値にすることで、遷移の途中、例えば現在の秒に相当
+する正確な数字から開始させることも可能だ。
+
 ### transition-timing-function
 
+プロパティー `transition-timing-function` には、アニメーションの進行を時間軸に沿ってどのように配分するかを記述する。
+このプロパティーは Bezier 曲線と階段関数の二種類の値を取ることができる。
+
 #### Bezier curve
+
+タイミング関数、次の条件を満たす四制御点からなる Bezier 曲線として設定できる：
+
+1. 最初の制御点は (0, 0)
+2. 最後の制御点は (1, 1)
+3. 中間点では x の値は区間 (0, 1) 内でなければならず、y は何でもよい。
+
+CSS での Bezier 曲線の構文はこうなる：
+
+```text
+cubic-bezier(x2, y2, x3, y3)
+```
+
+最初と最後の制御点は固定されているので、間の二点だけを指定する。
+
+タイミング関数はアニメーション処理の速さを記述する：
+
+1. x 成分は時刻を指定する: 0: 開始、1: 終了。
+2. y 成分は処理の完了を指定する。0: 開始値、1: 最終値。
+
+最も単純な変種は、アニメーションが等速で進む場合だ。これは曲線 `cubic-bezier(0, 0, 1, 1)` で指定することができる。
+
+列車のデモは解説がほとんど要らない。要素の位置を指定するのに `left` を援用するくらいか。
+
+次の曲線は初速がえらいことになっている。
+
+組み込み曲線がいくつか用意されている。
+
+* `linear`: `cubic-bezier(0, 0, 1, 1)` と形は同じ曲線。すなわち直線。
+* `ease`: `cubic-bezier(0.25, 0.1, 0.25, 1.0)`
+* `ease-in`: `cubic-bezier(0.42, 0, 1.0, 1.0)`
+* `ease-out`: `cubic-bezier(0, 0, 0.58, 1.0)`
+* `ease-in-out`: `cubic-bezier(0.42, 0, 0.58, 1.0)|`
+
+`transition-timing-function` の既定値は `ease` だ。
+
+TODO
 
 #### Steps
 
