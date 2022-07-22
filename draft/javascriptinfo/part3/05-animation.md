@@ -424,9 +424,40 @@ Paint も飛ばされるとより効果的だ。
 画像をクリックすると三秒かけて寸法を十倍にするアニメーションを作れ。
 終了したらメッセージボックスを出せ。アニメーション中にクリックされるときの対応も考えろ。
 
+私の答案はこう：
+
+```css
+#flyjet {
+    width: 40px;
+    height: 24px;
+    transition-property: width, height;
+    transition-duration: 3s;
+}
+```
+
+```javascript
+let done = false;
+flyjet.onclick = function(event){
+    if(done){
+        return;
+    }
+    this.style.width = "400px";
+    this.style.height = "240px";
+    setTimeout(() => alert('Done!'), 3000);
+    done = true;
+};
+```
+
+フラグを使うのがみっともないのならば、イベントハンドラーを着脱する方法も考えられる。
+
+本書では `transitionend` イベントを処理しろとある。なるほど。
+ただし `width` と `height` の遷移終了それぞれに対してイベントが起こるので注意が要る。
+
 #### Animate the flying plane (CSS)
 
 前の課題の解答を修正して、画像を animate して元のサイズより大きくし、そして元のサイズに戻るようにしろ。
+
+これは `transition-timing-function` に適当な Bezier 曲線を与えるだけでいい。
 
 #### Animated circle
 
@@ -436,6 +467,20 @@ Paint も飛ばされるとより効果的だ。
 * `radius` は円の半径
 
 とする。
+
+1. ボタンの HTML コード片を書く。ブラウザーの検証コマンドを利用して構わない。
+2. テンプレのスタイルシートの `width`, `height` をゼロにしておく。
+3. スクリプト。
+
+```javascript
+function showCircle(cx, cy, radius){
+    const circle = document.querySelector('div');
+    circle.style.left = cx + 'px';
+    circle.style.top = cy + 'px';
+    circle.style.width = radius * 2 + 'px';
+    circle.style.height = radius * 2 + 'px';
+}
+```
 
 #### Animated circle with callback
 
@@ -452,6 +497,18 @@ Paint も飛ばされるとより効果的だ。
 showCircle(150, 150, 100, div => {
     div.classList.add('message-ball');
     div.append("Hello, world!");
+});
+```
+
+テキストを垂直方向に中央に置く方法がわからない。解答を見ると
+`message-ball` に `line-height` を直接定義している。それでいいのか。
+
+しかし、本問の急所はここだ：
+
+```javascript
+circle.addEventListener('transitionend', function handler() {
+    circle.removeEventListener('transitionend', handler);
+    callback(C);
 });
 ```
 
