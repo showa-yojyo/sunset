@@ -516,36 +516,126 @@ circle.addEventListener('transitionend', function handler() {
 
 <https://javascript.info/js-animation> ノート。
 
-### CSS transitions
+JavaScript のアニメーションは CSS では扱えないものを扱える。
+例えば、Bezier 曲線とは異なるタイミング関数で複雑な経路を移動したり、キャンバス上でアニメーションを行ったりする。
 
-### transition-property
+### Using setInterval
 
-### transition-duration
+アニメーションは、一連のフレームとして実装できる。通常は、HTML/CSS のプロパ
+ティーに変更を小さく加えていく。たとえば、`style.left` を 0px から 100px に変更
+すると、要素が動く。そして、`setInterval()` でそれを増加させ、1 秒間に 50 回のよ
+うに小さな遅延で 2px ずつ変化させると滑らかに見える。これは映画と同じ原理で、1
+秒間に 24 フレームあれば十分滑らかに見える。
 
-### transition-delay
+```javascript
+let timer = setInterval(function() {
+    if (style.left >= 100px){
+        clearInterval(timer);
+    }
+    else{
+        style.left += 2px;
+    }
+}, 20); // change by 2px every 20ms, about 50 frames per second
+```
 
-### transition-timing-function
+ノート：javascript - Get a number for a style value WITHOUT the "px;" suffix - Stack Overflow
+https://stackoverflow.com/questions/8690463/get-a-number-for-a-style-value-without-the-px-suffix
 
-#### Bezier curve
+### Using requestAnimationFrame
 
-#### Steps
+複数のアニメーションを同時に実行する場合を考える。
+これらを別々に実行すると、それぞれに `setInterval(..., 20)` が設定されているにもか
+かわらず、ブラウザーは 20ms ごとよりもずっと頻繁に再描画しなければならない。
+これは、アニメーションの開始時間が異なるため、20ms ごとがアニメーションの種類に
+よって異なるからだ。間隔が揃っていないのだから、20ms の中に独立した複数の実行があることになる。
 
-### Event: "transitionend"
+```javascript
+setInterval(animate1, 20); // independent animations
+setInterval(animate2, 20); // in different places of the script
+setInterval(animate3, 20);
 
-### Keyframes
+// This is lighter than three independent calls:
+setInterval(function() {
+    animate1();
+    animate2();
+    animate3();
+}, 20);
+```
 
-### Performance
+独立した複数の再描画をグループ化することで、ブラウザーが再描画するのが容易になり、
+その結果、CPU 負荷が軽減し、見た目も滑らかになるはずだ。
+もうひとつ注意すべきことがある。CPU に負荷がかかっていたり、再描画の頻度を少なくする理由があったり
+（ブラウザーのタブが隠されているなど）するので、本当は 20ms ごとに実行するべきではない。
+
+JavaScript でそれを知るにはどうしたらいいのか。
+Animation timing という仕様があり、`requestAnimationFrame()` という関数が用意されている。
+これは、これらすべてとそれ以上の問題に対応している。
+
+```javascript
+let requestId = requestAnimationFrame(callback);
+```
+
+この呼び出しにより、ブラウザーがアニメーションを行いたいときに最も近いタイミングで
+関数 `callback` が実行されるようスケジュールされる。
+コールバックで要素の変更を行うと、他の `requestAnimationFrame()`
+コールバックや CSS アニメーションと一緒にまとめられる。そのため、幾何の再計算と
+再描画は、複数回ではなく、一度だけ行われる。
+
+戻り値 `requestId` は、呼び出しを取り消すために用いる。
+
+```javascript
+cancelAnimationFrame(requestId);
+```
+
+このコールバック関数は、ページロードの開始時点からのミリ秒単位の経過時間を引数に取る。
+同じものを `performance.now()` を呼び出すことによっても得られる。
+CPU に負荷がかかっていたり、ノートパソコンのバッテリーがほとんど放電していたり、
+その他の理由がない限り、通常、コールバックはすぐに実行される。
+
+以下のコードは、`requestAnimationFrame()` の最初の十回の実行の間の時間を示す。
+通常、10ms から 20ms になる。
+
+```javascript
+let prev = performance.now();
+let times = 0;
+
+requestAnimationFrame(function measure(time) {
+    document.body.insertAdjacentHTML("beforeEnd", Math.floor(time - prev) + " ");
+    prev = time;
+    if (times++ < 10) requestAnimationFrame(measure);
+});
+```
+
+ノート：実際に実行するとそうでもない。
+
+### Structured animation
+
+### Timing functions
+
+#### Power of n
+
+#### The arc
+
+#### Back: bow shooting
+
+#### Bounce
+
+#### Elastic animation
+
+### Reversal: ease*
+
+#### easeOut
+
+#### easeInOut
+
+### More interesting "draw"
 
 ### Summary
 
 ### Tasks
 
-#### Animate a plane (CSS)
+#### Animate the bouncing ball
 
-#### Animate the flying plane (CSS)
-
-#### Animated circle
-
-#### Animated circle with callback
+#### Animate the ball bouncing to the right
 
 ### Comments
