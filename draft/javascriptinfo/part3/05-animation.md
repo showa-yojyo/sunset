@@ -610,32 +610,186 @@ requestAnimationFrame(function measure(time) {
 
 ### Structured animation
 
+`requestAnimationFrame()` の上に、より汎用的なアニメーション機能を作る。
+
+```javascript
+function animate({timing, draw, duration}) {
+    let start = performance.now();
+
+    requestAnimationFrame(function animate(time) {
+        // timeFraction goes from 0 to 1
+        let timeFraction = (time - start) / duration;
+        if (timeFraction > 1) timeFraction = 1;
+
+        // calculate the current animation state
+        let progress = timing(timeFraction)
+
+        draw(progress); // draw it
+
+        if (timeFraction < 1) {
+          requestAnimationFrame(animate);
+        }
+    });
+}
+```
+
+関数 `animate()` は、アニメーションを本質的に記述する引数を三つ取る。
+
+TODO: DL
+
+`duration`:
+アニメーションの総時間。
+
+`timing(timeFraction)`:
+CSS プロパティー `transition-timing-function` のようなタイミング関数。経過した時
+間の割合（開始時 0、終了時 1）を取り、アニメーションの完成度（曲線の y 座標のよ
+うなもの）を返す関数だ。
+例えば、一次関数を与えると、アニメーションは一様に同じ速度で進行する。
+
+```javascript
+function linear(timeFraction) {
+    return timeFraction;
+}
+```
+
+CSS で言えば `transition-timing-function: linear` に相当する。
+
+`draw(progress)`:
+アニメーションの進行状態を取り、それを描画する関数。
+`progress=0` はアニメーションの開始状態、
+`progress=1` は終了状態を表す。
+実際にアニメーションを描くのはこの関数である。
+
+```javascript
+function draw(progress) {
+    train.style.left = progress + 'px';
+}
+```
+
+CSS アニメーションとは異なり、ここでは任意のタイミング機能、任意の描画機能を作る
+ことができる。タイミング機能は Bezier 曲線にとらわれない。また、描画はプロパティーを
+超えて、花火のアニメーションのような新しい要素を作ることができる。
+
 ### Timing functions
+
+ノート：GLSL で修行した人なら、ここで述べていることが何であるかはすぐに理解するだろう。
 
 #### Power of n
 
+アニメーションの速度を上げたい場合は、べき乗の累進性を利用すればよい。
+JavaScript には `Math.pow()` がある。
+
+ノート：とは言っているが、立ち上がりの速度はむしろ遅くなる。何しろ ${t \le 1}$ なのだから。
+
 #### The arc
+
+ノート：これはやり過ぎ。`1 - Math.sqrt(1 - t * t)` くらいで十分。
 
 #### Back: bow shooting
 
+この関数は「弓を射る」。まず「弓の弦を引く」。そして「射る」。
+これまでの関数とは異なり、追加の引数である「弾性係数」にも依存する。弓の弦を引く距離は、これによって定義される。
+
+```javascript
+function back(x, t) {
+    return Math.pow(t, 2) * ((x + 1) * t - x)
+}
+```
+
 #### Bounce
+
+ボールを落とすと下に落ち、数回跳ね返って止まる。
+関数 `bounce()` はこれと同じことをするが、順序は逆だ。
+跳ね返りが直ちに始まる。そのために、特殊な係数がいくつか使われている。
+
+```javascript
+function bounce(t) {
+    for (let a = 0, b = 1; ; a += b, b /= 2) {
+        if (t >= (7 - 4 * a) / 11) {
+            return -Math.pow((11 - 6 * a - 11 * t) / 4, 2) + Math.pow(b, 2);
+        }
+    }
+}
+```
+
+ノート：ひじょうにクセがある。
 
 #### Elastic animation
 
+プロットを見ると、順序が逆の減衰関数だ。
+
+```javascript
+function elastic(x, t) {
+    return Math.pow(2, 10 * (t - 1)) * Math.cos(20 * Math.PI * x / 3 * t);
+}
+```
+
 ### Reversal: ease*
+
+タイミング関数のコレクションを用意した。その直接の用途は easeIn と呼ばれる。
+時には、アニメーションを逆の順序で表示する必要がある。それは easeOut 変換で行う。
 
 #### easeOut
 
+easeOut モードでは、タイミング関数はラッパー `timingEaseOut` に包められる。
+つまり、通常のタイミング関数を取り、そのラッパーを返す変換関数 `makeEaseOut` があるのだ。
+
+```javascript
+function makeEaseOut(timing) {
+    return function(t) {
+        return 1 - timing(1 - t);
+    };
+}
+```
+
+例えば、先ほどの関数 `bounce()` に適用できる。
+そうすると、跳ねるのがアニメーションの最初ではなく、最後になる。具合が良い。
+
+```javascript
+let bounceEaseOut = makeEaseOut(bounce);
+```
+
+一般に、easeOut 化すると、アニメーション効果が最初にあれば、最後になる。
+
+* 通常版：オブジェクトは下部で跳ねて、最後に急激に上部へ飛び上がる。
+* easeOut 適用後：最初に上部へ飛んで、そこで跳ねる。
+
 #### easeInOut
+
+また、アニメーションの最初と最後の両方で効果を示す変換も考えられる。これを easeInOut と呼ぶ。
+
+```javascript
+function makeEaseInOut(timing) {
+    return function(t) {
+        if (t < .5)
+            return timing(2 * t) / 2;
+        else
+            return (2 - timing(2 * (1 - t))) / 2;
+    }
+}
+
+bounceEaseInOut = makeEaseInOut(bounce);
+```
+
+easeInOut 変換はアニメーションの前半は easeIn, 後半は easeOut で合成したようなものだ。
+関数 `circ()` の easeIn, easeOut, easeInOut のプロットを比較すると、効果は明白だ。
+このように、アニメーションの前半のグラフは、easeIn を縮小したもので、後半は
+easeOut を縮小したものであることがわかる。その結果、アニメーションは同じ効果
+で始まり、終わる。
 
 ### More interesting "draw"
 
-### Summary
+要素を移動させる代わりに、他のことをすることができる。必要なのは適切な描画を書くことだ。
+ここに「跳ねる」テキストタイピングがある。
+
+ノート：ソースを見ると、ほんとうに本書の内容の関数で実装されている。
 
 ### Tasks
 
 #### Animate the bouncing ball
 
+弾むボールを作れ。
+
 #### Animate the ball bouncing to the right
 
-### Comments
+ボールを右に弾ませろ。左からの距離は 100px とする。前の問題の解から作れ。
