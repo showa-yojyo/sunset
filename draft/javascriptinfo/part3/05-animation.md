@@ -790,6 +790,27 @@ easeOut を縮小したものであることがわかる。その結果、アニ
 
 弾むボールを作れ。
 
+ノート：次の量を先に計算しておく必要がある：
+
+```javascript
+field.clientHeight - ball.clientHeight;
+```
+
 #### Animate the ball bouncing to the right
 
 ボールを右に弾ませろ。左からの距離は 100px とする。前の問題の解から作れ。
+
+水平方向に等速運動させたい。こういう場合には座標軸別に `aminate()` するという発想をする。
+次の呼び出しを前問の解答に追加：
+
+```javascript
+animate({
+    duration: 2000,
+    timing(t){
+      return t;
+    },
+    draw(progress) {
+      ball.style.left = 100 * progress + 'px';
+    }
+});
+```
