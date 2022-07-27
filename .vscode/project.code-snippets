@@ -104,6 +104,10 @@
 		"prefix": "thebookofshaders",
 		"body": "${1|[The Book of Shaders],[The Book of Shaders]: https://thebookofshaders.com/|}$0"
 	},
+	"type":{
+		"prefix": "type",
+		"body": "[転職・求人情報サイトの type](https://type.jp/)"
+	},
 	"twgl":{
 		"prefix": "twgl",
 		"body": "${1|[TWGL],[TWGL]: https://twgljs.org/docs/|}$0"
