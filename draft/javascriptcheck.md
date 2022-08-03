@@ -19,6 +19,38 @@ title: JavaScript チェック項目集
 * `...` 代入
 * もちろん `setTimeout()`, `setInterval()`
 * `call()`, `apply()`
+  * `call()` を少し試す。`null`, `undefined` を与えたときの挙動が MDN の記載どおりであることを確認。
+  * `apply()` は `call()` とほとんど同じ。たとえば演習問題の一問目は次でも同じだ：
+
+    ```javascript
+    function spy(func) {
+        wrapped.calls = [];
+    
+        function wrapped(...args){
+          wrapped.calls.push(args);
+          return func.call(this, ...args);
+        };
+        
+        return wrapped;
+    }
+    ```
+
+  * 二問目では矢関数を採用しない場合には `this` を変なスコープで保存しないとうまく動かない。
+
+    ```javascript
+    function delay(f, ms){
+        function wrapped(...args){
+            let savedThis = this;
+            return setTimeout(
+                //() => f.call(this, ...args),
+                function(){ return f.call(savedThis, ...args); },
+                ms);
+        }
+
+        return wrapped;
+    }
+    ```
+
 * debounce
 * throttle
 * `bind()`
