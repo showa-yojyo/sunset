@@ -4,20 +4,148 @@ title: JavaScript チェック項目集
 
 ## Part 1
 
-* Type conversions
-* 比較演算子の使い方 `===` など
-* `??`
-* モジュールに 'use strict' は不要
-* JSDoc の「導入方法」
-* Mocha の「導入方法」
-* `Object.assign()` を使う
-* `this` 周り
-* 演算子 `?.` を使うか
-* さらに `?.()`, `?.[]` も使うか？
-* `parseInt()`, `parseFloat()`
-* `Object.fromEntries()` をもう一度調べる
-* `...` 代入
-* もちろん `setTimeout()`, `setInterval()`
+### Type conversions
+
+非 `Object` 型の自動型キャストについて気になるところをチェックしておく。
+いざとなれば明示的キャストが有効なので困ることはない。
+
+1. `String` へのキャストは `String` 値が必要なときに暗黙的に行われる。
+2. `Number` へのキャストは数学関数や式の中で暗黙的に行われる。
+3. `Boolean` へのキャストは論理演算が必要なときに暗黙的に行われる。
+
+明示的キャストの一覧：
+
+1. `String(value)`
+2. `Number(value)`, `+value`
+3. `Boolean(value)`, `!!value`
+
+### 比較演算子の使い方 `===` など
+
+JavaScript 固有の挙動として、型が異なる値を比較してもエラーにならない。
+先述の自動型キャストが発動して型を揃えてから比較される。
+両辺ともに `Number` 型にキャストされると憶えておいて間違いない。
+
+そこで演算子 `===`/`!==` がある。これは自動型キャストを一切行わない。
+両辺の型が異なっていれば、それだけで `false`/`true` と評価される。
+
+### `??`
+
+既存コードで `result = a ?? b` のような書き方に置き換えることを考えたい。
+
+### モジュールに 'use strict' は不要
+
+書いてあったら sed 的に削ってしまえ。
+
+### JSDoc の導入方法
+
+[jsdoc - npm](https://www.npmjs.com/package/jsdoc) に書いてある。
+
+### Mocha の導入方法
+
+[Mocha - the fun, simple, flexible JavaScript test framework](https://mochajs.org/) に書いてある。
+
+### `Object.assign()` を使う
+
+オブジェクトの複製方法を理解しておく。
+対象オブジェクトのプロパティーは指示されなければ保存されるので、実態としてはマージと言いたい。
+
+```javascript
+Object.assign(dest, [src1, src2, src3...]);
+```
+
+キーと値の集合ではなく、オブジェクトを `src` としてもよい。
+その場合には元オブジェクトのプロパティーのキーと値がマージされる。
+
+```javascript
+let clone = Object.assign({}, user);
+```
+
+`Object.assign()` を使わない方法もある：
+
+```javascript
+let clone = {...user};
+```
+
+深い複製をするにはより巧妙な手段を講じる必要がある。
+
+### `this` 周り
+
+オブジェクトのメソッドが、そのオブジェクトのメンバーにアクセスすることを考える。
+その前にオブジェクト自身にアクセスする必要がある。この状況でキーワード `this` を用いることができる。
+`this` の値は、メソッドを呼び出すために使用されるオブジェクトのドット以前が指すものに等しい。
+
+JavaScript に慣れていない段階では、`this` が `undefined` を指す状況によく陥る。
+こういうときには `call()`/`apply()`, `bind()` の適用や、
+`function` 型関数を矢関数に置き換えることを調べるようにする。
+
+### 演算子 `?.` を使うか
+
+```javascript
+user?.address?.street;
+document.querySelector('.elem')?.innerHTML;
+```
+
+この演算子は short-circuit ルールが適用される。
+
+### さらに `?.()`, `?.[]` も使うか？
+
+オブジェクト `userAdmin` と `userGuest` があり、もしかしたらメソッド
+`admin()` があるかもしれない場合に次のようなコードがあり得る：
+
+```javascript
+userAdmin.admin?.();
+userGuest.admin?.();
+```
+
+オブジェクト `user1` と `user2` があり、もしかしたらプロパティー
+`firstName` があるかもしれない場合に次のようなコードがあり得る：
+
+```javascript
+user1?.["firstName"];
+user2?.["firstName"];
+```
+
+### `parseInt()`, `parseFloat()`
+
+```javascript
+parseInt(string);
+parseInt(string, radix);
+```
+
+`parseInt()` は第一引数を文字列とする。文字列でない引数には自動型キャストが発生する。
+
+先頭に空白文字が来ても結果に影響しない。
+
+正負の符号は考慮される。
+
+極端な値の `radix` は認められず、`NaN` を返す。
+
+`parseInt()` の戻り値を `isNaN()` でなるべくテストする。
+
+```javascript
+parseFloat(string);
+```
+
+`Number(string)` との違いは？
+
+### `Object.fromEntries()` をもう一度調べる
+
+このメソッドはキーと値のペアの集合を `Object` に変換するようなものだ。引数は反復可能ならば十分だ。
+例えば `Array` や `Map` は通じる。
+
+メソッド `Object.entries()` が逆関数に相当する。これは `Object` をキーと値のペアの配列に変換する。
+
+### `...` 代入
+
+```javascript
+[a, b, ...rest] = [10, 20, 30, 40, 50];
+```
+
+このような代入ができる。色々とパターンがあって、有用なものを忘れたくない。
+
+### `setTimeout()`, `setInterval()`
+
+Python equivalent を考えると眠れなくなる。
 
 ### `call()`, `apply()`
 
@@ -123,22 +251,73 @@ function partial(func, ...args) {
 }
 ```
 
-* `Promise`
-* `async`/`await` など
-* スクリプトタグの defer や async の理解は問題ないか
-* `Proxy` で何か面白いことができないか
+### Promise
+
+基本動作を確認する：
+
+```javascript
+let p = new Promise((resolve, reject) => {
+    reject("POOR");
+}).catch(e => alert(e));
+
+let p = new Promise((resolve, reject) => {
+    reject("POOR");
+}).then(r => alert(r), e => alert(e));
+
+let p = new Promise((resolve, reject) => {
+    resolve("OK");
+}).catch(e => alert(e));
+```
+
+`resolve()` も `reject()` も呼び出さないままでいると、内部状態は pending のまま変わらない。
+
+Python での「等価物」は `asyncio` 周りの機能ということになるのだろう。
+`async`/`await` も関係する。
+
+### スクリプトタグの defer や async の理解は問題ないか
+
+ブラウザーが HTML を解析するときに SCRIPT タグを見つけると、DOM の構築をそこで中断する。
+そのタグを実行してから構築を再開する。これが DOM 生成の基本だ。
+
+`defer`: そこで中断する代わりにスクリプトのロードをバックグランドで行い、かつ
+DOM の構築を続行する。DOM の準備ができたらスクリプトが実行する。
+複数の `defer` スクリプトがある場合、それらの順序は考慮される。
+
+`async`: 他のスクリプトのロードを待たないし、他のスクリプトも `async` スクリプトを待たない。
+イベント `DOMContentLoaded` さえ `async` スクリプトの完了を待たない。
+つまり、ページのロード完了前に実行される。
+
+どちらの属性も、`src` のない（つまり外部ファイルではない）スクリプトには効かない。
+
+以上を踏まえて、モジュールスクリプトは `defer` が与えられていないものでも `defer` が適用される。
+HTML ファイルに直接書かれているスクリプトでもだ。
+ユーザーはモジュールスクリプトが実行される前のページを一瞬見ることになる可能性が高い。
+
+`async` モジュールの場合はやはり独立性があり、他を待たない。
+
+### `Proxy` で何か面白いことができないか
+
+`Proxy` はふつう `Reflect` と一緒に用いる。
 
 ## Part 2
 
-* Walking the DOM で述べられている基本的 API の理解を確認する
-* Insertion methods 全部確認
-* `elem.classList`
-* `window.getComputedStyle(elem)` を上手く使えないか
-* CSS positioning 各種
-* `element.addEventListener()` のオプション
-* 要素 `elem` 上でイベント `event` を発生させるには `elem.dispatchEvent(event)` を呼び出す。
-* `CustomEvent`
-* `closest()`
+### Walking the DOM で述べられている基本的 API の理解を確認する
+
+### Insertion methods 全部確認
+
+### `elem.classList`
+
+### `window.getComputedStyle(elem)` を上手く使えないか
+
+### CSS positioning 各種
+
+### `element.addEventListener()` のオプション
+
+### `elem.dispatchEvent(event)`
+
+### `CustomEvent`
+
+### `closest()`
 
 ## Part 3
 
