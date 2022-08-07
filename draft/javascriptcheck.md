@@ -40,6 +40,9 @@ JavaScript 固有の挙動として、型が異なる値を比較してもエラ
 
 [jsdoc - npm](https://www.npmjs.com/package/jsdoc) に書いてある。
 
+しかし、これだけだとハローワールドがわからないので、次を試す：
+[JSDoc Tutorial](https://learning-zone.github.io/jsdoc-tutorial/)
+
 ### Mocha の導入方法
 
 [Mocha - the fun, simple, flexible JavaScript test framework](https://mochajs.org/) に書いてある。
