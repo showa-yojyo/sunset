@@ -306,6 +306,32 @@ HTML ファイルに直接書かれているスクリプトでもだ。
 
 ### Walking the DOM で述べられている基本的 API の理解を確認する
 
+DOM ノードを与えると、ナビゲーションプロパティーを使って、そのすぐ近くにあるノードにアクセスできる。
+まずはどのノードに対しても有効なプロパティーである次を憶える：
+
+`childNodes`
+    直接の子ノード全部。テキストノードなども含む。
+`firstChild`
+    `childNodes` の先頭要素に等しい。
+`lastChild`
+    `childNodes` の末尾要素に等しい。
+`parentNode`
+    親ノード。
+`previousSibling`
+    親ノードが自身の親ノードに等しく、自身の直前にあるノード。
+`nextSibling`
+    親ノードが自身の親ノードに等しく、自身の直後にあるノード。
+
+ノードにはテキストも要素もコメントも含まれるので、これらのプロパティーでは邪魔なものを拾ってくることがある。
+要素に限定したプロパティーもある：
+
+* `children`
+* `firstElementChild`
+* `lastElementChild`
+* `parentElement`
+* `previousElementSibling`
+* `nextElementSibling`
+
 ### Insertion methods 全部確認
 
 ### `elem.classList`
