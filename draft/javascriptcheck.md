@@ -332,7 +332,51 @@ DOM ノードを与えると、ナビゲーションプロパティーを使っ�
 * `previousElementSibling`
 * `nextElementSibling`
 
+### `closest()`
+
+`elem.closest(css)` セレクターに合致する祖先のうち、`elem` から最も近いものを返す。
+`elem` 自身が合致するならば、それが返る。
+
+イベントハンドリングにおいて、このメソッドの親へ親へと向かう性質が利用できる。
+
 ### Insertion methods 全部確認
+
+何らかの方法で生成したノードを、与えられたノード位置を基準にして挿し込む方法たち。
+まず先にメソッド一覧を挙げる。それから引数の意味と振る舞いを述べる。
+
+* `node.append(...nodes or strings)`
+* `node.prepend(...nodes or strings)`
+* `node.before(...nodes or strings)`
+* `node.after(...nodes or strings)`
+* `node.replaceWith(...nodes or strings)`
+
+引数 `...nodes or strings` はノードか文字列が複数、カンマ区切りで与えられることを示している。
+文字列の場合には、テキストノードとして `node` の近くに挿し込まれる。
+ノードでも文字列でもない場合には、JavaScript の規則に従って文字列に自動変換されたものが扱われる。
+
+`node.append()`, `node.prepend()` は引数ノードが子になる。末尾から入れるか先頭から入れるかの違いしかない。
+
+`node.before()`, `node.after()` は引数ノードが兄弟になる。
+
+`node.replaceWith()` は自身を引数ノード全部と取り替える。自身はどこかへ行く。
+
+ノードの生成と挿し込みを同時に行うメソッドもある。
+
+```javascript
+elem.insertAdjacentHTML(where, html);
+```
+
+引数 `where` は次の文字列のどれか。憶えにくい気がする。しかし、
+引数 `html` に `innerHTML` 相当の文字列を指定できる利便性を無視できない。
+
+"beforebegin"
+    自身の直前に挿し込む。
+"afterbegin"
+    自身の子になるように挿し込む。先頭に来る。
+"beforeend"
+    自身の子になるように挿し込む。末尾に来る。
+"afterend"
+    自身の直後に挿し込む。
 
 ### `elem.classList`
 
@@ -346,7 +390,6 @@ DOM ノードを与えると、ナビゲーションプロパティーを使っ�
 
 ### `CustomEvent`
 
-### `closest()`
 
 ## Part 3
 
