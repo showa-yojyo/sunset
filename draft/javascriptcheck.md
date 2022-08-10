@@ -380,9 +380,69 @@ elem.insertAdjacentHTML(where, html);
 
 ### `elem.classList`
 
+HTML 要素は CSS クラスを一般的には複数含むことに注意。
+
+`elem.className` に CSS 内容を代入すると、クラスを定義する文字列全体が置き換わる。
+しかし、たいていの場合にはクラス一つを追加なり削除なりしたい。
+この用途にプロパティー `elem.classList` を利用できる。
+`elem.classList` はクラス単位で操作するためのメソッドがある特別なオブジェクトだ。
+
+`elem.classList.add("class")`
+`elem.classList.remove("class")`
+    クラス "class" を追加、削除する。
+    削除の場合、指定したクラスがない場合には単に無視されるようだ。
+`elem.classList.toggle("class")`
+    クラス "class" を既に含む場合には削除を、ない場合には追加をする。
+    戻り値の真偽値で実際にはどう処理されたかを区別できる。
+`elem.classList.contains("class")`
+    クラス "class" を含んでいるかどうかを判定する。
+
 ### `window.getComputedStyle(elem)` を上手く使えないか
 
+このメソッドは read-only な値を参照するだけなので、上手く使うということは考えないでいい。
+
+`getComputedStyle(elem)` の用途は具体的なスタイル定義を参照することだ。
+例えば、空のドキュメント上で次の二つの値を比較するといい：
+
+```javascript
+getComputedStyle(document.body).background;
+document.body.style.background;
+```
+
+`getComputedStyle()` の戻り値オブジェクトに対して `getPropertyValue()` を呼び出すのがていねいだ。
+
+```javascript
+getComputedStyle(document.body).getPropertyValue('background-color');
+```
+
 ### CSS positioning 各種
+
+一瞬だけ JavaScript というより CSS の理解に集中する。
+CSS プロパティー `position` に固有の値指定をまずは理解しておく。
+
+```text
+position: static | relative | absolute | fixed | sticky;
+```
+
+`static`
+    この値のいちばんの特徴は、プロパティー `position` の既定値だということだ。
+    `top`, `right`, `bottom`, `left`, `z-index` が意味をなさない。
+`relative`
+    `static` と比べるとわかりやすい。
+    `top`, `right`, `bottom`, `left` の値に基づいて自分自身からの相対オフセットで配置される。
+    `z-index` も考慮されるようになる。
+`absolute`
+    配置基準が、直近の配置されている祖先要素、または初期の包含ブロックとなる。
+    それから最終的な位置が `top`, `right`, `bottom`, `left` の値により決定する。
+    `z-index` も考慮される。
+`fixed`
+    `absolute` と似ている。配置基準がもっと外側の祖先になる。ビューポートやページだと考えられる。
+`sticky`
+    直近のスクロールする祖先および包含ブロックに対して `top`, `right`, `bottom`, `left`
+    の値に基づいて相対配置される。
+
+[position - CSS: Cascading Style Sheets | MDN](https://developer.mozilla.org/en-US/docs/Web/CSS/position)
+のコードを変更して感覚をつかむといい。
 
 ### `element.addEventListener()` のオプション
 
