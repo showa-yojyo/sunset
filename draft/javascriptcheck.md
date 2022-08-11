@@ -446,11 +446,30 @@ position: static | relative | absolute | fixed | sticky;
 
 ### `element.addEventListener()` のオプション
 
+```javascript
+element.addEventListener(event, handler, [options]);
+```
+
+`once`
+    `true` であれば `handler` は処理後に自動的に削除する。テストなどに使えそうだ。
+`capture`
+    `true` であればイベントハンドラーは capturing 局面で、
+    `false` ならば bubbling 局面でそれぞれ処理される。
+    これが重要になるのは、親子関係（一般的には祖先子孫関係）にある要素の同じイベントに対してイベントハンドラーを追加するときだ。
+`passive`
+    `true` であれば `handler` で `preventDefault()` を呼び出さない（ことをブラウザーに教えて、全体の処理効率を上げる？）。
+
+----
+
+まずイベントの capturing と bubbling の概念を頭に叩き込むことだ。これは憶えないといけない。
+[Javascript - Event order](https://www.quirksmode.org/js/events_order.html#link4) の説明が詳しい。
+
+----
+
 ### `elem.dispatchEvent(event)`
 
 ### `CustomEvent`
 
-
 ## Part 3
 
-* `requestAnimationFrame()`
+### `requestAnimationFrame()`
