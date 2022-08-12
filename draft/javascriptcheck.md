@@ -464,11 +464,122 @@ element.addEventListener(event, handler, [options]);
 まずイベントの capturing と bubbling の概念を頭に叩き込むことだ。これは憶えないといけない。
 [Javascript - Event order](https://www.quirksmode.org/js/events_order.html#link4) の説明が詳しい。
 
-----
-
 ### `elem.dispatchEvent(event)`
 
+UI イベントを JavaScript コードの形で再現するにはこのメソッドが利用できるはずだ。
+そのためにイベントオブジェクトを自前で生成する必要がある。
+まず、イベントクラスのコンストラクターを理解する。
+
+```mermaid
+classDiagram
+    Event <|-- UIEvent
+
+    UIEvent <|-- MouseEvent
+        MouseEvent <|-- WheelEvent
+    UIEvent <|-- FocusEvent
+    UIEvent <|-- KeyboardEvent
+    UIEvent <|-- InputEvent
+
+    class Event{
+        +EventTarget currentTarget
+        +Boolean defaultPrevented
+        +EventTarget eventTarget
+        +String type
+        +Event(type, options)
+        +preventDefault()
+        +stopPropagation()
+    }
+
+    class UIEvent{
+        +UIEvent(type)
+    }
+
+    class MouseEvent{
+        +EventTarget relatedTarget
+        +Boolean altKey
+        +Boolean ctrlKey
+        +Boolean metaKey
+        +Boolean shiftKey
+        +Number button
+        +Number buttons
+        +Number clientX
+        +Number clientY
+        +Number movementX
+        +Number movementY
+        +Number offsetX
+        +Number offsetY
+        +Number pageX
+        +Number pageY
+        +Number screenX
+        +Number screenY
+
+        +MouseEvent(type, options)
+    }
+
+    class WheelEvent{
+        +Number deltaMode
+        +Number deltaX
+        +Number deltaY
+        +Number deltaZ
+        +WheelEvent(type, options)
+    }
+
+    class FocusEvent{
+        +EventTarget relatedTarget
+    }
+
+    class KeyboardEvent{
+        +Boolean altKey
+        +Boolean ctrlKey
+        +Boolean metaKey
+        +Boolean shiftKey
+        +String code
+        +String key
+        +Boolean repeat
+
+        +KeyboardEvent(type, options)
+        +getModifierState(key)
+    }
+
+    class InputEvent{
+        +DOMString data
+        +InputEvent(type, options)
+    }
+```
+
+いずれも `options` の `bubbles` フラグは明示的に指定するほうがいい。
+
+サブクラス固有のプロパティーをセットするのにコンストラクターで `options` の対応プロパティーを指定する感じか。
+そうなると `MouseEvent` の生成で一部のタイプでは著しく難しい。
+
+首尾よくイベントオブジェクトを用意できたら `dispatchEvent()` を呼び出す。
+
 ### `CustomEvent`
+
+クラス `CustomEvent` を研究したい理由は、WebGL コードでビュー操作をイベントにしたいから。
+
+```mermaid
+classDiagram
+    Event <|-- CustomEvent
+
+    class Event{
+        +EventTarget currentTarget
+        +Boolean defaultPrevented
+        +EventTarget eventTarget
+        +String type
+        +Event(type, options)
+        +preventDefault()
+        +stopPropagation()
+    }
+
+    class CustomEvent{
+        +CustomEvent(type, options)
+    }
+```
+
+まず `CustomEvent()` に入力する文字列 `type` の値を標準にはない値にする。
+さらに `options` にはプロパティー `detail` を必ず持たせ、その値を
+`Object` とする。
 
 ## Part 3
 
