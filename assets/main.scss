@@ -12,6 +12,17 @@ $grey-color-dark: lighten($grey-color, 25%);
 
 @import "minima";
 
+kbd {
+    border-radius: 0.25rem;
+    border: 1px solid $text-color;
+    box-shadow: inset 0 -1px 0 $text-color;
+    display: inline-block;
+    font-size: 0.75rem;
+    line-height: 10px;
+    padding: 0.25rem;
+    vertical-align: middle;
+}
+
 .post-title {
   @include relative-font-size(2.0);
   letter-spacing: -1px;
