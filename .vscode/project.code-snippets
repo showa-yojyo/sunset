@@ -88,6 +88,10 @@
 		"prefix": "note",
 		"body": "${1|[読書ノート][note],[note]: https://showa-yojyo.github.io/notebook/|}$0"
 	},
+	"powertoys":{
+		"prefix": "powertoys",
+		"body": "${1|[PowerToys],[PowerToys]: https://github.com/microsoft/PowerToys|}$0"
+	},
 	"pytube": {
 		"prefix": "pytube",
 		"body": "${1|[Pytube],[pytube]: https://pytube.io/en/latest/|}$0"
