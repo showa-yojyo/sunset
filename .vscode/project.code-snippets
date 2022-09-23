@@ -119,5 +119,9 @@
 	"wf": {
 		"prefix": "wf",
 		"body": "${1|[WebGL2 Fundamentals],[WebGL2 Fundamentals]: https://webgl2fundamentals.org|}$0"
+	},
+	"wsl": {
+		"prefix": "wsl",
+		"body": "${1|[WSL],[WSL]: https://learn.microsoft.com/ja-jp/windows/wsl/|}$0"
 	}
 }
