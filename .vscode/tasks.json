@@ -19,27 +19,6 @@
                 "isDefault": true
             },
             "problemMatcher": []
-        },
-        {
-            "label": "Serve (WSL)",
-            "type": "shell",
-            //"command": "bundle",
-            //"args": [
-            //    "exec", "jekyll", "serve", "--incremental", "--no-watch"
-            //],
-            "command": "\"bundle exec jekyll serve --incremental --no-watch\"",
-            "options": {
-                "shell": {
-                    "executable": "wsl.exe",
-                    //"args": ["~", "-d", "Ubuntu"]
-                    "args": ["bash", "--login", "-c"]
-                }
-            },
-            "group": {
-                "kind": "build",
-                "isDefault": true
-            },
-            "problemMatcher": []
         }
     ]
 }
