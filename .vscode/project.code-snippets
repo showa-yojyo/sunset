@@ -60,9 +60,13 @@
 		"prefix": "DeepL",
 		"body": "${1|[DeepL],[DeepL]: https://www.deepl.com/translator|}$0"
 	},
-	"dtp22":{
-		"prefix": "dtp22",
-		"body": "${1|[SOPHIE][dtp22],[dtp22]: https://wodifes.net/game/show/469|}$0"
+	"dtp22a":{
+		"prefix": "dtp22a",
+		"body": "${1|[SOPHIE][dtp22a],[dtp22a]: https://wodifes.net/game/show/469|}$0"
+	},
+	"dtp22b":{
+		"prefix": "dtp22b",
+		"body": "${1|[SOPHIE][dtp22b],[dtp22b]: https://www.dlsite.com/maniax/work/=/product_id/RJ424807/|}$0"
 	},
 	"Haverbeke18": {
 		"prefix": ["Haverbeke18", "eloquent"],
