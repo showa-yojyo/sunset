@@ -6,14 +6,7 @@
         {
             "label": "Serve",
             "type": "shell",
-            "command": "bundle",
-            "args": [
-                "exec",
-                "jekyll",
-                "serve",
-                "--incremental",
-                "--no-watch"
-            ],
+            "command": "touch index.html archive/*.html && bundle exec jekyll serve --incremental --no-watch",
             "group": {
                 "kind": "build",
                 "isDefault": true
