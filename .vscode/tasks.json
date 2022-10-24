@@ -4,7 +4,7 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "Serve",
+            "label": "Serve: Run Jekyll server",
             "type": "shell",
             "command": "touch index.html archive/*.html && bundle exec jekyll serve --incremental --no-watch",
             "group": {
@@ -25,6 +25,15 @@
                 "isDefault": false
             },
             "problemMatcher": []
+        },
+        {
+            "label": "Update Gemfile.lock: execute `bundle update`",
+            "type": "shell",
+            "command": "bundle update",
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            },
         }
     ]
 }
