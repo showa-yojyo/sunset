@@ -1,10 +1,8 @@
 {
-    // See https://go.microsoft.com/fwlink/?LinkId=733558
-    // for the documentation about the tasks.json format
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "Serve: Run Jekyll server",
+            "label": "Run Jekyll server",
             "type": "shell",
             "command": "touch index.html archive/*.html && bundle exec jekyll serve --incremental --no-watch",
             "group": {
@@ -23,17 +21,32 @@
             "group": {
                 "kind": "build",
                 "isDefault": false
-            },
-            "problemMatcher": []
+            }
         },
         {
             "label": "Update Gemfile.lock: execute `bundle update`",
-            "type": "shell",
-            "command": "bundle update",
+            "type": "process",
+            "command": "bundle",
+            "args": [
+                "update"
+            ],
             "group": {
                 "kind": "build",
                 "isDefault": false
             },
+        },
+        {
+            "label": "Check how many days",
+            "type": "process",
+            "command": "python",
+            "args": [
+                "-c",
+                "from datetime import date; print((date.today() - date(2020, 4, 27)).days + 1)"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            }
         }
     ]
 }
