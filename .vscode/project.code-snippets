@@ -66,7 +66,7 @@
 	},
 	"dtp22b":{
 		"prefix": ["dtp22b", "sophie"],
-		"body": "${1|[SOPHIE][dtp22b],[dtp22b]: https://www.dlsite.com/maniax/work/=/product_id/RJ424807/|}$0"
+		"body": "${1|[SOPHIE Naked Massacre Version][dtp22b],[dtp22b]: https://www.dlsite.com/maniax/work/=/product_id/RJ424807/|}$0"
 	},
 	"Haverbeke18": {
 		"prefix": ["Haverbeke18", "eloquent"],
