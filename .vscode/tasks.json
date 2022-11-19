@@ -12,12 +12,9 @@
             "problemMatcher": []
         },
         {
-            "label": "Optimize PNG files",
+            "label": "Optimize PNG files recently modified",
             "type": "shell",
-            "command": "optipng",
-            "args": [
-                "assets/images/*.png"
-            ],
+            "command": "optipng $(find assets/images -type f -iname \\*.png -mtime -24)",
             "group": {
                 "kind": "build",
                 "isDefault": false
