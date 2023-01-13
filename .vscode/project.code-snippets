@@ -92,6 +92,10 @@
 		"prefix": "note",
 		"body": "${1|[読書ノート][note],[note]: https://showa-yojyo.github.io/notebook/|}$0"
 	},
+	"pcloud": {
+		"prefix": "pcloud",
+		"body": "${1|[pCloud],[pCloud]: https://www.pcloud.com/,[pCloud](https://www.pcloud.com/)|}$0"
+	},
 	"powertoys":{
 		"prefix": "powertoys",
 		"body": "${1|[PowerToys],[PowerToys]: https://github.com/microsoft/PowerToys|}$0"
