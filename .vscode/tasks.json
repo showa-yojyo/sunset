@@ -4,7 +4,7 @@
         {
             "label": "Run Jekyll server",
             "type": "shell",
-            "command": "touch index.html archive/*.html && bundle exec jekyll serve --incremental --no-watch",
+            "command": "touch index.html archive/*.html && bundle exec jekyll serve --incremental --watch",
             "group": {
                 "kind": "build",
                 "isDefault": true
