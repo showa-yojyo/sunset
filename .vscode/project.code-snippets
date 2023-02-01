@@ -131,5 +131,9 @@
 	"wsl": {
 		"prefix": "wsl",
 		"body": "${1|[WSL],[WSL]: https://learn.microsoft.com/ja-jp/windows/wsl/|}$0"
+	},
+	"zoom":{
+		"prefix": "zoom",
+		"body": "${1|[Zoom],[Zoom Cloud Meetings][Zoom],[Zoom]: https://zoom.us/|}$0"
 	}
 }
