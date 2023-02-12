@@ -104,7 +104,7 @@ ffmpeg -i A.avi -i B.mp4 out1.mkv out2.wav -map 1:a -c:a copy out3.mov
 `out1.mkv` は Matroska コンテナーファイルで、映像、音声、字幕のストリームを受け付ける。
 よって、`ffmpeg` は各種別の一つを選択しようとする：
 
-* 映像：すべての入力ビデオストリームの中で最も解像度の高いものは `B.mp4` のスト
+* 映像：すべての入力映像ストリームの中で最も解像度の高いものは `B.mp4` のスト
   リーム 0であるので、それを選択する。
 * 音声：チャンネル数が最も多い `B.mp4` からストリーム 3 を選択する。
 * 字幕：`A.avi` と `B.mp4` のうち最初の字幕ストリームである `B.mp4` からストリー
@@ -113,11 +113,22 @@ ffmpeg -i A.avi -i B.mp4 out1.mkv out2.wav -map 1:a -c:a copy out3.mov
 `out2.wav` は音声ストリームのみを受け付ける。したがって、`B.mp4` のストリーム 3
 のみが選択される。
 
-For out3.mov, since a -map option is set, no automatic stream selection will occur. The -map 1:a option will select all audio streams from the second input B.mp4. No other streams will be included in this output file.
+```text
+-map 1:a -c:a copy out3.mov
+```
 
-For the first two outputs, all included streams will be transcoded. The encoders chosen will be the default ones registered by each output format, which may not match the codec of the selected input streams.
+`out3.mov` ではオプション `-map` が設定されているため、ストリーム自動選択は行われない。
+オプション `-map 1:a` 指定により、2 (`1` + 1) 番目の入力である `B.mp4` から音声ストリームのすべてが
+オプション `-c:a copy` 指定により選択される。この出力ファイルは、他のストリームを含まない。
 
-For the third output, codec option for audio streams has been set to copy, so no decoding-filtering-encoding operations will occur, or can occur. Packets of selected streams shall be conveyed from the input file and muxed within the output file.
+最初の二つの出力では、含まれるストリームのすべてが transcode される。選択される
+encoder は各出力フォーマットで登録された既定のもので、選択された入力ストリームの
+codec と一致しない場合がある。
+
+三番目の出力では、音声ストリームの codec オプションが `copy` に設定されているた
+め、decoding-filtering-encoding の処理は発生しないはずだが、その可能性はある。選
+択ストリームパケットは、入力ファイルから伝達されて、出力ファイル内で混合されなけ
+ればならない。
 
 #### Example: automatic subtitles selection
 
@@ -125,7 +136,20 @@ For the third output, codec option for audio streams has been set to copy, so no
 ffmpeg -i C.mkv out1.mkv -c:s dvdsub -an out2.mkv
 ```
 
-Although out1.mkv is a Matroska container file which accepts subtitle streams, only a video and audio stream shall be selected. The subtitle stream of C.mkv is image-based and the default subtitle encoder of the Matroska muxer is text-based, so a transcode operation for the subtitles is expected to fail and hence the stream isn’t selected. However, in out2.mkv, a subtitle encoder is specified in the command and so, the subtitle stream is selected, in addition to the video stream. The presence of -an disables audio stream selection for out2.mkv.
+`out1.mkv` は字幕ストリームも受け入れる Matroska コンテナーファイルだが、映像と
+音声のストリームのみが選択されなければならないものとする。`C.mkv` の字幕ストリー
+ムは画像ベースであり、Matroska muxer の既定の字幕 encoder はテキストベースなの
+で、字幕の transcode 操作は失敗すると予想され、したがってストリームは選択されないのだ。
+
+Note: ここでは字幕コピーオプションを明示しないと失敗する挙動を逆用しているということ。
+
+```text
+-c:s dvdsub -an out2.mkv
+```
+
+一方、`out2.mkv` ではコマンドに字幕 encoder が指定されている (`-c:s dvdsub`) の
+で、映像ストリームに加えて、字幕ストリームが選択される。音声ストリームは `-an`
+を指定してあるので含まれない。
 
 #### Example: unlabeled filtergraph outputs
 
@@ -133,44 +157,74 @@ Although out1.mkv is a Matroska container file which accepts subtitle streams, o
 ffmpeg -i A.avi -i C.mkv -i B.mp4 -filter_complex "overlay" out1.mp4 out2.srt
 ```
 
-A filtergraph is setup here using the -filter_complex option and consists of a single video filter. The overlay filter requires exactly two video inputs, but none are specified, so the first two available video streams are used, those of A.avi and C.mkv. The output pad of the filter has no label and so is sent to the first output file out1.mp4. Due to this, automatic selection of the video stream is skipped, which would have selected the stream in B.mp4. The audio stream with most channels viz. stream 3 in B.mp4, is chosen automatically. No subtitle stream is chosen however, since the MP4 format has no default subtitle encoder registered, and the user hasn’t specified a subtitle encoder.
+オプション `-filter_complex` を使って、単一の映像フィルターからなる filtergraph
+を設定している。フィルター `overlay` は、ちょうど二つの映像入力を必要とするものだが、
+何も指定されていないので、最初に利用可能な映像ストリーム二つ、
+`A.avi` と `C.mkv` が選ばれる。
 
-The 2nd output file, out2.srt, only accepts text-based subtitle streams. So, even though the first subtitle stream available belongs to C.mkv, it is image-based and hence skipped. The selected stream, stream 2 in B.mp4, is the first text-based subtitle stream.
+フィルターの出力パッドにはラベルがないので、最初の出力ファイル `out1.mp4` に送ら
+れる。このため、映像ストリームの自動選択は飛ばされ、`B.mp4` のストリームが選択
+されるはずだった。音声ストリームは、`B.mp4` のストリーム 3 など、最も多くのチャ
+ンネルを持つストリームが自動選択される。しかし、MP4 形式には既定の字幕 encoder
+が登録されておらず、利用者が字幕 encoder を指定していないため、字幕ストリームは
+選択されない。
+
+Note: パッドが何を指すのかわからない。
+
+2 番目の出力ファイルである `out2.srt` は、文字ベースの字幕ストリームのみを受け付ける。
+したがって、最初に利用可能な字幕ストリームは `C.mkv` にあるが、それは画像ベースであるため飛ばされる（さっきと同じ理由）。
+選択ストリームである `B.mp4` のストリーム 2 は、最初の文字ベースの字幕ストリームだ。
 
 #### Example: labeled filtergraph outputs
 
 ```console
 ffmpeg -i A.avi -i B.mp4 -i C.mkv -filter_complex "[1:v]hue=s=0[outv];overlay;aresample" \
-       -map '[outv]' -an        out1.mp4 \
-                                out2.mkv \
-       -map '[outv]' -map 1:a:0 out3.mkv
+    -map '[outv]' -an        out1.mp4 \
+                             out2.mkv \
+    -map '[outv]' -map 1:a:0 out3.mkv
 ```
 
-The above command will fail, as the output pad labelled [outv] has been mapped twice. None of the output files shall be processed.
+Note: `-filter_complex` の引数の読み方がわからないが、とりあえず読み続ける。
+
+ラベル `[outv]` の付いた出力パッドが二度 map されているので、上記のコマンドは失
+敗する。どの出力ファイルも処理されない。
 
 ```console
 ffmpeg -i A.avi -i B.mp4 -i C.mkv -filter_complex "[1:v]hue=s=0[outv];overlay;aresample" \
-       -an        out1.mp4 \
-                  out2.mkv \
-       -map 1:a:0 out3.mkv
+    -an        out1.mp4 \
+               out2.mkv \
+    -map 1:a:0 out3.mkv
 ```
-This command above will also fail as the hue filter output has a label, [outv], and hasn’t been mapped anywhere.
 
-The command should be modified as follows,
+上記のコマンドも失敗する。色相フィルター `hue` の出力は `[outv]` というラベルが
+ありながら、どこにも map されていない。次が修正済みコマンドだ：
 
 ```console
 ffmpeg -i A.avi -i B.mp4 -i C.mkv -filter_complex "[1:v]hue=s=0,split=2[outv1][outv2];overlay;aresample" \
-        -map '[outv1]' -an        out1.mp4 \
-                                  out2.mkv \
-        -map '[outv2]' -map 1:a:0 out3.mkv
+    -map '[outv1]' -an        out1.mp4 \
+                              out2.mkv \
+    -map '[outv2]' -map 1:a:0 out3.mkv
 ```
 
-The video stream from B.mp4 is sent to the hue filter, whose output is cloned once using the split filter, and both outputs labelled. Then a copy each is mapped to the first and third output files.
+`[1:v]` 指定により、`B.mp4` の映像ストリームは `hue` フィルターに送られ、その
+出力は `split` フィルターでいったん複製され、双方の出力にラベルが付けられる。そ
+して、複製のそれぞれが出力ファイル `out1.mp4`, `out3.mkv` それぞれに map される。
 
-The overlay filter, requiring two video inputs, uses the first two unused video streams. Those are the streams from A.avi and C.mkv. The overlay output isn’t labelled, so it is sent to the first output file out1.mp4, regardless of the presence of the -map option.
+フィルター `overlay` は、映像入力を二つ必要とし、最初の未使用の映像ストリーム二
+つを使用する。ここでは `A.avi` と `C.mkv` のストリームだ。`overlay` 出力はラベル
+が付いていないので、オプション `-map` の有無にかかわらず、最初の出力ファイル
+`out1.mp4` に送信される。
 
-The aresample filter is sent the first unused audio stream, that of A.avi. Since this filter output is also unlabelled, it too is mapped to the first output file. The presence of -an only suppresses automatic or manual stream selection of audio streams, not outputs sent from filtergraphs. Both these mapped streams shall be ordered before the mapped stream in out1.mp4.
+フィルター `aresample` は、最初の未使用の音声ストリーム `A.avi` を送信する。この
+フィルター出力もラベルが付いていないため、最初の出力ファイルに map される。オプ
+ション `-an` は音声ストリームの自動的または手動的なストリーム選択を無効にするだ
+けで、filtergraph から送信される出力は抑制しない。マップされたストリームはどち
+らも `out1.mp4` の map されたストリームの前に並べられる。
 
-The video, audio and subtitle streams mapped to out2.mkv are entirely determined by automatic stream selection.
+Note: 上の記述の最後がわからない。
 
-out3.mkv consists of the cloned video output from the hue filter and the first audio stream from B.mp4.
+`out2.mkv` に map される映像、音声、字幕ストリームは（出力オプションが何もないの
+で）すべて自動選択によって決定する。
+
+`out3.mkv` は `hue` フィルターから出力された複製映像 (`[outv2]`)と、
+`B.mp4` の最初の音声ストリーム (`-map 1:a:0`) から構成されている。
