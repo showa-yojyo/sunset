@@ -72,6 +72,10 @@
 		"prefix": ["Haverbeke18", "eloquent"],
 		"body": "${1|[Eloquent JavaScript][Haverbeke18],[Haverbeke18]: https://eloquentjavascript.net/|}$0"
 	},
+	"ffmpeg":{
+		"prefix": "FFmpeg",
+		"body": "${1|[FFmpeg],[ffmpeg]: https://ffmpeg.org/ffmpeg.html|}$0"
+	},
 	"gist": {
 		"prefix": "gist",
 		"body": "[gist]: https://gist.github.com/showa-yojyo/$0"
