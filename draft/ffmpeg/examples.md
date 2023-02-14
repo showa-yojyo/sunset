@@ -4,45 +4,11 @@ title: Examples
 
 ## Video and Audio grabbing
 
-If you specify the input format and device then ffmpeg can grab video and audio
-directly.
-
-```console
-ffmpeg -f oss -i /dev/dsp -f video4linux2 -i /dev/video0 out.mpg
-```
-Or with an ALSA audio source (mono input, card id 1) instead of OSS:
-
-```console
-ffmpeg -f alsa -ac 1 -i hw:1 -f video4linux2 -i /dev/video0 out.mpg
-```
-
-Note that you must activate the right video source and channel before launching
-ffmpeg with any TV viewer such as xawtv by Gerd Knorr. You also have to set the
-audio recording levels correctly with a standard mixer.
-
-----
-
-WSL では動作確認できない。
+割愛。WSL では動作確認できない。
 
 ## X11 grabbing
 
-Grab the X11 display with ffmpeg via
-
-```console
-ffmpeg -f x11grab -video_size cif -framerate 25 -i :0.0 out.mpg
-```
-
-0.0 is display.screen number of your X11 server, same as the DISPLAY environment variable.
-
-```console
-ffmpeg -f x11grab -video_size cif -framerate 25 -i :0.0+10,20 out.mpg
-```
-
-0.0 is display.screen number of your X11 server, same as the DISPLAY environment variable. 10 is the x-offset and 20 the y-offset for the grabbing.
-
-----
-
-WSL では動作確認できない。
+割愛。WSL では動作確認できない。
 
 ### Video and Audio file format conversion
 
@@ -50,8 +16,8 @@ WSL では動作確認できない。
 
 ----
 
-入力オプション `-s size` でコマの寸法を指定しながら音声ファイル `a.wav` と YUV 生映
-像ファイル `a.yuv` を MPEG ファイル `a.mpg` に変換する：
+入力オプション `-s size` でコマの寸法を指定しながら音声ファイル `a.wav` と YUV
+生映像ファイル `a.yuv` を MPEG ファイル `a.mpg` に変換する：
 
 ```console
 ffmpeg -i a.wav -s 640x480 -i a.yuv a.mpg
@@ -68,7 +34,8 @@ ffmpeg -i a.wav -ar 22050 a.mp2
 
 ----
 
-複数のフォーマットに同時に encode することができ、入力ストリームから出力ストリームへの写像を定義できる：
+複数のフォーマットに同時に encode することができ、入力ストリームから出力ストリー
+ムへの写像を定義できる：
 
 ```console
 ffmpeg -i a.wav \
@@ -126,8 +93,8 @@ ffmpeg -f image2 -pattern_type glob -framerate 12 -i 'foo-*.jpeg' -s WxH foo.avi
 
 ----
 
-同種のストリームを多数出力にすることが可能。
-次のコマンドは出力ファイル `test12.nut` に入力ファイルの最初の四ストリームを逆順に格納する：
+同種のストリームを多数出力にすることが可能。次のコマンドは出力ファイル
+`test12.nut` に入力ファイルの最初の四ストリームを逆順に格納する：
 
 ```console
 ffmpeg -i test1.avi -i test2.avi -map 1:1 -map 1:0 -map 0:1 -map 0:0 -c copy -y test12.nut
@@ -141,3 +108,154 @@ ffmpeg -i test1.avi -i test2.avi -map 1:1 -map 1:0 -map 0:1 -map 0:0 -c copy -y 
 * オプション `-y` はプロンプトなしで出力ファイルを上書きする。
 
 したがって、出力ビデオの映像と音声は `test2.avi` のものが「優先」して再生する。
+
+----
+
+固定ビットレートビデオ出力を強制する場合:
+
+
+```console
+ffmpeg -i myfile.avi -b 4000k -minrate 4000k -maxrate 4000k -bufsize 1835k out.m2v
+```
+
+* `-b 4000k` は「ビットレートを 4000k とする」の意。
+* `-minrate bitrate`, `-maxrate bitrate` はオプション名の示唆するとおりだろうが、
+  ヘルプに記載がない。`man ffmpeg-codecs` を当たると見つかる。
+  固定ビットレート指定の場合には前者が有用。
+  後者を用いるときには次の `-bufsize` 指定を必要とする。
+* `-bufsize integer` はレート制御バッファーサイズをビット単位で指定する。
+  今回の値はどうして出てきたのか不明。
+
+## ottverse.com
+
+ここから [What is FFmpeg? Usage, Benefits, and Installation Simplified - OTTVerse](https://ottverse.com/what-is-ffmpeg-installation-use-cases/)
+を読解。
+
+### スクリーンショットまたはサムネイルのための操作
+
+```console
+ffmpeg -i input.mp4 -ss 00:00:03 -frames:v 1 foobar.jpeg
+```
+
+### リサイズを伴う定期的なスクリーンショットまたはサムネイルを得る操作
+
+```console
+ffmpeg -i input1080p.mp4 -r 1 -s 1280x720 -f image2 screenshot-%03d.jpg
+```
+
+* `-r 1` は 1Hz を意味する。すなわち一秒間に一枚。
+* `-s 1280x720` はこの寸法に縮尺する指定。映像が伸縮する。
+* `-f image2` は先述のとおり。
+* 引用元の述べる通り、フレーム精度は別に高くない。
+
+### Cut, Trim, Extract
+
+* オプション `-ss` を正しく理解する。入力と出力で分けて理解する。
+* オプション `-t`, `-to` を理解する。時間と時刻の違いということだ。
+  そして、両者はどちらか一方しか同時に用いることができない。
+
+この手の操作時に同時に再エンコード処理を試みるとフレーム精度を得られる。
+見返りに、エンコード処理は少なくない時間を要する。
+
+```console
+ffmpeg -i input.mp4 -ss 00:03 -to 00:08 -c:v libx264 -crf 30 trim_opseek_encode.mp4
+```
+
+* `-c:v libx264 -crf 30`: H.264 で encode し直す。
+  `-crf 30` は H.264 encoding オプションであり、この値が小さいほど品質が良い。
+* `-ss`, `-to` が出力側オプションであることに注意する。
+
+再エンコードをしない場合は高速で切り抜ける：
+
+```console
+ffmpeg -ss 00:00:03 -i input.mp4 -to 00:00:08 -c:v copy -c:a copy trim_ipseek_copy.mp4
+```
+
+* 今度はオプション `-ss` が入力側に来ることに注意する。これが高速の理由の一つだ。
+  ただし、それゆえにフレーム正確度が落ちる。
+* オプション `-codec: copy` は decoding/encoding を省略するので高速だ。
+
+### 垂直、水平、グリッドレイアウト
+
+ビートマニアの V のビデオのようなことができる。
+
+ビデオ二つを水平に並べる方法がある。次の条件を必要とする：
+
+1. 両者の画面高が同じであること。
+2. 両者のピクセルフォーマットが同じであること。
+
+MP4 ビデオ二つを水平に並べるコマンドはこのようなものだ：
+
+```console
+ffmpeg -i input0.mp4 -i input1.mp4 -filter_complex "hstack=inputs=2" horizontal-stacked-output.mp4
+```
+
+ビデオを垂直に並べるには `hstack` の代わりに `vstack` を用いる。
+入力の条件は方向を考慮して `hstack` に準じる。
+
+どちらのフィルターにも引数 `shortest` がある。これを `1` にすると最短のビデオの長さに合わせる。
+
+どちらの操作でも、何か黄色いメッセージが出てきたらオプション `-vsync 2` を併用してやり直す。
+
+以上を組み合わせて 2x2 レイアウトを実現できる：
+
+```console
+ffmpeg \
+   -i input0.mp4 -i input1.mp4 \
+   -i input2.mp4 -i input3.mp4 \
+   -filter_complex "
+     [0:v][1:v]hstack=inputs=2[top];
+     [2:v][3:v]hstack=inputs=2[bottom];
+     [top][bottom]vstack=inputs=2[v]"
+   -map "[v]" \
+   finalOutput.mp4
+```
+
+演習：音声を復活させろ。
+
+### ぼかし
+
+映像の空間的または時間的一部をぼかす方法がある。
+
+まずオプション `-filter_complex` の引数だけを抜粋したものを調べる：
+
+```text
+ffmpeg -i input.mp4 \
+  -filter_complex "[0:v]crop=400:400:300:350,boxblur=10[fg]; [0:v][fg]overlay=300:350[v]" \
+  -map "[v]" \
+  output.mp4
+```
+
+模式化しておく：
+
+```mermaid
+flowchart TB
+  input --> 0(0:v)
+  0 --> crop\n400:400:300:350 --> boxblur\n10 --> fg(fg);
+
+  0 --> overlay[overlay\n300:350]
+  fg --> overlay
+
+  overlay --> output
+```
+
+* `crop=400:400:300:350`: 座標 (300, 350) を原点とする矩形 400x400 を crop するの意。
+* `overlay=300:350`: オーバーレイ座標。
+* `boxblur=10`: ぼかしの強度。
+
+ぼかしを矩形の周囲にしたい場合は全域を `boxblur` した絵にオリジナルの矩形を
+`crop` したものを `overlay` すればいい。
+
+### Transition Effects
+
+フィルター `xfade` を中心にパイプラインを組み立てる。
+
+```console
+ffmpeg \
+  -i input0.mp4 \
+  -i input1.mp4 \
+  -filter_complex "xfade=transition=<FADE_TYPE>:
+  duration=<TRANSITION_DURATION_IN_SECONDS>:
+  offset=<OFFSET_RELATIVE_TO_FIRST_STREAM_IN_SECONDS>"
+  output.mp4
+```
