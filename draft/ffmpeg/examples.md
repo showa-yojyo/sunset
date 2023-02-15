@@ -259,3 +259,117 @@ ffmpeg \
   offset=<OFFSET_RELATIVE_TO_FIRST_STREAM_IN_SECONDS>"
   output.mp4
 ```
+
+* `input0.mp4` から `input1.mp4` へ transit するものだ。
+* 次の引数でフィルター `xfade` を使う：
+
+  * `<FADE_TYPE>`: `xfade` が対応する `fade`, `dissolve`, `wipeleft`, `wiperight`, etc. を指定する。
+  * `<TRANSITION_DURATION_IN_SECONDS>`: 遷移を継続させる時間を指定する。
+  * `<OFFSET_RELATIVE_TO_FIRST_STREAM_IN_SECONDS>`: 最初のビデオから何秒後に遷移を開始するかを秒単位で指定する。
+
+* 最後に出力ファイルを指定する。望むなら encoding オプションを追加的に指定する。
+
+Note: 困ったときの `settb=AVTB,fps=30`
+
+### 解像度操作
+
+まずビデオの解像度を `ffprobe` で確認する。コマンドラインオプションを細かく指定すれば解像度だけを出力できる：
+
+```console
+ffprobe -v error -select_streams v:0 -show_entries stream=width,height -of csv=s=x:p=0 input.mp4
+```
+
+伸縮操作のコマンド基本形：
+
+```console
+ffmpeg -i input.mp4 -vf scale=$w:$h ... output.mp4
+```
+
+品質が劣化するのが気になる場合は `...` に encoding 指定をする。
+
+```console
+ffmpeg -i input.mp4 -vf scale=$w:$h -preset slow -crf 18 output.mp4
+```
+
+libx264 の低速プリセットで `crf=18` を使用する。
+
+* FFmpeg では、アスペクト比を保ったまま動画を拡大縮小したい場合、
+  `height` か `width` のどちらかの引数を設定し、もう一方の引数を `-1` に設定する。
+* 入力画面の幅と高さをそれぞれ `iw` と `ih` で参照できる。
+
+  例：画面幅を二倍に拡大する `scale=iw*2:ih` この `*` はシェルに展開されない。
+  例：寸法を半分にする `scale=iw/2:ih/2` こちらは引用符で囲むこと。
+
+コツ。次のようにすれば最小の幅と高さを決められる。単純な方法で質の悪い拡縮を防げる。
+
+```console
+ffmpeg -i input.mp4 -vf "scale='min(320,iw)':'min(240,ih)'" output.mp4
+```
+
+### 回転
+
+90 度回転処理を覚えておくと何かのときに助かる。
+
+```console
+ffmpeg -y -i input.mp4 \
+  -filter_complex "
+    [0:v]transpose=dir=0[t0];
+    [0:v]transpose=dir=1[t1]; \
+    [0:v]transpose=dir=2[t2]; \
+    [0:v]transpose=dir=3[t3]" \
+    -map "[t0]" transpose-0.mp4 \
+    -map "[t1]" transpose-1.mp4 \
+    -map "[t2]" transpose-2.mp4 \
+    -map "[t3]" transpose-3.mp4
+```
+
+`dir` の引数は数字かキーワードで指定できる。都合の良いほうを使っていい。
+
+| number | id | transform |
+|-----|-----|----------|
+| 0 | cclock_flip | +90 度回転してミラー |
+| 1 | clock | -90 度回転
+| 2 | clock | +90 度回転
+| 3 | clock_flip | -90 度回転してミラー |
+
+180 度回転は `transpose` を合成すれば実現できる（こうなると恒等変換が欲しい）。
+
+FFmpeg に縦長・横長を判定させて必要な場合に限り回転させるというコマンドもあり得る。
+キーワード `passthrough=landscape` 等を指定する。「横長ならば横長のままとする」の指示を意味する：
+
+```console
+ffmpeg -i input.mp4 -vf "transpose=dir=2:passthrough=landscape" output.mp4
+```
+
+### 逆再生
+
+映像と音声を同時に逆転させることも、一方だけを逆転させることも可能だ。
+
+```console
+ffmpeg -i input.mp4 -vf reverse output.mp4
+ffmpeg -i input.mp4 -vf reverse -af areverse output.mp4
+```
+
+この処理は入力全体をメモリーに格納することに注意を要する。巨大なビデオに対して
+は、何分割かしてからそれぞれを個別に逆転させて結合することを検討する。
+
+### テキスト
+
+フィルター `drawtext` を使用してテキストを画面に動的に重ね合わせる。
+タイムコード、解像度、ウォーターマークを表示するのに使える。
+また、フォント、フォントサイズ、位置、背景色、整列、複数行などの設定方法を見ていく。
+
+まず、インストールした `ffmpeg` が `drawtext` を対応しているかを調べる。
+
+```console
+ffmpeg -filters | grep drawtext
+```
+
+いちばん単純な描画例：
+
+```console
+ffmpeg -i input.mp4 -vf "drawtext=text='東京都新宿区
+新宿中央公園':fontfile=/usr/share/fonts/opentype/ipaexfont-mincho/ipaexm.ttf:\
+  x=(w-text_w)/2:y=(h-text_h)/2:fontsize=24:fontcolor=deeppink" \
+  -c:a copy outout.mp4
+```
