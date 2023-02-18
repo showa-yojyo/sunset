@@ -1,5 +1,6 @@
 ---
 title: ffplay
+status: WIP
 ---
 
 WSLg が有効になっている必要があるが、`ffplay` でコンソールから手を離さずにビデオ
