@@ -50,3 +50,6 @@ alias ffplay='ffplay -v error -hide_banner'
 ## コマンドラインオプション
 
 画面寸法指定など。
+
+* `-x`: 画面幅
+* `-y`: 画面高
