@@ -51,5 +51,10 @@ alias ffplay='ffplay -v error -hide_banner'
 
 画面寸法指定など。
 
+* `-autoexit`: 再生が終了すると直ちにビューワーを終了する
 * `-x`: 画面幅
 * `-y`: 画面高
+
+```console
+ffmpeg ... -f yuv4mpegpipe -| ffplay ... -
+```
