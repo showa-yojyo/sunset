@@ -18,8 +18,8 @@ status: WIP
 * [arrange](./arrange)
 * blur
 * crossfade
-* resolution
+* [resolution](./resolution)
 * [rotation](./rotation)
 * [reverse](./reverse)
 * text
-* slides
+* [slides](./slides)
