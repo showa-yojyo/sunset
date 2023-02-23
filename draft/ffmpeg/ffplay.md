@@ -1,6 +1,6 @@
 ---
 title: ffplay
-status: WIP
+status: RC
 ---
 
 WSLg が有効になっている必要があるが、`ffplay` でコンソールから手を離さずにビデオ
@@ -10,10 +10,19 @@ WSLg が有効になっている必要があるが、`ffplay` でコンソール
 ffplay video.mp4
 ```
 
+## 起動
+
 例によって開始時の出力が邪魔なので、`alias` を定義しておく：
 
 ```shell
 alias ffplay='ffplay -v error -hide_banner'
+```
+
+`ffmpeg` コマンドの出力結果を `ffplay` で確認するのに、ファイル出力をせずにパイプで済ませることができる。
+例えば：
+
+```console
+ffmpeg -i input.mp4 ... -f matroska - | ffplay ... -
 ```
 
 ## キーボード操作
