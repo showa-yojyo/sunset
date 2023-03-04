@@ -117,23 +117,32 @@ int main() {
 
 ## 3.3 rvalue Reference
 
-rvalue は、C++11 での導入により歴史的な問題を大量に解決した重要な概念だ。
+rvalue 参照は、C++11 での導入により歴史的な問題を大量に解決した重要な概念だ。
 `std::vector`, `std::string` などの余分なオーバーヘッドを排除し、関数オブジェク
 トコンテナー `std::function` の実現を可能にするものだ。
 
 ### lvalue, rvalue, prvalue, xvalue
 
-TODO: 以前描いた図式をここに転載する。
+```mermaid
+flowchart BT
+    glvalue & rvalue --> expression
+    lvalue --> glvalue
+    xvalue --> glvalue & rvalue
+    prvalue --> rvalue
 
-pvalue (pure rvalue, purely rvalue) は、
+    linkStyle 0,1,2,3,4,5 stroke:#000,stroke-width:1px,fill:none;
+    classDef default fill:none,stroke:none;
+```
+
+prvalue (pure rvalue, purely rvalue) は、
 
 * `10`, `true` などの純粋なリテラルか、
 * `1 + 2` などの評価結果がリテラルまたは匿名一時オブジェクトと等価である
 
 かのどちらかだ。非参照によって返される一時変数、演算式によって生成される一時変
-数、元のリテラル、ラムダ式はすべて純粋な rvalue 値だ。特に、リテラル（文字列リテ
-ラルを除く）は prvalue だ。文字列リテラルは `const char` 配列型の lvalue である
-とする。
+数、元のリテラル、ラムダ式はすべて純粋な rvalue だ。特に、リテラル（文字列リテラ
+ルを除く）は prvalue だ。文字列リテラルは例外的に `const char` 配列型の lvalue
+であるとする。
 
 xvalue (expiring value) は C++11 が rvalue 参照を導入するために提案した概念で
 （つまり従来の C++ では、prvalue と rvalue は同じ概念）、破棄されるが移動できる
@@ -155,7 +164,59 @@ std::vector<int> v = foo();
 なった。
 
 ### rvalue reference and lvalue reference
+
+xvalue を取得するには、rvalue 参照の宣言 `T&&` を使用する。
+rvalue 参照の宣言は、この一時的な値の寿命を延長する。変数が生きている限り、xvalue は存続する。
+
+C++11 では、lvalue 引数を無条件に rvalue に変換する `std::move` がある。
+`std::move` は宣言が `<utility>` にある。
+これを使えば、例えば rvalue の一時オブジェクトを簡単に取得することができる。
+
+```c++
+std::string  lv1 = "string,";       // lv1 is a lvalue
+// std::string&& r1 = lv1;          // illegal, rvalue can't ref to lvalue
+std::string&& rv1 = std::move(lv1); // legal, std::move can convert lvalue to rvalue
+```
+
 ### Move semantics
+
+```c++
+std::string str = "Hello world.";
+std::vector<std::string> v;
+
+// use push_back(const T&&),
+// no copy the string will be moved to vector,
+// and therefore std::move can reduce copy cost
+v.push_back(std::move(str));
+```
+
 ### Perfect forwarding
+
+従来の C++ では参照型を参照し続けることできなかった。しかし、rvalue 参照の登場に
+よりこの慣習が撤回され、 lvalue 参照と rvalue 参照の両方を参照することができる規
+則に変わった。
+
+関数テンプレートで `T&&` を使用すると、rvalue 参照ができない場合があり、 lvalue
+が渡されると、この関数への参照は lvalue として導出されることになる。より正確に
+は、テンプレート引数がどのような参照型であっても、引数の型が右参照である場合に限
+り、テンプレート引数は右参照型として導出されることができる。これにより、lvalue
+の受け渡しが成功する。
+
+完全転送 (perfect forwarding) とは、引数を渡す際に元の引数の型を維持したまま転送
+する（渡す）ことを意味する。lvalue 参照は lvalue 参照を、rvalue 参照は rvalue 参
+照を維持する。この問題を解決するために、`std::forward` を使って引数を転送する必
+要がある。
+
+`std::forward<T>(v)` は `static_cast<T&&>(v)` に他ならない。
+
 ### Conclusion
+
+本章で紹介する機能はすべて知っておいて損はない：
+
+* ラムダ式
+* 関数オブジェクトコンテナー `std::function`
+* rvalue 参照
+
 ### Further Readings
+
+Bjarne Stroustrup, The Design and Evolution of C++ は邦訳書が確かあったか？
