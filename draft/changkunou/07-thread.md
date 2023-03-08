@@ -139,16 +139,65 @@ int main() {
 `std::condition_variable::notify_one()` はスレッドを目覚めさせるために、
 `std::condition_variable::notify_all()` はすべてのスレッドに通知するために用いられる。
 
-本書のコード生産者消費者モデルの例。
+本書のコード生産者消費者モデルの例。まずは `main` の先頭の変数宣言を調べる。
+これらのオブジェクト、変数すべてを生産者と消費者のどちらも参照する。
 
 ```c++
-// ここにかなりの量のコードが来るが、検証してから転載する。
+std::queue<int> produced_nums;
+std::mutex mtx;
+std::condition_variable cv;
+bool notified = false;  // notification sign
 ```
 
-生産者では `notify_one()` を使用することができますが、それは推められない。複数の
-消費者が存在する場合、ここでの消費者の実装は単にロック保持を放棄しているが、他の
-消費者がこのロックを奪い合うことが可能になり、複数消費者間の並行性をより活用する
-ことができるからだ。
+次に生産者スレッドのタスクを示す。本文の言うように `unique_lock` を用いる。 0.5
+秒ふかしてからキューに値を押し込み、フラグをオンにして `cv.notify_all` を呼び出
+すというものだ：
+
+```c++
+auto producer = [&]() {
+    for (int i = 0; ; i++) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+        std::unique_lock<std::mutex> lock(mtx);
+        std::cout << "producing " << i << std::endl;
+        produced_nums.push(i);
+        notified = true;
+        cv.notify_all();
+    }
+};
+```
+
+消費者スレッドタスク。消費者は複数ある。排他制御スコープが二つに分かれていること
+に注意。生産物を消費した後のフラグの変更が怪しい。
+
+```c++
+auto consumer = [&]() {
+    for (;;) {
+        std::unique_lock<std::mutex> lock(mtx);
+        while (!notified) {  // avoid spurious wakeup
+            cv.wait(lock);
+        }
+        // temporal unlock to allow producer produces more rather than
+        // let consumer hold the lock until its consumed.
+        lock.unlock();
+        // consumer is slower
+        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+        lock.lock();
+        if (!produced_nums.empty()) {
+            std::cout << "consuming " << produced_nums.front() << std::endl;
+            produced_nums.pop();
+        }
+        notified = false;
+    }
+};
+```
+
+あとは生産者スレッド一つと消費者スレッド複数を生成して、その全てに対して `join`
+するコードが続く。
+
+生産者では `notify_one()` を使用することもできるがそれは推められない。複数の消費
+者が存在する場合、ここでの消費者の実装は単にロック保持を放棄しているが、他の消費
+者がこのロックを奪い合うことが可能になり、複数消費者間の並行性をより活用すること
+ができるからだ。
 
 とはいえ、実際には `std::mutex` の排他性から、複数の消費者が並列消費者キューで中
 身を生成できることは期待できないので、やはりよりきめ細かい取り組み方が必要だ。
@@ -188,6 +237,9 @@ int main() {
 み書きの競合を無視しても、CPU の out-of-order 実行や、コンパイラーによる命令の並
 べ替えの影響を受ける可能性がある。つまり `flag=1` の後に `a = 5` を発生させる可
 能性がある。
+
+このコードを手許の環境で実行したら、`b = 5` がいつでも出力される。
+`volatile` を付けても外しても。
 
 用語をよく習得しておくこと。
 
@@ -236,6 +288,9 @@ int main() {
 }
 ```
 
+`atomic<int>::operator++()` も `atomic<int>::operator+=(1)` も
+`atomic<int>::fetch_add(1)` と同じだと言っている。
+
 不可分操作を提供できない操作もある。型が `T` 不可分操作をサポートするかどうかを
 確認するには、 `std::atomic<T>::is_lock_free` をチェックすればいい。
 
@@ -255,6 +310,9 @@ int main() {
     return 0;
 }
 ```
+
+このコードは手許の g++ でコンパイルエラーとなった。調べるとリンクオプション
+`-latomic` が要るのだった。
 
 ### Consistency Model
 
@@ -418,6 +476,7 @@ std::cout << "current counter:" << counter << std::endl;
 * `counter.fetch_add(1)` はカウンターを 1 増やすのをクリティカルセクションで行う
   ものと思ってよい。
 * `v.emplace_back(args)` は `v.push_back(T(args))` のようなもの。
+* 実行結果は `100` が出力されるはずだ。手許の環境でそうなる。
 
 #### Release/consumption model
 
@@ -446,13 +505,15 @@ std::thread consumer([&]() {
     int* p;
     while(!(p = ptr.load(std::memory_order_consume)));
 
-    std::cout << "p: " << *p << std::endl;
+    std::cout << "*p: " << *p << std::endl;
     std::cout << "v: " << v << std::endl;
 });
 
 producer.join();
 consumer.join();
 ```
+
+このコードを実行すると `*p: 42` と `v: 1024` が出力される。
 
 #### Release/Acquire model
 
@@ -489,7 +550,7 @@ std::thread acqrel([&]() {
 std::thread acquire([&]() {
     while(flag.load(std::memory_order_acquire) < 2);
 
-    std::cout << v.at(0) << std::endl; // must be 42
+    std::cout << v[0] << std::endl; // must be 42
 });
 
 release.join();
@@ -504,6 +565,8 @@ acquire.join();
 することによって不整合が発生する。さらに、`compare_exchange_strong` の性能は
 `compare_exchange_weak` より若干劣るかもしれないが、ほとんどの場
 合、`compare_exchange_weak` はその使用の複雑さを考えると、推奨されない。
+
+この例では `flag` と `expected` の値が一定の条件で exchange されるというのだろう。
 
 #### Sequential Consistent Model
 
@@ -526,7 +589,7 @@ std::cout << "current counter:" << counter << std::endl;
 ```
 
 この例は、最初の例で不可分演算のメモリー順序を `memory_order_seq_cst` に変更した
-だけだ。この二種類の性能差を測定するといい。
+だけだ。出力はもちろん `100` だ。この二種類の性能差を測定するといい。
 
 ## Conclusion
 
@@ -538,7 +601,8 @@ std::cout << "current counter:" << counter << std::endl;
 
 ## Exercises
 
-TODO
+1. `ThreadPool` を実装しろ。コンストラクター、メソッド `enqueue`, etc.
+2. `std::atomic<bool>` を使って排他制御を実装しろ。
 
 ## Further Readings
 
