@@ -36,8 +36,8 @@ title: Windows Subsystem for Linux GUI 利用ノート
 
 ## 準備
 
-私の環境は次のとおり。WSL が稼働しているので、WSL のインストールについては述べず、
-WSLg のインストール、更新、状態確認に集中して記述する。
+私の環境は次のとおり。WSL が稼働しているので、WSL のインストールについては述べ
+ず、 WSLg のインストール、更新、状態確認に集中して記述する。
 
 | 項目 | 状態 |
 |---------|----------------------|
@@ -72,7 +72,8 @@ WSLg を一度も動作したことがない場合には Windows 側のコンソ
 
 ## 動作確認
 
-WSLg のおかげで動作するアプリケーションは、Windows からでも Ubuntu からでも起動可能だ。
+WSLg のおかげで動作するアプリケーションは、Windows からでも Ubuntu からでも起動
+可能だ。
 
 WSLg インストール初期状態では、おそらく Linux GUI アプリケーションもいくつかイン
 ストールされている。まずはそれが正しく起動することを確認する。Windows にわざわざ
@@ -128,8 +129,9 @@ bash$ display funny-cat.jpg
 
 ## 文献
 
-* [microsoft/wslg: Enabling the Windows Subsystem for Linux to include support for Wayland and X server related scenarios][1]:
-  GitHub にある当開発サイトの README に目を通しておけば、少なくとも正常動作時に
-  欲しい情報は十分得られる。異常時には Wiki の関連項目を当たること。
+* [microsoft/wslg: Enabling the Windows Subsystem for Linux to include support
+  for Wayland and X server related scenarios][1]: GitHub にある当開発サイトの
+  README に目を通しておけば、少なくとも正常動作時に欲しい情報は十分得られる。異
+  常時には Wiki の関連項目を当たること。
 
 [1]: https://github.com/microsoft/wslg
