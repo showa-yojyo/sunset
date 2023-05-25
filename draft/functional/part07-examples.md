@@ -15,7 +15,7 @@ $\text{(2)}$ ${(\{0\}, 0)}$ は 0 次元 Banach 空間（ノルムは零写像�
 $\text{(3)}$ これは重要な例だと言っている。${p \in [1, \infty)}$ とする。
 
 ${l^p(\mathbb N, \mathbb F)}$ を $\mathbb F$ における次の性質を満たす数列
-$(x_n)$ すべてからなる集合とする：
+${(x_n)_{n \in \mathbb N} \subset \mathbb F}$ すべてからなる集合とする：
 
 $$
 \sum_{n = 1}^\infty \lvert x_n \rvert^p \lt \infty.

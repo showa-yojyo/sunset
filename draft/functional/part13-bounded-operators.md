@@ -5,8 +5,9 @@ title: Functional Analysis - Part 13 - Bounded Operators
 [Functional Analysis - Part 13 - Bounded Operators - YouTube](https://www.youtube.com/watch?v=442PxdU35q4&list=PLBh2i93oe2qsGKDOsuVVw-OCAfprrnGfr&index=13)
 
 定義： ${(X,\lVert\cdot\rVert_X),}{(Y,\lVert\cdot\rVert_Y)}$ をノルム空間とする。
-写像 ${T \colon X \longrightarrow Y}$ は線形かつ連続とする：
-次を $T$ の**作用素ノルム**という。
+写像 ${T \colon X \longrightarrow Y}$ は線形とする。
+次で定義される
+${\lVert T \rVert = \lVert T \rVert_{X \to Y}}$ を $T$ の**作用素ノルム**という。
 
 $$
 \begin{aligned}
@@ -15,15 +16,17 @@ $$
 \end{aligned}
 $$
 
-また、$\lVert T \rVert \lt \infty$ のとき、それは有界であるという。
+（※ベクトルが何倍になるかということに興味がある。その上限に名前をつける）
 
-命題：次の主張は同値である：
+また、$\lVert T \rVert \lt \infty$ のとき、それは **有界（作用素）** であるという。
+
+命題：上記の記号をそのまま使う。次の主張は同値である：
 
 $\text{(a)}$ $T$ は連続である。
 
 $\text{(b)}$ $T$ は $x=0$ で連続である。
 
-$\text{(c)}$ $T$ は有界である。
+$\text{(c)}$ $T$ は有界作用素である。
 
 証明：
 $\text{(a)} \implies \text{(b)}$: これは当然成り立つ。
@@ -58,7 +61,7 @@ $$
 $$
 
 （※不等号の分子部分 ${\lt 1}$ に注意）
-ゆえに $\lVert T \rVert$ は有界である。
+ゆえに $T$ は有界作用素である。
 
 $\text{(c)} \implies \text{(a)}$:
 点列 ${(x_n) \subset X}$ を点 ${\tilde x \in X}$ を極限に持つように取る。
