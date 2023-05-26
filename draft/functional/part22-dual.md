@@ -19,7 +19,7 @@ $X^\prime$ と $X$ は距離に関して（？）同型である。
 ${(X^\prime, \lVert \cdot\rVert_{X \to \mathbb F})}$ は Banach 空間である。
 
 証明：
-Cauchy 列 $(l_k) \subset X^\prime$ をとる。
+Cauchy 列 $(l_k) \subset X^\prime$ をとる：
 
 $$
 \forall \varepsilon \gt 0\;
@@ -29,7 +29,7 @@ $$
 \lVert l_n - l_m\rVert_{X \to \mathbb F} \lt \varepsilon.
 $$
 
-$\forall x \in X$ に対して次が成り立つ：
+$\forall x \in X$ に対して上記の不等式および作用素ノルムの定義から次が成り立つ：
 
 $$
 x \ne 0 \implies
@@ -37,8 +37,8 @@ x \ne 0 \implies
 \le \lVert l_n - l_m\rVert_{X \to \mathbb F} \lt \varepsilon.
 $$
 
-ゆえに ${(l_k(x)) \subset F}$ は $x = 0$ の場合も含めて $\forall x \in X$ に対して
-Cauchy 列である。したがって極限が存在する。これを $l(k) \in \mathbb F$ とおく：
+ゆえにスカラー列 ${(l_k(x)) \subset F}$ は $x = 0$ の場合も含めて $\forall x \in X$ に対して
+Cauchy 列である。したがって極限が存在する。これを $l(x) \in \mathbb F$ とおく：
 
 $$
 l(x) \coloneqq \lim_{k \to \infty}l_k(x).
@@ -52,7 +52,7 @@ $\text{(2)}$ $l$ は有界作用素である
 
 $\text{(3)}$ $\lVert l_k - l\rVert_{X \to \mathbb F} \to 0\quad(k \to \infty)$
 
-$\text{(1)}$ は OK.
+$\text{(1)}$ は No problem.
 
 $\text{(2)}$ ${\forall n \ge N}$ に対して：
 
@@ -60,7 +60,7 @@ $$
 \begin{aligned}
 \lVert l_n\rVert_{X \to \mathbb F}
 &\le \lVert l_n - l_N\rVert_{X \to \mathbb F} + \lVert l_N\rVert_{X \to \mathbb F}\\
-&\le C + \varepsilon.
+&\le \varepsilon + C.
 \end{aligned}
 $$
 
@@ -97,7 +97,7 @@ $$
 &= \frac{1}{\lVert x\rVert_X} \lvert l_n(x) - \lim_{m \to \infty}l_m(x)\rvert\\
 &= \frac{1}{\lVert x\rVert_X} \lvert l_n(x) - l(x) \rvert.\\
 \therefore
-\varepsilon &\ge \sup_{x \in X x \ne 0} \frac{1}{\lVert x\rVert_X} \lvert l_n(x) - l(x) \rvert\\
+\varepsilon &\ge \sup_{\substack{x \in X\\x \ne 0} } \frac{1}{\lVert x\rVert_X} \lvert l_n(x) - l(x) \rvert\\
 &= \lVert l_n - l\rVert_{X \to \mathbb F}.\\
 \end{aligned}
 $$
