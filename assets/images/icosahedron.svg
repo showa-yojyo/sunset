@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="256"
+   height="256"
+   viewBox="0 0 67.733325 67.733325"
+   version="1.1"
+   id="svg3776"
+   sodipodi:docname="icosahedron.svg"
+   inkscape:version="1.2.2 (732a01da63, 2022-12-09)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview3778"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     showgrid="false"
+     inkscape:zoom="1"
+     inkscape:cx="304.5"
+     inkscape:cy="29"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs3773" />
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <g
+       inkscape:label="icos:x0.00:z0.00:x0.00:x0.00:z0.00:x0.00"
+       transform="matrix(0.37763788,0,0,0.37763788,33.866667,33.866667)"
+       id="g4117"
+       style="stroke-width:0.700627">
+      <path
+         inkscape:label="Face:10"
+         style="fill:#b90e72;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linejoin:round;stroke-opacity:1"
+         d="M 26.2866,-80.9017 H -26.2866 L -68.8191,-50 Z"
+         id="path4097" />
+      <path
+         inkscape:label="Face:11"
+         style="fill:#af0d6b;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linejoin:round;stroke-opacity:1"
+         d="m -68.8191,-50 -16.246,50 16.246,50 z"
+         id="path4099" />
+      <path
+         inkscape:label="Face:12"
+         style="fill:#770949;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linejoin:round;stroke-opacity:1"
+         d="m -68.8191,50 42.5325,30.9017 h 52.5732 z"
+         id="path4101" />
+      <path
+         inkscape:label="Face:13"
+         style="fill:#5d0739;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linejoin:round;stroke-opacity:1"
+         d="M 26.2866,80.9017 68.8191,50 85.0651,0 Z"
+         id="path4103" />
+      <path
+         inkscape:label="Face:14"
+         style="fill:#840a51;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linejoin:round;stroke-opacity:1"
+         d="M 85.0651,0 68.8191,-50 26.2866,-80.9017 Z"
+         id="path4105" />
+      <path
+         inkscape:label="Face:0"
+         style="fill:#e8128f;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linejoin:round;stroke-opacity:1"
+         d="M 0,0 26.2866,-80.9017 -68.8191,-50 Z"
+         id="path4107" />
+      <path
+         inkscape:label="Face:1"
+         style="fill:#d91186;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linejoin:round;stroke-opacity:1"
+         d="M 0,0 -68.8191,-50 V 50 Z"
+         id="path4109" />
+      <path
+         inkscape:label="Face:2"
+         style="fill:#a90d68;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linejoin:round;stroke-opacity:1"
+         d="M 0,0 -68.8191,50 26.2866,80.9017 Z"
+         id="path4111" />
+      <path
+         inkscape:label="Face:3"
+         style="fill:#980b5d;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linejoin:round;stroke-opacity:1"
+         d="M 0,0 26.2866,80.9017 85.0651,0 Z"
+         id="path4113" />
+      <path
+         inkscape:label="Face:4"
+         style="fill:#b30e6e;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linejoin:round;stroke-opacity:1"
+         d="M 0,0 H 85.0651 L 26.2866,-80.9017 Z"
+         id="path4115" />
+    </g>
+  </g>
+</svg>
