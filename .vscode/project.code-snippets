@@ -60,6 +60,10 @@
 		"prefix": "DeepL",
 		"body": "${1|[DeepL],[DeepL]: https://www.deepl.com/translator|}$0"
 	},
+	"draw.io": {
+		"prefix": "draw.io",
+		"body": "${1|[draw.io],[draw.io]: https://www.drawio.com/|}$0"
+	},
 	"dtp22a":{
 		"prefix": "dtp22a",
 		"body": "${1|[SOPHIE][dtp22a],[dtp22a]: https://wodifes.net/game/show/469|}$0"
