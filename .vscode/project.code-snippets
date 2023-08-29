@@ -88,6 +88,10 @@
 		"prefix": "gist",
 		"body": "[gist]: https://gist.github.com/showa-yojyo/$0"
 	},
+	"github docs":{
+		"prefix": "github",
+		"body": "${1|[GitHub Docs],[GitHub Docs]: https://docs.github.com/en|}"
+	},
 	"glMatrix": {
 		"prefix": "glMatrix",
 		"body": "${1|[glMatrix],[glMatrix]: https://glmatrix.net/|}"
