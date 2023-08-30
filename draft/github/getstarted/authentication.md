@@ -455,17 +455,192 @@ OpenSSH を更新する。
 
 ## Verify commit signatures
 
+個人でリポジトリーを使うぶんには必要のない概念だが見ていく。
+
+> GitHub will automatically sign commits you make using the GitHub web
+> interface.
+
 ### Commit signature verification
+
+> SSH signatures are the simplest to generate.
+
+> Generating a GPG signing key is more involved than generating an SSH key, but
+> GPG has features that SSH does not. A GPG key can expire or be revoked when no
+> longer used. GitHub shows commits that were signed with such a key as
+> "Verified" unless the key was marked as compromised. SSH keys don't have this
+> capability.
+
+> By default vigilant mode is not enabled.
+
+コミット状態は vigilane mode でない場合には次の三種類：
+
+* Verified
+* Unverified
+* No verification status
+
+GitHub でブランチをマージすると署名検証が機能しない。ローカルでマージする。
+
+コミット状態は vigilane mode である場合には次の三種類：
+
+* Verified
+* Partially verified
+* Unverified
+
+> Repository administrators can enforce required commit signing on a branch to
+> block all commits that are not signed and verified.
+
+> GitHub will automatically use GPG to sign commits you make using the web
+> interface. Commits signed by GitHub will have a verified status. You can
+> verify the signature locally using the public key available at
+> https://github.com/web-flow.gpg. The full fingerprint of the key is 5DE3 E050
+> 9C47 EA3C F04A 42D3 4AEE 18F8 3AFD EB23.
+
+> You can optionally choose to have GitHub GPG sign commits you make in GitHub
+> Codespaces.
+
+> You can use GPG to sign commits with a GPG key that you generate yourself.
+
+GitHub はその GPG を検証する。
+
+> You can use SSH to sign commits with an SSH key that you generate yourself.
+> For more information, see the Git reference documentation for user.Signingkey.
+
+GitHub はローカルで署名したコミットやタグが GitHub.com のアカウントに追加した公
+開鍵に対して暗号的に検証可能かどうかを確認する。
+
+S/MIME は割愛。
+
 ### Displaying verification for all commits
+
+> You can enable vigilant mode for commit signature verification to mark all of
+> your commits and tags with a signature verification status.
+
+署名の意図はこうだ：
+
+> Git allows you to set the author of your changes and the identity of the
+> committer. This, potentially, makes it difficult for other people to be
+> confident that commits and tags you create were actually created by you.
+
+他人に信用させるのが目的だ。
+
+> you can give other users increased confidence in the identity attributed to
+> your commits and tags by enabling vigilant mode in your GitHub settings.
+
+このモードを有効にする条件はひじょうに限定される：
+
+> You should only enable vigilant mode if you sign all of your commits and tags
+> and use an email address that is verified for your account on GitHub as your
+> committer email address. After enabling this mode, any unsigned commits or
+> tags that you generate locally and push to GitHub will be marked "Unverified."
+
+`Settings --> SSH and GPG keys --> Vigilant mode --> Flag unsigned commits as unverified`
+
 ### Existing GPG keys
+
+> Before you generate a GPG key, you can check to see if you have any existing
+> GPG keys.
+
+```console
+bash$ gpg --list-secret-keys --keyid-format=long
+```
+
+> If there are no GPG key pairs or you don't want to use any that are available
+> for signing commits and tags, then generate a new GPG key.
+
 ### Generating a new GPG key
+
+```console
+bash$ gpg --full-generate-key
+```
+
+ユーザー情報と passphrase を用意しておく。
+
 ### Add a GPG key
+
+`Settings --> SSH and GPG keys --> New GPG key`
+
 ### Tell Git about your signing key
+
+> To sign commits locally, you need to inform Git that there's a GPG, SSH, or
+> X.509 key you'd like to use.
+
+GPG 鍵が複数ある場合に意味がある。
+
+```console
+bash$ git config --global --unset gpg.format
+bash$ gpg --list-secret-keys --keyid-format=long
+bash$ git config --global user.signingkey XXXXXXXXXXX
+bash$ git config --global commit.gpgsign true
+```
+
+`.bashrc` のどこかで `export GPG_TTY=$(tty)` する。
+
+> You can use an existing SSH key to sign commits and tags, or generate a new
+> one specifically for signing.
+
+```console
+bash$ git config --global gpg.format ssh
+bash$ git config --global user.signingkey /PATH/TO/.SSH/KEY.PUB
+```
+
+X.509 鍵は割愛。
+
 ### Associate email with GPG key
+
+> If you're using a GPG key that matches your committer identity and your
+> verified email address associated with your account on GitHub.com, then you
+> can begin signing commits and signing tags.
+
+```console
+bash$ gpg --edit-key XXXXXXXXXXX
+gpg> adduid
+...
+gpg> save
+bash$ gpg --armor --export XXXXXXXXXXX
+```
+
+GitHub にアップロードする。
+
 ### Signing commits
+
+> You can sign commits locally using GPG, SSH, or S/MIME.
+
+> To configure your Git client to sign commits by default for a local
+> repository, in Git versions 2.0.0 and above, run `git config commit.gpgsign
+> true`. To sign all commits by default in any local repository on your
+> computer, run `git config --global commit.gpgsign true`.
+
+繰り返しになるが：
+
+> If you have multiple keys or are attempting to sign commits or tags with a key
+> that doesn't match your committer identity, you should tell Git about your
+> signing key.
+
+`git commit` のオプション `-S` で署名コミットとなる。
+
 ### Signing tags
+
+> You can sign tags locally using GPG, SSH, or S/MIME.
+
+`git tag` コマンドのオプション `-s` で署名する。署名したタグを確認するにはオプション `-v` を使う。
 
 ## Troubleshoot verification
 
 ### Check verification status
+
+> You can check the verification status of your commit and tag signatures on
+> GitHub.
+
+GitHub のリポジトリー画面 `Pull request` 以下から確認する。`Commits` タブを開くと
+`Verified` ボタンがあるはず。
+
+タグに対しては `Releases --> Tags` で `Verified` ボタンがある。
+
 ### Use verified email in GPG key
+
+> Commits and tags may contain several email addresses. For commits, there is
+> the author — the person who wrote the code — and the committer — the person
+> who added the commit to the tree. When signing a commit with Git, whether it
+> be during a merge, cherry-pick, or normal git commit, the committer email
+> address will be yours, even if the author email address isn't. Tags are more
+> simple: The tagger email address is always the user who created the tag.
