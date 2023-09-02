@@ -544,16 +544,257 @@ GitHub Advanced Security を利用するにはライセンス料金が必要。�
 ## Writing on GitHub
 
 ### Start writing on GitHub
+
+#### Quickstart for writing on GitHub
+
+> Learn advanced formatting features by creating a README for your GitHub
+> profile.
+
+* Introduction
+  * Markdown で書く。
+* Creating or editing your profile README
+  * If you don't already have a profile README, you can add one.
+  * アカウント名と同名のリポジトリーを作成する。その README を編集する。
+* Adding an image to suit your visitors
+  * HTML に `picture` というタグがあるのか。
+* Adding a table
+* Adding a collapsed section
+  * HTML に `details` というタグがあるのか。
+* Adding a quote
+* Adding a comment
+* Saving your work
+  * 当然だが `main` ブランチのファイルが画面に反映する。
+
+#### About writing and formatting on GitHub
+
+GitHub の Markdown は標準のそれとは少し異なる。
+
+> Every comment field on GitHub contains a text formatting toolbar, which allows
+> you to format your text without learning Markdown syntax.
+
+`Settings --> Appearance --> Use a fixed-width (monospace) font when editing Markdown`
+
+#### Basic writing and formatting syntax
+
+文書内に見出しを深く設けると TOC を用意してくれる。
+
+`pitcure` タグの詳細な使用法。
+
+Alerts は使いたくなる。
+
 ### Work with advanced formatting
+
+#### Organizing information with tables
+
+* 表の記法
+* 表のマス内の記法
+* 文字寄せ
+
+#### Organizing information with collapsed sections
+
+`details` タグで折りたたみセクションを作れば、Markdownを効率化できる。
+これは HTML5 標準のタグだが、この中身として Markdown コードを混入させることが可能。
+
+#### Creating and highlighting code blocks
+
+これはさすがにすでに利用している。
+
+> You can also use code blocks to create diagrams in Markdown. GitHub supports
+> Mermaid, GeoJSON, TopoJSON, and ASCII STL syntax.
+
+#### Creating diagrams
+
+* About creating diagrams
+  * Diagram rendering is available in GitHub Issues, GitHub Discussions, pull
+    requests, wikis, and Markdown files.
+* Creating Mermaid diagrams
+  * すでに利用済み。
+* Creating GeoJSON and TopoJSON maps
+  * You can use GeoJSON or TopoJSON syntax to create interactive maps.
+  * ここで言う maps は地図のこと。
+* Creating STL 3D models
+  * なんと……。GitHub は何を考えているのだ。
+
+#### Writing mathematical expressions
+
+* About writing mathematical expressions
+  * Markdown 内の LaTeX コードの描画には MathJax を利用している。Jekyll ブログの
+    既定エンジンとは異なる。
+* Writing inline expressions
+  * ドルマークで挟む方式と、ドルマークとバッククオートをくっつけたパターン同士で挟む方式がある。
+    後者は開始記号と終了記号が見分けられるので好みだ。ただし GitHub による拡張。
+* Writing expressions as blocks
+  * ダブルドルマークで挟む方式
+  * コードブロックで構文を `math` とする方式（これも GitHub 固有）
+* Writing dollar signs in line with and within mathematical expressions
+  * 常識的な方法でエスケープ可能。
+
+#### Autolinked references and URLs
+
+> References to URLs, issues, pull requests, and commits are automatically
+> shortened and converted into links.
+
+* URLs: これはわかりやすい。
+* Issues and pull requests: Short link というルールがある。
+* Labels
+  * When referencing the URL of a label in Markdown, the label is automatically
+    rendered.
+* Commit SHAs
+  * References to a commit's SHA hash are automatically converted into shortened
+    links to the commit on GitHub.
+* Custom autolinks to external resources
+  * If custom autolink references are configured for a repository, then
+    references to external resources, like a JIRA issue or Zendesk ticket,
+    convert into shortened links. なるほど。
+
+#### Attaching files
+
+> To attach a file to an issue or pull request conversation, drag and drop it
+> into the comment box. Alternatively, you can click the bar at the bottom of
+> the comment box to browse, select, and add a file from your computer.
+
+GitHub 上のページにファイルを添付できることになるが、そのわりに上限が 10MB もある。
+
+MP4 に関する次のコツは有益だ：
+
+> Note: Video codec compatibility is browser specific, and it's possible that a
+> video you upload to one browser is not viewable on another browser. At the
+> moment we recommend using h.264 for greatest compatibility.
+
+#### About task lists
+
+> You can use task lists to break the work for an issue or pull request into
+> smaller tasks, then track the full set of work to completion.
+
+ほう。
+
+> You can use Markdown to create a task list in any comment on GitHub. If you
+> reference an issue, pull request, or discussion in a task list, the reference
+> will unfurl to show the title and state.
+
+このリストの項目を issue に変換することが可能。
+
+要するに issue や pull request を細分するための機能だ。
+
+#### Creating a permanent link to a code snippet
+
+> You can create a permanent link to a specific line or range of lines of code
+> in a specific version of a file or pull request.
+
+* Linking to code: コード中のテキストを選択して、行表示部分にマウスを持っていくと
+  `...` が現れる。メニューにある `Copy permalink` を押す。
+* Linking to Markdown: URL の仕様
+
+#### Using keywords in issues and pull requests
+
+> To link a pull request to an issue to show that a fix is in progress and to
+> automatically close the issue when someone merges the pull request, type one
+> of the following keywords followed by a reference to the issue.
+
+* close
+* closes
+* closed
+* fix
+* fixes
+* fixed
+* resolve
+* resolves
+* resolved
+
+> To mark an issue or pull request as a duplicate, type "Duplicate of" followed
+> by the issue or pull request number it duplicates in the body of a new
+> comment.
+
 ### Work with saved replies
+
+> To save time and make sure you're delivering a consistent message, you can add
+> saved replies to issue and pull request comments.
+
+嫌いな機能だ。
+
+#### About saved replies
+
+> Saved replies are tied to your personal account. Once they're created, you'll
+> be able to use them across repositories and organizations.
+
+#### Creating a saved reply
+
+`Settings --> Saved replies`
+
+このフォームを見れば機能のすべてを了解するだろう。
+
+#### Editing a saved reply
+
+割愛。
+
+#### Deleting a saved reply
+
+バツボタン。
+
+#### Using saved replies
+
+コメント欄のツールバーに呼び出しボタンがある。
+
 ### Share content with gists
+
+#### Creating gists
+
+これだけ注意：
+
+> Secret gists aren't private. If you send the URL of a secret gist to a friend,
+> they'll be able to see it.
+
+Gist のファイルをページに埋め込むことが可能：
+
+> To embed a specific gist file, append the Embed URL with `?file=FILENAME`.
+
+* Creating a gist: 方法が複数ある。
+  * `gh gist create`
+  * Gist のホームページから作成
+
+#### Forking and cloning gists
+
+Gist ページはリポジトリーの一種なので、フォークも複製も考えられる。
+ドロップダウンメニューを見ればやり方はわかるだろう。
+
+#### Saving gists with stars
+
+Gist ページに対してもリポジトリー同様に星をつけることが可能。行動の意味も同じ。
 
 ## Explore projects
 
 ### Contribute to open source
+
+自分に関連するオープンソースプロジェクトに貢献する方法を見つける。
+
+* Discovering relevant projects
+  * `https://github.com/topics/<topic>` にアクセス
+  * Explore GitHub
+  * メールマガジン
+* Finding good first issues
+  * `github.com/<owner>/<repository>/contribute` で初心者用
+* Opening an issue
+  * バグを見つけたと思ったら、すでに報告済みでないかを確認しろ。
+* Validating an issue or pull request
+  * 報告されているバグを再現したり、テストするのも貢献の一形態だ。
+
 ### Save repos with stars
+
+星の機能については GitHub ユーザーは文書を読む前に慣れていると思う。
+
 ### Following people
+
+* About followers on GitHub
+  * 誰かを follow すると、ダッシュボードにその行動が示される。
+  * その人物がリポジトリーに星をつけると、それがおすすめとして示される。
+* Following a user on GitHub
+  * 対象のプロフィール画面の `Follow` をクリック
+* Unfollowing a user on GitHub
+  * 対象のプロフィール画面の `Unfollow` をクリック
+
 ### Following organizations
+
+組織版。
 
 ## Getting started with Git
 
