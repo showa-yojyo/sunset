@@ -798,29 +798,257 @@ Gist ページに対してもリポジトリー同様に星をつけることが
 
 ## Getting started with Git
 
+ここは Git の基本だろう。GitHub との連携に注目する。
+
 ### Set your username
+
+```console
+bash$ git config --global user.name XXXXXXX
+```
+
+リポジトリー単位で設定するには、当該リポジトリーの `gitconfig` にコマンドを作用させる。
+
 ### Caching credentials
+
+> If you're cloning GitHub repositories using HTTPS, we recommend you use GitHub
+> CLI or Git Credential Manager (GCM) to remember your credentials.
+
+SSH でやっているから流し読みか？
+
+> GitHub CLI will automatically store your Git credentials for you when you
+> choose HTTPS as your preferred protocol for Git operations and answer "yes" to
+> the prompt asking if you would like to authenticate to Git with your GitHub
+> credentials.
+
+コマンド `gh auth login` を実行する。
+
+> With GCM, you don't have to manually create and store a personal access token,
+> as GCM manages authentication on your behalf, including 2FA (two-factor
+> authentication).
+
+GCM をインストールするのが必要。後で詳しく。
+
+リポジトリーを HTTPS でクローンした場合にこのような認証が発生する。
+
+> Once you've authenticated successfully, your credentials are stored on your
+> system and will be used every time you clone an HTTPS URL. Git will not
+> require you to type your credentials in the command line again unless you
+> change your credentials.
+
 ### Git passwords
+
+逆に、GitHub にアクセスするたびにユーザー名とパスワードの入力を求められる場合は、
+クローン URL を HTTPS にしているということだ。
+
+> However, it also prompts you to enter your GitHub credentials every time you
+> pull or push a repository.
+
+入力を省略するようにするには：
+
+> You can avoid being prompted for your password by configuring Git to cache
+> your credentials for you. Once you've configured credential caching, Git
+> automatically uses your cached personal access token when you pull or push a
+> repository using HTTPS.
+
 ### macOS Keychain credentials
+
+Mac は使っていないので割愛。
+
 ### Git workflows
+
+この節には情報がない。後で。
+
 ### About remote repositories
+
+所有者をまたぐリポジトリーの操作についてか。
+
+* About remote repositories
+  * 次のタイプの URL にしか push 不能：
+    * An HTTPS URL like `https://github.com/user/repo.git`
+    * An SSH URL, like `git@github.com:user/repo.git`
+  * Git はリモート URL に名前を付ける。通常 `origin` だ。
+* Creating remote repositories
+  * `git remote add origin <REMOTE_URL>`
+  * `git remote set-url XXXXXXX`
+* Choosing a URL for your remote repository
+  * クローンのためのコマンドはリポジトリー画面の `Code --> Clone` で得る。
+* Cloning with HTTPS URLs
+  * HTTP はプロキシーやファイアーウォールを通る。
+  * 次の Git コマンドでユーザー名とパスワード入力を要求される：
+    `clone`, `fetch`, `pull`, `push`.
+  * To clone a repository without authenticating to GitHub on the command line,
+    you can use GitHub Desktop to clone instead. For more information, see
+    "Cloning a repository from GitHub to GitHub Desktop."
+* Cloning with SSH URLs
+  * To use these URLs, you must generate an SSH keypair on your computer and add
+    the public key to your account on GitHub.com.
+  * 次の Git コマンドでパスワードと SSH キーパスフレーズ入力を要求される：
+    `clone`, `fetch`, `pull`, `push`.
+* Cloning with GitHub CLI: 別途述べる。
+* Cloning with Subversion: 割愛。
+
 ### Manage remote repositories
+
+* Adding a remote repository
+  * ローカルリポジトリーにリモートリポジトリーを追加する方法だ。
+  * 先述のように `git remote add origin https://github.com/OWNER/REPOSITORY.git` だ。
+* Changing a remote repository's URL
+  * `git remote set-url origin https://github.com/OWNER/REPOSITORY.git`
+  * 記録し忘れていたが Password-based authentication for Git has been removed in
+    favor of more secure authentication methods.
+  * HTTPS から SSH に変えたいときなどに実行。
+* Renaming a remote repository
+  * `git remote rename OLD NEW` を実行。
+* Removing a remote repository
+  * `git remote rm NAME` を実行。Git の各種コマンドで名前 `NAME` が使えなくなる。
+
 ### Associate text editors
+
+```console
+git config --global core.editor "code --wait"
+```
+
 ### Handle line endings
+
+* `git config --global core.autocrlf`
+* ファイル `.gitattributes` で `text eol=lf` とするのが望みなのだが、最良ではないようだ。
+
+> After you set the core.autocrlf option or commit a `.gitattributes` file, Git
+> automatically changes line endings to match your new configuration. You may
+> find that Git reports changes to files that you have not modified.
+
+これは知らなんだ。
+
 ### Ignoring files
+
+> GitHub maintains an official list of recommended `.gitignore` files for many
+> popular operating systems, environments, and languages in the
+> "github/gitignore" public repository.
+
+これを参考にして自分のリポジトリーの `.gitignore` を編成するといい。
+
+> To always ignore a certain file or directory, add it to a file named ignore
+> that's located inside the directory `~/.config/git`. By default, Git will
+> ignore any files and directories that are listed in the global configuration
+> file `~/.config/git/ignore`.
+
+これは設置済みだった。
+
+無視したいファイルパターンを `.gitignore` に書けない場合は：
+
+> Use your favorite text editor to open the file called `.git/info/exclude`
+> within the root of your Git repository. Any rule you add here will not be
+> checked in, and will only ignore files for your local repository.
 
 ## Using Git
 
 ### About Git
+
+> GitHub hosts Git repositories and provides developers with tools to ship
+> better code through command line features, issues (threaded discussions), pull
+> requests, code review, or the use of a collection of free and for-purchase
+> apps in the GitHub Marketplace.
+
 ### Push commits to a remote
+
+```console
+bash$ git push REMOTE-NAME :BRANCH-NAME
+```
+
+このコマンドがなぜリモートのブランチを削除することになるのか、仕組みを理解するといい。
+
+フォークしたリポジトリーのリモートリポジトリーは、ローカルから見ると複数ある。
+
 ### Get changes from a remote
+
+* `git clone` については先述のとおり。
+* `git fetch` はマージなしで追跡先の各種ブランチ、タグを得る。
+* `git merge` では通常、リモート追跡ブランチをローカルブランチにマージする。
+  `git merge REMOTE-NAME/BRANCH-NAME`
+* 練習だと思って `git pull` は使わないという手もある。
+  * 失敗したら `git merge --abort` を実行する。
+
 ### Non-fast-forward error
+
+個人でやっていれば出ないエラーだが、対処法は知っておく必要がある。
+
+```console
+bash$ git fetch origin
+bash$ git merge origin YOUR_BRANCH_NAME
+```
+
+もちろん `git pull` を使っても可。
+
 ### Splitting a subfolder
+
+> You can turn a folder within a Git repository into a brand new repository.
+
+この手法は何かのときに使うかもしれないので読む。
+
+> However, note that the new repository won't have the branches and tags of the
+> original repository.
+
+```console
+bash$ git clone https://github.com/USERNAME/REPOSITORY-NAME
+bash$ cd REPOSITORY-NAME
+bash$ git filter-repo --path FOLDER-NAME/
+```
+
+ここでは `FOLDER-NAME` 以下を残したい。
+
 ### About Git subtree merges
+
+> If you need to manage multiple projects within a single repository, you can
+> use a subtree merge to handle all the references.
+
+これは聞いたことがない。
+
+この記事のコマンドをまねて理解することは可能。ポイントは：
+
+```console
+bash$ git merge -s ours --no-commit --allow-unrelated-histories spoon-knife/main
+bash$ git read-tree --prefix=spoon-knife/ -u spoon-knife/main
+bash$ git pull -s subtree spoon-knife main
+```
+
 ### About Git rebase
+
+`git rebase -i` の基本が述べられている。
+
 ### Git rebase
+
+`git rebase` 後のブランチを `git push` するにはオプションが必要。
+`--force` はよく使うが `--force-with-lease` は知らなんだ。
+
 ### Resolve conflicts after rebase
+
+マージが衝突した場合の、ごく一般的な対処方法だ。
+これらの技法はよそのリポジトリーを研究するときによく使うはずだ。
+
 ### Special characters in names
+
+> If possible, create branch and tag names that don't contain special
+> characters, as these would need to be escaped.
+
+> GitHub restricts a small number of branch and tag names from being pushed up.
+
+### Troubleshooting the 2 GB push limit
+
+> GitHub has a maximum 2 GB limit for a single push.
+
+* プッシュを細分するしかない。
+* ブランチのサイズが重要。
+* コミットは一つずつプッシュすることが可能：
+  `git push REMOTE-NAME <YOUR_COMMIT_SHA_NUMBER>:refs/heads/BRANCH-NAME`
+
+> If the repository does not have any history, or your initial commit was over 2
+> GB on its own and you don't mind resetting the Git history, you can also start
+> from scratch.
+
+最初からリポジトリーを構築することで `git lfs install` を実行できる。
+
+ビデオファイルメインのリポジトリーをやるときがあるかもしれない。そのときはこの記
+事が役に立つ。
 
 ## Subversion
 
