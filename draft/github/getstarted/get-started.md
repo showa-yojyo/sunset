@@ -1165,3 +1165,5 @@ Twitter はないのか。
 
 > People with admin permissions to a public repository can opt into or out of
 > the GitHub Archive Program.
+
+リポジトリーの `Settings --> Features --> Preserve this repository`
