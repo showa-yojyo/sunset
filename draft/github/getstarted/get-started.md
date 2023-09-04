@@ -1052,18 +1052,116 @@ bash$ git pull -s subtree spoon-knife main
 
 ## Subversion
 
+> You can use Subversion clients and some Subversion workflows and properties
+> with GitHub.
+
+Git を使っているのならばわざわざ旧式の VCS を採用することはない。
+
 ### Subversion & Git differences
+
+* ブランチやタグに相当するものはサブディレクトリーの形式で表現される。
+* サブプロジェクトについてはこの記述では概要が見えない。
+* 履歴は後から変更されないものとする。
+
+> Note: Subversion support will be removed from GitHub on January 8, 2024. A
+> future release of GitHub Enterprise Server after January 8, 2024 will also
+> remove Subversion support.
+
 ### Support for Subversion clients
+
+> GitHub supports Subversion clients via the HTTPS protocol. We use a Subversion
+> bridge to communicate svn commands to GitHub.
+
+> Subversion checkouts are different: they mix the repository data in the
+> working directories, so there is a working directory for each branch and tag
+> you've checked out. For repositories with many branches and tags, checking out
+> everything can be a bandwidth burden, so you should start with a partial
+> checkout.
+
+以降の記述からすると、任意の GitHub Repository を `svn` で取り扱い可能であるよう
+に読める？
+
+```console
+bash$ svn co --depth empty https://github.com/USER/REPO
+bash$ svn up trunk
+bash$ svn up --depth empty branches
+```
+
+これは立ち入らなくていい。
+
 ### Properties supported by GitHub
+
+次の三つは support している：
+
+* svn:executable
+* svn:mime-type
+* svn:ignore
+
+その他はしていない。
 
 ## Exploring integrations
 
 ### About using integrations
+
+> Integrations are tools and services that connect with GitHub to complement and
+> extend your workflow.
+
+> You can discover many integrations in GitHub Marketplace.
+
 ### About building integrations
+
+> Many integrations are GitHub Apps, GitHub Actions workflows, or custom actions
+> for GitHub Actions workflows.
+
+* GitHub Apps are integrations that run on the app owner's server or on a user
+  device.
+* GitHub Actions workflows are workflows that run when specific events occur on
+  GitHub.
+* Custom actions are code that can be executed by a GitHub Actions workflow.
+
+> If your integration is a GitHub App or custom action, you can publish your
+> integration on GitHub Marketplace.
+
 ### Featured integrations
+
+> Use GitHub extensions to work seamlessly in repositories on GitHub.com within
+> third-party applications.
+
+> With the GitHub for Visual Studio Code extension, you can review and manage
+> GitHub pull requests in VS Code.
+
+GitHub Pull Requests and Issues か？
+
+> You can integrate your personal or organization account on GitHub.com with
+> third-party team communication tools, such as Slack or Microsoft Teams.
+
+Twitter はないのか。
+
 ### GitHub Developer Program
+
+> If you build tools that integrate with GitHub, you can join the GitHub
+> Developer Program.
 
 ## Archive account and public repos
 
 ### Request account archive
+
+> You can export and review the metadata that GitHub stores about your personal
+> account.
+
+自分のアカウントのみか。
+
+> When you request an export of your personal data through settings on
+> GitHub.com, GitHub packages your personal data in a `tar.gz` file and sends
+> you an email to your primary email address with a download link.
+
+リンクの期限は一週間。
+
+`Settings --> Account --> Export account data` の `Start export`
+
+このリンクはメールで知る。リンクを無効にするには同じように `Delete` を押す。
+
 ### GitHub Archive program
+
+> People with admin permissions to a public repository can opt into or out of
+> the GitHub Archive Program.
