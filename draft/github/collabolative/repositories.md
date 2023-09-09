@@ -310,41 +310,326 @@ GitHub が自動判定する。
 
 リポジトリー `Settings --> Actions --> Actions permissions` 以下を調整する。
 
+リポジトリー `Settings --> Actions --> General --> Fork pull request workflows from outside collaborators`
+以下を調整する。
+
+`GITHUB_TOKEN` 権限を構成する：
+リポジトリー `Settings --> Actions --> General --> Workflow permissions` 以下を調整。
+
+> By default, when you create a new repository in your personal account,
+> workflows are not allowed to create or approve pull requests.
+
+チェックボックスのほう。
+
+> You can configure the retention period for GitHub Actions artifacts and logs
+> in your repository.
+
+実は private のほうが長期間保存可能。
+
+リポジトリー `Settings --> Actions --> General -->Artifact and log retention` 以
+下を調整。
+
 #### Enabling or disabling GitHub Discussions for a repository
+
+リポジトリー `Settings --> General --> Features --> Discussion` をオンかオフ。
 
 #### Managing security and analysis settings for your repository
 
+リポジトリー `Settings --> Code security and analysis` 各機能の `Enable` ボタンを押す。
+
 ### Managing repository settings
+
+リポジトリーの機能を選択する。
 
 #### Setting repository visibility
 
+* リポジトリーを public/private にする違いを理解する。
+* リポジトリーを public/private に変更する方法を理解する。
+
 #### Managing teams and people with access to your repository
+
+割愛。
 
 #### Managing the forking policy for your repository
 
+> You can allow or prevent the forking of a specific private repository owned by
+> an organization.
+
+割愛。
+
 #### Managing pull request reviews in your repository
+
+> You can limit which users can approve or request changes to a pull requests in
+> a public repository.
+
+リクエスト者を制限するわけではないことに注意。
+
+> When you enable code review limits, anyone can comment on pull requests in
+> your public repository, but only people with read access or higher can approve
+> pull requests or request changes.
+
+査読者を制限するオプションであると読める？
+
+リポジトリー `Settings --> Moderation options --> Code review limits` 以下をいじる。
 
 #### Managing the commit signoff policy for your repository
 
+> You can require users to automatically sign off on the commits they make to
+> your repository using GitHub's web interface.
+
+サインオフはコミットの内容を保証するための仕組みらしい。
+
+> Compulsory commit signoffs only apply to commits made via the web interface.
+
+ローカルでコミットする場合は本項の範囲外ということか。
+
+> You can determine whether a repository you are contributing to has compulsory
+> commit signoffs enabled by checking the header of the commit form at the
+> bottom of the file you are editing. After compulsory commit signoff has been
+> enabled, the header will read "Sign off and commit changes."
+
+ブラウザー経由でファイルを変更するときに確認したい。
+
+リポジトリー `Settings --> General --> Require contributors to sign off on web-based commits`
+をオンにする。
+
 #### Managing the push policy for your repository
+
+> You can limit how many branches and tags can be updated in a single push.
+
+ちなみに `git push --mirror` も禁止できる。
+
+リポジトリー `Settings --> General --> Limit how many branches and tags can be updated in a single push`
+をオンにして `Up to` 値を設定する。推奨値は 5 だ。なぜなら Git では一度の push
+でブランチの名前を変更するには、ブランチの削除とブランチの作成という二つが必要だ
+からだ。
 
 #### Managing Git LFS objects in archives of your repository
 
+コードアーカイブに LFS を含めるか否か。
+
+リポジトリー `Settings --> General --> Include Git LFS objects in archives` をオンオフ。
+
 #### About email notifications for pushes to your repository
+
+> You can choose to automatically send email notifications to a specific email
+> address when anyone pushes to the repository.
+
+リポジトリー `Settings --> Email notifications` を選択。番号を入れて次へ。
 
 #### Configuring autolinks to reference external resources
 
+割愛。
+
 #### Configuring tag protection rules
+
+リポジトリー `Settings --> Tags --> New rule` を押す。
+このパターンにマッチするタグを作成することが不可能になる？
 
 ## Configuring branches and merges in your repository
 
-### Managing branches in your repository • 4 articles
+### Managing branches in your repository
 
-### Configuring pull request merges • 8 articles
+> Whenever you propose a change in Git, you create a new branch.
 
-### Managing protected branches • 2 articles
+ということになっている。
+
+#### Viewing branches in your repository
+
+リポジトリー画面左上のブランチボタンに `View all branches` リンクがある。
+リンク先の画面ではブランチ一覧から検索したりフィルターしたりすることが可能。
+
+`Stale branshes` に現れるものが削除候補だ。
+
+#### Renaming a branch
+
+`master` を `main` に変更するなど、状況は思いつく。
+
+> When you rename a branch on GitHub.com, any URLs that contain the old branch
+> name are automatically redirected to the equivalent URL for the renamed
+> branch.
+
+ローカルリポジトリーの対応ブランチも rename する必要が生じる。その案内も対応。
+さらに GitHub Actions も自動更新されたりはしない。
+
+`View all branches` リンク先の項目鉛筆ボタンから rename 可能。
+
+ローカルで必要となる作業は：
+
+```console
+bash$ git branch -m OLD-BRANCH-NAME NEW-BRANCH-NAME
+bash$ git fetch origin
+bash$ git branch -u origin/NEW-BRANCH-NAME NEW-BRANCH-NAME
+bash$ git remote set-head origin -a
+```
+
+おまけで
+
+```console
+bash$ git remote prune origin
+```
+
+#### Changing the default branch
+
+> The default branch is the base branch for pull requests and code commits.
+
+リポジトリー `Settings --> General --> Default branch` で設定。
+
+#### Deleting and restoring branches in a pull request
+
+> You can delete a branch that is associated with a pull request if the pull
+> request has been merged or closed and there are no other open pull requests
+> referencing the branch.
+
+処理済みの Pull request ページ下部に `Delete branch` があるからそれを押す。
+復元したい場合も同様の手順。
+
+### Configuring pull request merges
+
+#### About merge methods on GitHub
+
+> The default merge method creates a merge commit.
+
+これは Git 単体の話？
+
+> The rebase and merge behavior on GitHub deviates slightly from `git rebase`.
+
+このことを承知しておく。
+
+以前述べたように GitHub 上でのマージでは sign off が効かなくなる。
+
+#### Configuring commit merging for pull requests
+
+リポジトリー `Settings --> General --> Pull Requests` で
+`Allow merge commits` をオンにする。
+
+> If you select more than one merge method, collaborators can choose which type
+> of merge commit to use when they merge a pull request.
+
+#### Configuring commit squashing for pull requests
+
+リポジトリー `Settings --> General --> Pull Requests` で
+`Allow squash merging` をオンにする。
+
+#### Configuring commit rebasing for pull requests
+
+リポジトリー `Settings --> General --> Pull Requests` で
+`Allow rebase merging` をオンにする。
+
+#### Managing a merge queue
+
+> Using a merge queue is particularly useful on branches that have a relatively
+> high number of pull requests merging each day from many different users.
+
+したがって割愛。
+
+#### Managing suggestions to update pull request branches
+
+Pull request にはベースブランチの最新状態に追いついていて欲しい。
+
+リポジトリー `Settings --> General --> Pull Requests` で
+`Always suggest updating pull request branches` をオンにする。
+
+#### Managing auto-merge for pull requests in your repository
+
+> If you allow auto-merge for pull requests in your repository, people with
+> write permissions can configure individual pull requests in the repository to
+> merge automatically when all merge requirements are met.
+
+リポジトリー `Settings --> General --> Pull Requests` で
+`Allow auto-merge` をオンにする。
+
+#### Managing the automatic deletion of branches
+
+リポジトリー `Settings --> General --> Pull Requests` で
+`Automatically delete head branches` をオンにする。
+
+### Managing protected branches
+
+> For example, you can block pull requests that don't pass status checks or
+> require that pull requests have a specific number of approving reviews before
+> they can be merged.
+
+#### About protected branches
+
+ブランチに対する push, merge, delete から保護したいというのが主旨だ。
+
+> By default, the restrictions of a branch protection rule don't apply to people
+> with admin permissions to the repository or custom roles with the "bypass
+> branch protections" permission.
+
+特権を有する人には効かない。
+
+> Required status checks ensure that all required CI tests are passing before
+> collaborators can make changes to a protected branch.
+
+？
+
+> When you enable required commit signing on a branch, contributors and bots can
+> only push commits that have been signed and verified to the branch.
+
+だんだんごちゃごちゃしてきた。
+
+> A strictly linear commit history can help teams reverse changes more easily.
+
+これは良さそうだ。
+
+> You can require that changes are successfully deployed to specific
+> environments before a branch can be merged.
+
+> Locking a branch ensures that no commits can be made to the branch.
+
+#### Managing a branch protection rule
+
+リポジトリー `Settings --> Branches --> Add branch protection rules` を押す。
+パターンを記入、オプションを追加する。
+
+上級者向け機能。割愛。
 
 ### Managing rulesets for a repository
+
+#### About rulesets
+
+> A ruleset is a named list of rules that applies to a repository. You can
+> create rulesets to control how people can interact with selected branches and
+> tags in a repository.
+
+既視感のある機能だが？
+
+Rulesets のほうが branch protection よりも望ましい。
+
+#### Creating rulesets for a repository
+
+リポジトリー `Settings --> Rules --> Rulesets` で緑ボタンを押す。
+
+#### Managing rulesets for a repository
+
+ブランチ一覧画面で Rulesets を有するブランチの盾アイコンを押す。
+
+#### Available rules for rulesets
+
+* Restrict creations
+* Restrict updates
+* Restrict deletions
+* Require linear history
+* Require deployments to succeed before merging
+* Require signed commits
+* Require a pull request before merging
+* Require status checks to pass before merging
+* Block force pushes
+
+#### Troubleshooting rules
+
+> Depending on which rules are active, you may need to edit your commit history
+> locally before you can push your commits to the remote branch.
+
+や
+
+> If a branch or tag is targeted by rules restricting the metadata of commits,
+> your commits may be rejected if part of the commit's metadata does not match a
+> certain pattern.
+
+を覚えておく。
 
 ## Working with files
 
