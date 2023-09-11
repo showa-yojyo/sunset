@@ -970,28 +970,112 @@ URL に引数を付ければ自動でリリースを定義できる？
 
 ## Viewing activity and data for your repository
 
+> Gain insight into your repository by viewing activity and data.
+
 ### Viewing deployment activity for your repository
+
+この機能は成果物を配備するプロジェクト向け。ウチで言うと読書ノートがいい。
+
+リポジトリーページ右柱 `Environments` 下に `github-pages` などの成果物一覧がある。
 
 ### About repository graphs
 
+> If you maintain a repository, you can use this data to get a better
+> understanding of who's using your repository and why they're using it.
+
+なお、GitHub Free の公開リポジトリーでしか利用不能なリポジトリーグラフがある。
+
 ### Using Pulse to view a summary of repository activity
+
+> You can use Pulse to see an overview of a repository's pull request, issue,
+> and commit activity.
+
+リポジトリーページの `Insights` を押す。
 
 ### Viewing traffic to a repository
 
+リポジトリー `Insights --> Traffic`
+
 ### Viewing a project's contributors
+
+リポジトリー `Insights --> Contrinutors`
 
 ### Analyzing changes to a repository's content
 
+> You can see all commits made to a repository in the past year (excluding merge
+> commits) in the `Commit` graph.
+
+リポジトリー `Insights --> Commits`
+
+リポジトリー `Insights --> Code frequency`
+
 ### Understanding connections between repositories
+
+> The network graph displays the branch history of the entire repository
+> network, including fork branches.
+
+リポジトリー `Insights --> Network`
+
+リポジトリー `Insights --> Forks`
 
 ### Using the activity view to see changes to a repository
 
+> For example, you can choose to filter by "Force pushes", to see all force
+> pushes to the repository.
+
+これは楽しそうだ。
+
+リポジトリーページ右柱の `Activity` から、上のを見るには `All activities --> Force pushes` を押す。
+
 ## Archiving a GitHub repository
+
+> You can archive, back up, and cite your work using GitHub, the API, or
+> third-party tools and services.
+
+引用とは？
 
 ### Archiving repositories
 
+リポジトリーを保管することで、全てが読み取り専用になる。
+
+> To make changes in an archived repository, you must unarchive the repository
+> first.
+
+解除できるのか。
+
+> We recommend that you close all issues and pull requests, as well as update
+> the `README` file and description, before you archive a repository.
+
+当然だ。
+
+リポジトリー `Settings --> Danger Zone --> Archive this repository` を押す。
+
+保管解除は同じような手順による。
+
 ### About archiving content and data on GitHub
+
+> By default, all public repositories are included in the GitHub Archive
+> Program, a partnership between GitHub and organizations such as Software
+> Heritage Foundation and Internet Archive to ensure the long-term preservation
+> of the world's open source software.
+
+海外人はこういう保護意識がしっかりしている。
+
+> If you want third parties to consider your work on GitHub for archiving, you
+> can add an open source license to your projects.
+
+なのでリポジトリーにライセンス声明があることが重要。
 
 ### Referencing and citing content
 
+> To make your repositories easier to reference in academic literature, you can
+> create persistent identifiers, also known as Digital Object Identifiers
+> (DOIs).
+
+リポジトリーが公開であることが必要。
+
+ここは割愛していいか。
+
 ### Backing up a repository
+
+GitHub をバックアップ領域として利用しているので割愛。
