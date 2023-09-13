@@ -69,7 +69,6 @@ plugins:
 exclude:
   - .gitignore
   - .mailmap
-  - draft/
 
 # Minima settings
 minima:
