@@ -498,46 +498,358 @@ Git 操作で当該ブランチをローカルにクローンして、普通に�
 
 ### Addressing merge conflicts
 
+マージ衝突の解決方法と見ていく？
+
 #### About merge conflicts
+
+> Often, merge conflicts happen when people make different changes to the same
+> line of the same file, or when one person edits a file and another person
+> deletes the same file.
+
+それ以外の違いは Git が自然に解消してくれる。
+
+> The `Merge pull request` button is deactivated until you've resolved all
+> conflicts between the compare branch and base branch.
+
+衝突の解消は手動による編集が基本だ。
+
+衝突を解消するまで、そのブランチの作業は先に進めないとみなしていい。
 
 #### Resolving a merge conflict on GitHub
 
+> You can resolve simple merge conflicts that involve competing line changes on
+> GitHub, using the conflict editor.
+
+衝突解消のための専用編集ツールを使う場合。
+
+`Pull requests` 画面の `Resolve conflicts` を押す。このボタンがグレーになっているときは
+GitHub でもお手上げという複雑な衝突であるので、ほんとうに手作業でやるしかない。
+
+最終的に `Merge pull request` ボタンを押せるようにする。
+
 #### Resolving a merge conflict using the command line
+
+コマンドラインとテキストエディターで解消するのが基本だ。
+`git status` すると `both modified` であるファイルが含まれているはず。
+
+エディターで衝突マークが追加されたファイルを目と手で編集する。
+ファイルを保存したら Git でコミットする。これでブランチが正常化する。
+
+ファイル自体が衝突する場合（削除や改名）はテキスト編集というより Git コマンドで解消する。
+`git add`, `git rm` などを確定する。
 
 ### Reviewing changes in pull requests
 
+> After a pull request has been opened, you can review and discuss the set of
+> proposed changes.
+
+一連の文書で現れる各文章の代名詞主語が誰を指しているのか不明瞭な場合が多いのが気になる。
+
 #### About pull request reviews
+
+レビュー：コメント、許可、要求
+
+> You can define which individuals or teams own certain types or areas of code
+> in a `CODEOWNERS` file.
+
+急所：
+
+> A review has three possible statuses:
+>
+> * `Comment`: Submit general feedback without explicitly approving the changes
+>   or requesting additional changes.
+> * `Approve`: Submit feedback and approve merging the changes proposed in the
+>   pull request.
+> * `Request changes`: Submit feedback that must be addressed before the pull
+>   request can be merged.
+
+マージ可かどうかを見分ける方法：
+
+> If your repository requires approving reviews from people with `write` or
+> `admin` permissions, then any approvals from people with these permissions are
+> denoted with a green check mark, and approvals from people without these
+> permissions have a gray check mark. Approvals with a gray check mark do not
+> affect whether the pull request can be merged.
+
+`Conversation` にも解消状態が存在する：
+
+> To indicate that a conversation on the `Files changed` tab is complete, click
+> `Resolve conversation`.
+
+`Files changed` タブの左下辺りに `Conversations` を押すと会話があれば出る。
+
+レビューを再依頼することが可能。
 
 #### Reviewing proposed changes in a pull request
 
+現行のコードの差分を確認しながら批評する。
+
+> While reviewing the files in a pull request, you can leave individual comments
+> on specific changes. After you finish reviewing each file, you can mark the
+> file as viewed.
+
+これで見逃しがないことを期待する。
+
+`Files changed` タブのすぐ下辺りの歯車アイコンで差分表示を united か split か選ぶ。
+
+差分のチャンクごとにコメントを付すことが可能。
+
+`Start a review` や `Add review comment` を押す。
+
+> If the pull request contains changes to dependencies you can use the
+> dependency review for a manifest or lock file to see what has changed and
+> check whether the changes introduce security vulnerabilities.
+
+この種の差分は `rich diff` を押す特殊な表示となる。バージョンが目立つような。
+
+> After you finish reviewing a file, you can mark the file as viewed, and the
+> file will collapse. If the file changes after you view the file, it will be
+> unmarked as viewed.
+
+`Viewed` にチェックがつく。
+
+`Review changes` を押して `Submit review` を押せばレビュー完了。
+
 #### Filtering files in a pull request
+
+> To help you quickly review changes in a large pull request, you can filter
+> changed files or use the file tree to navigate between files.
+
+大規模な変更はもらいたくないものだ。
+
+`Files changed` タブ下メニューにある `File filter` を押すと、いい感じのフィルターオプションが現れる。
 
 #### Finding changed methods and functions in a pull request
 
+> You can quickly find proposed changes to a method or function in a pull
+> request in .go, .js, .ts, .py, .php, and .rb files.
+
+怪しい触れ込みだ。
+
+`Files changed --> Jump to` のドロップダウンリストに関数一覧が現れるようだ。
+
 #### Commenting on a pull request
+
+何度も見てきたように：
+
+> You can comment on a pull request's `Conversation` tab to leave general
+> comments, questions, or props. You can also suggest changes that the author of
+> the pull request can apply directly from your comment.
+
+`Files changed --> Conversations` でその pull request の会話すべてを見つけられる。
 
 #### Viewing a pull request review
 
+`Conversation` ページの下部、`View all changes` を押す。
+
 #### Reviewing dependency changes in a pull request
+
+> If a pull request contains changes to dependencies, you can view a summary of
+> what has changed and whether there are known vulnerabilities in any of the
+> dependencies.
+
+そして前に習ったように：
+
+> It provides an easily understandable visualization of dependency changes with
+> a rich diff on the "Files Changed" tab of a pull request.
+
+このレビューで得られる情報とは：
+
+> * Which dependencies were added, removed, or updated, along with the release
+>   dates.
+> * How many projects use these components.
+> * Vulnerability data for these dependencies.
+
+次のような特別アクションがある：
+
+> You can use the dependency review action to help enforce dependency reviews on
+> pull requests in your repository.
+
+表示順序で優遇される：
+
+> Any added or changed dependencies that have vulnerabilities are listed first,
+> ordered by severity and then by dependency name. This means that the highest
+> severity dependencies are always at the top of a dependency review.
 
 #### Incorporating feedback in your pull request
 
+査読者が pull request に対して変更を提案するとどうなるか。
+
+> you can also apply suggested changes if you have write access to the upstream
+> repository.
+
+これがわからない。誰が適用できるのか。
+
+> Applying one suggested change or a batch of suggested changes creates a single
+> commit on the compare branch of the pull request.
+
+実質的には当該 pull request に対して新規コミットが加わる。さらに、
+
+> Each person who suggested a change included in the commit will be a co-author
+> of the commit.
+
+やり方は？
+
+`Commit suggestion` と `Add suggestion to batch` を押す。
+
 #### Approving a pull request with required reviews
+
+レビューが必要かどうかはリポジトリーの性質らしい。
+
+> If a pull request you approved has changed significantly, you can dismiss your
+> review.
+
+Pull request を提出した者がレビュー結果を却下可能だと読める。
+次の節で述べられるものか。
+
+`Approve` からの `Submit review` でレビューは終わる。
+
+> Pull request authors cannot approve their own pull requests.
+
+この条件と矛盾する条件を考える。
 
 #### Dismissing a pull request review
 
+> If your repository requires reviews, you can dismiss pull request reviews that
+> are no longer valid or are unable to be approved by the reviewer.
+
+ああ、却下するというのは自分の提出を撤回するということか。
+
+> When you dismiss a review, you must add a comment explaining why you dismissed
+> it. Your comment will be added to the pull request conversation.
+
+却下するには `Dismiss review` を押す。弁解を記入する必要がある。
+
 #### Checking out pull requests locally
+
+> When someone sends you a pull request from a fork or branch of your
+> repository, you can merge it locally to resolve a merge conflict or to test
+> and verify the changes before merging on GitHub.
+
+この話題が最後ということは、この手法は主流ではないということか。
+
+休眠 pull request を再生する方法：
+Pull request ID がわかっていれば、次のコマンドでコードを得られる：
+
+```console
+bash$ git fetch origin pull/ID/head:BRANCH_NAME
+```
+
+このブランチで作業を引き継いでプッシュすれば pull request を新しい ID で再発行可
+能となる。
+
+> The remote `refs/pull/` namespace is read-only.
+
+したがって、ここにはプッシュできない。
 
 ### Incorporating changes from a pull request
 
+> You can propose changes to your work on GitHub through pull requests. Learn
+> how to create, manage, and merge pull requests.
+
 #### About pull request merges
+
+基本的には `git merge` の様式の議論だ。
+
+> When you click the default `Merge pull request` option on a pull request on
+> GitHub.com, all commits from the feature branch are added to the base branch
+> in a merge commit. The pull request is merged using the `--no-ff` option.
+
+マージオプション `--no-ff` がオンであるということを承知しおく。
+
+> When you select the `Squash and merge` option on a pull request on GitHub.com,
+> the pull request's commits are squashed into a single commit.
+
+作業途中のコミットが含まれているブランチだから、それらを縮合していいと考える。
+こちらは `--ff` でマージ。
+
+> When you squash and merge, GitHub generates a default commit message, which
+> you can edit.
+
+Git の生成する既定メッセージと異なる。
+
+> If you plan to continue work on the head branch of a pull request after the
+> pull request is merged, we recommend you don't squash and merge the pull
+> request.
+
+なるほど。`--squash` を多用する作業では衝突を生じやすい。
+
+> When you select the `Rebase and merge` option on a pull request on GitHub.com,
+> all commits from the topic branch (or head branch) are added onto the base
+> branch individually without a merge commit.
+
+ただし、次の仕様上の事実に注意する：
+
+> The rebase and merge behavior on GitHub deviates slightly from `git rebase`.
+
+あとは間接的マージという概念の記述。割愛。
 
 #### Merging a pull request
 
+> You can configure a pull request to merge automatically when all merge
+> requirements are met.
+
+> The repository may be configured so that the head branch for a pull request is
+> automatically deleted when you merge a pull request.
+
+自動処理設定をオンにしておく。
+
+> You can link a pull request to an issue to show that a fix is in progress and
+> to automatically close the issue when someone merges the pull request.
+
+このページに GitHub 上のマージ手順が記載されている。
+
 #### Automatically merging a pull request
+
+自動マージ有効化について。
+
+> If you enable auto-merge for a pull request, the pull request will merge
+> automatically when all required reviews are met and all required status checks
+> have passed.
+
+自動マージを有効にしていても、一定の状況下で無効になる。
+
+> For example, if a maintainer enables auto-merge for a pull request from a
+> fork, auto-merge will be disabled after a contributor pushes new changes to
+> the pull request.
+
+有効化設定は pull request ごとに対しての操作だ。自動マージを有効化したい pull request 画面を開く。
 
 #### Merging a pull request with a merge queue
 
+マージを待っている行列がある。ステータスチェックを待つ必要がない。
+
+> Using a merge queue is particularly useful on branches that have a relatively
+> high number of pull requests merging each day from many different users.
+
+だからウチには要らない。
+
+ステータスチェックが終わっている Pull request 画面の `Merge when ready` を押す。
+反対に、キューから除きたくなったら `Remove from queue` を押す。
+
+マージキューを観察するにはブランチページを開く。キューが空でなければリンクがあるはず。
+
+マージキューから pull request が削除される場合がある。理由はタイムラインから確認可能。
+
 #### Closing a pull request
 
+> You may choose to close a pull request without merging it into the upstream
+> branch.
+
+閉じる前に次をチェック：
+
+> Tip: If you opened a pull request with the wrong base branch, rather than
+> closing it out and opening a new one, you can instead change the base branch.
+
+Pull request 画面を開いて `Close pull request` を押す。場合によっては専用ブランチを削除する。
+
 #### Reverting a pull request
+
+これはマージ後の取り消しを念頭に置いている。
+
+> Reverting a pull request on GitHub creates a new pull request that contains
+> one revert of the merge commit from the original merged pull request.
+
+考え方は `git revert` と同様だろう。
+
+`Conversation` 画面のタイムラインにおけるマージ項目右側 `Revert` ボタンを押す。
