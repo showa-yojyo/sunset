@@ -21,10 +21,9 @@ lang: ja
 title: マイ没日録
 author: プレハブ小屋
 email: yojyo@hotmail.com
-description: >- # this means to ignore newlines until "baseurl:"
-  このブログは私にとって門外不出の真実の日記でなければならない。
-baseurl: /sunset # the subpath of your site, e.g. /blog
-url: https://showa-yojyo.github.io # the base hostname & protocol for your site, e.g. http://example.com
+description: このブログは私にとって門外不出の真実の日記でなければならない。
+baseurl: /sunset
+url: https://showa-yojyo.github.io
 repository: https://github.com/showa-yojyo/sunset
 
 show_excerpts: true
@@ -75,22 +74,20 @@ minima:
   date_format: "%Y-%m-%d (%a)"
 
 defaults:
-  -
-    scope:
-      path: "_posts"
-      type: "posts"
+  - scope:
+      path: _posts
+      type: posts
     values:
       author: "showa-yojyo"
-      categories: "diary"
-      layout: "diary"
+      categories:
+        - diary
+      layout: diary
       image:
         path: /assets/images/ogp-default.png
         width: 400
         height: 400
-  -
-    scope:
-      path: "archive"
-      type: "pages"
+  - scope:
+      path: archive
+      type: pages
     values:
-      layout: "archive"
-      permalink: /archive/:basename.html
+      layout: archive
