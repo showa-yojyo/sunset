@@ -14,3 +14,12 @@ image:
   <li><a href="./2022.html">2022 年</a></li>
   <li><a href="./2023.html">2023 年</a></li>
 </ul>
+
+<form action="javascript:navigateToDiaryPage()">
+  <label>
+    日付を指定して日記を見る：
+    <input type="date" id="start" min="2000-04-27" required/>
+  </label>
+  <input type="submit" value="Go"/>
+</form>
+<script src="{{ site.baseurl }}/assets/js/calendar.js" defer></script>
