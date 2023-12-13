@@ -22,7 +22,12 @@ title: マイ没日録
 author: プレハブ小屋
 email: yojyo@hotmail.com
 description: このブログは私にとって門外不出の真実の日記でなければならない。
+
+# baseurl is only necessary when hosting your site in a sub-directory. Project
+# sites hosted on GitHub Pages are the common use-case of this variable.
 baseurl: /sunset
+
+# Leave off trailing forward slashes when setting url
 url: https://showa-yojyo.github.io
 repository: https://github.com/showa-yojyo/sunset
 
