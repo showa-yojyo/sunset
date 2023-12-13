@@ -10,7 +10,7 @@ function initCalendar(event){
     ];
 
     dateControl.value = `${year}-${month}-${date}`;
-    dateControl.min = '2000-04-27';
+    dateControl.min = '2020-04-27';
     dateControl.max = `${year}-${month}-${date}`;
 }
 
