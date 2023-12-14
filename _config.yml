@@ -43,8 +43,12 @@ rss: RSS
 
 # Build settings
 markdown: kramdown
+
+# See <https://kramdown.gettalong.org/options.html>
 kramdown:
   math_engine: mathjax
+  remove_line_breaks_for_cjk: true
+
 theme: minima
 plugins:
   - jekyll-feed
