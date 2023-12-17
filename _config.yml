@@ -1,59 +1,21 @@
-# Welcome to Jekyll!
-#
-# This config file is meant for settings that affect your whole blog, values
-# which you are expected to set up once and rarely edit after that. If you find
-# yourself editing this file very often, consider using Jekyll's data files
-# feature for the data you need to update frequently.
-#
-# For technical reasons, this file is *NOT* reloaded automatically when you use
-# 'bundle exec jekyll serve'. If you change this file, please restart the server process.
-#
-# If you need help with YAML syntax, here are some quick references for you:
-# https://learn-the-web.algonquindesign.ca/topics/markdown-yaml-cheat-sheet/#yaml
-# https://learnxinyminutes.com/docs/yaml/
-#
-# Site settings
-# These are used to personalize your new site. If you look in the HTML files,
-# you will see them accessed via {{ site.title }}, {{ site.email }}, and so on.
-# You can create any custom variable you would like, and they will be accessible
-# in the templates via {{ site.myvariable }}.
-lang: ja
-title: マイ没日録
-author: プレハブ小屋
-email: yojyo@hotmail.com
-description: このブログは私にとって門外不出の真実の日記でなければならない。
+# Where things are
+#source: "."
+destination: ./_site
+#collections_dir: "."
+plugins_dir: _plugins
+layouts_dir: _layouts
+data_dir: _data
+includes_dir: _includes
+sass:
+  sass_dir: _sass
+collections:
+  posts:
+    output: true
 
-# baseurl is only necessary when hosting your site in a sub-directory. Project
-# sites hosted on GitHub Pages are the common use-case of this variable.
-baseurl: /sunset
-
-# Leave off trailing forward slashes when setting url
-url: https://showa-yojyo.github.io
-repository: https://github.com/showa-yojyo/sunset
-
-show_excerpts: true
-
-header_pages:
-  - about.md
-  - archive.html
-
-twitter_username: showa_yojyo
-github_username: showa-yojyo
-rss: RSS
-
-# Build settings
-markdown: kramdown
-
-# See <https://kramdown.gettalong.org/options.html>
-kramdown:
-  math_engine: mathjax
-  remove_line_breaks_for_cjk: true
-
-theme: minima
-plugins:
-  - jekyll-feed
-  - jekyll-include-cache
-  - jekyll-sitemap
+# Handling Reading
+safe: false
+include:
+  - ".htaccess"
 
 # Exclude from processing.
 # The following items will not be processed, by default.
@@ -62,26 +24,61 @@ plugins:
 #
 # Excluded items can be processed by explicitly listing the directories or
 # their entries' file path in the `include:` list.
-#
-# exclude:
-#   - .sass-cache/
-#   - .jekyll-cache/
-#   - gemfiles/
-#   - Gemfile
-#   - Gemfile.lock
-#   - node_modules/
-#   - vendor/bundle/
-#   - vendor/cache/
-#   - vendor/gems/
-#   - vendor/ruby/
 exclude:
+  - .sass-cache/
+  - .jekyll-cache/
+  - gemfiles/
+  - Gemfile
+  - Gemfile.lock
+  - node_modules/
+  - vendor/bundle/
+  - vendor/cache/
+  - vendor/gems/
+  - vendor/ruby/
   - .gitignore
   - .mailmap
+keep_files:
+  - .git
+encoding: "utf-8"
+markdown_ext: md
+strict_front_matter: false
 
-# Minima settings
-minima:
-  date_format: "%Y-%m-%d (%a)"
+# Filtering Content
+show_drafts: false
+limit_posts: 0
+future: false
+unpublished: false
 
+# Plugins
+whitelist: []
+plugins:
+  - jekyll-feed
+  - jekyll-include-cache
+  - jekyll-sitemap
+
+# Conversion
+markdown: kramdown
+highlighter: rouge
+lsi: false
+excerpt_separator: "\n\n"
+incremental: false
+
+# Serving
+detach: false
+port: 4000
+host: localhost
+# baseurl is only necessary when hosting your site in a sub-directory. Project
+# sites hosted on GitHub Pages are the common use-case of this variable.
+baseurl: /sunset
+show_dir_listing: false
+
+# Outputting
+permalink: date
+paginate_path: /page:num
+timezone: Asia/Tokyo
+
+quiet: false
+verbose: false
 defaults:
   - scope:
       path: _posts
@@ -100,3 +97,67 @@ defaults:
       type: pages
     values:
       layout: archive
+
+liquid:
+  error_mode: warn
+  strict_filters: false
+  strict_variables: false
+
+# Markdown Processors
+# See <https://kramdown.gettalong.org/options.html>
+kramdown:
+  auto_id_prefix: ''
+  auto_ids: false
+  entity_output: as_char
+  footnote_backlink: '&8617;'
+  #footnote_backlink_inline: false
+  footnote_nr: 1
+  footnote_prefix: ''
+  forbidden_inline_options:
+    - template
+  header_offset: 0
+  html_to_native: false
+  latex_headers: section,subsection,subsubsection,paragraph,subparagraph,subparagraph
+  line_width: 80
+  link_defs: {}
+  list_indent: 2
+  math_engine: mathjax
+  math_engine_opts: {}
+  parse_block_html: false
+  parse_span_html: true
+  remove_block_html_tags: true
+  remove_line_breaks_for_cjk: true
+  remove_span_html_tags: false
+  smart_quotes: lsquo,rsquo,ldquo,rdquo
+  syntax_highlighter: rouge
+  syntax_highlighter_opts: {}
+  template: ''
+  toc_levels: 1..6
+  transliterated_header_ids: false
+  typographic_symbols: {}
+
+# Site (and Minima) settings
+# These are used to personalize your new site. If you look in the HTML files,
+# you will see them accessed via {{ site.title }}, {{ site.email }}, and so on.
+# You can create any custom variable you would like, and they will be accessible
+# in the templates via {{ site.myvariable }}.
+theme: minima
+minima:
+  date_format: "%Y-%m-%d (%a)"
+
+# Minima settings
+author: プレハブ小屋
+description: このブログは私にとって門外不出の真実の日記でなければならない。
+email: yojyo@hotmail.com
+github_username: showa-yojyo
+header_pages:
+  - about.md
+  - archive.html
+lang: ja
+repository: https://github.com/showa-yojyo/sunset
+rss: RSS
+show_excerpts: true
+title: マイ没日録
+twitter_username: showa_yojyo
+# Leave off trailing forward slashes when setting url
+url: https://showa-yojyo.github.io
