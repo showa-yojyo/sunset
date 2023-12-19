@@ -54,6 +54,7 @@ whitelist: []
 plugins:
   - jekyll-feed
   - jekyll-include-cache
+  - jekyll-seo-tag
   - jekyll-sitemap
 
 # Conversion
