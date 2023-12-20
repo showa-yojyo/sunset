@@ -58,6 +58,14 @@ plugins:
   - jekyll-seo-tag
   - jekyll-sitemap
 
+# Feed
+feed:
+  categories:
+    - diary
+  disable_in_development: false
+  excerpt_only: true
+  posts_limit: 20
+
 # Conversion
 markdown: kramdown
 highlighter: rouge
