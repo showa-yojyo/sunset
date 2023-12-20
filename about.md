@@ -1,10 +1,6 @@
 ---
 layout: page
 title: ブログについて
-image:
-  path: /assets/images/ogp-default.png
-  width: 400
-  height: 400
 permalink: /about/
 ---
 

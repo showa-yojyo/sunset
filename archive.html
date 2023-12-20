@@ -2,10 +2,6 @@
 layout: page
 title: 全記録
 permalink: /archive/
-image:
-  path: /assets/images/ogp-default.png
-  width: 400
-  height: 400
 ---
 
 <ul>
@@ -15,7 +11,7 @@ image:
   <li><a href="./2023.html">2023 年</a></li>
 </ul>
 
-<form action="javascript:navigateToDiaryPage()">
+<form action="javascript:navigateToDiaryPage('{{ site.baseurl }}')">
   <label>
     日付を指定して日記を見る：
     <input type="date" id="start" min="2000-04-27" required/>

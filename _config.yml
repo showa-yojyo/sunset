@@ -67,7 +67,7 @@ feed:
   posts_limit: 20
 
 # SEO
-#tagline: タグラインテスト
+tagline: タグラインテスト
 twitter:
   username: showa_yojyo
   card: summary
@@ -106,6 +106,7 @@ defaults:
   - scope:
       path: ""
     values:
+      description: null
       image:
         path: /assets/images/ogp-default.png
         width: 400
@@ -122,6 +123,7 @@ defaults:
       path: archive
       type: pages
     values:
+      description: 日記アーカイブ
       layout: archive
 
 liquid:
