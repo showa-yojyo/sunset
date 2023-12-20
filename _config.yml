@@ -66,6 +66,19 @@ feed:
   excerpt_only: true
   posts_limit: 20
 
+# SEO
+#tagline: タグラインテスト
+twitter:
+  username: showa_yojyo
+  card: summary
+logo: /assets/images/ogp-default.png
+social:
+  name: プレハブ小屋
+  links:
+    - https://twitter.com/showa_yojyo
+    - https://github.com/showa-yojyo
+locale: ja_JP
+
 # Conversion
 markdown: kramdown
 highlighter: rouge
@@ -91,6 +104,13 @@ quiet: false
 verbose: false
 defaults:
   - scope:
+      path: ""
+    values:
+      image:
+        path: /assets/images/ogp-default.png
+        width: 400
+        height: 400
+  - scope:
       path: _posts
       type: posts
     values:
@@ -98,10 +118,6 @@ defaults:
       categories:
         - diary
       layout: diary
-      image:
-        path: /assets/images/ogp-default.png
-        width: 400
-        height: 400
   - scope:
       path: archive
       type: pages
