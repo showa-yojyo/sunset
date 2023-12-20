@@ -8,6 +8,7 @@ data_dir: _data
 includes_dir: _includes
 sass:
   sass_dir: _sass
+  style: compressed
 collections:
   posts:
     output: true
