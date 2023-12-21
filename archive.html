@@ -4,17 +4,19 @@ title: 全記録
 permalink: /archive/
 ---
 
+{%- assign date_min = site.posts[-1].date -%}
+{%- assign year_first = date_min | date: '%Y' -%}
+{%- assign year_last = site.posts[0].date | date: '%Y' -%}
 <ul>
-  <li><a href="./2020.html">2020 年</a></li>
-  <li><a href="./2021.html">2021 年</a></li>
-  <li><a href="./2022.html">2022 年</a></li>
-  <li><a href="./2023.html">2023 年</a></li>
+  {% for i in (year_first..year_last) %}
+  <li><a href="./{{ i }}.html">{{ i }} 年</a></li>
+  {%- endfor %}
 </ul>
 
 <form action="javascript:navigateToDiaryPage('{{ site.baseurl }}')">
   <label>
     日付を指定して日記を見る：
-    <input type="date" id="start" min="2000-04-27" required/>
+    <input type="date" id="start" min="{{ date_min | date: '%Y-%m-%d' }}" required/>
   </label>
   <input type="submit" value="Go"/>
 </form>
