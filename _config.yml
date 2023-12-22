@@ -36,6 +36,7 @@ exclude:
   - vendor/cache/
   - vendor/gems/
   - vendor/ruby/
+  - .github/
   - .gitignore
   - .mailmap
 keep_files:
@@ -172,6 +173,15 @@ kramdown:
 theme: minima
 minima:
   date_format: "%Y-%m-%d (%a)"
+
+# Archive settings
+jekyll-archives:
+  enabled:
+    - year
+  layouts:
+    year: archive
+  permalinks:
+    year: '/archive/:year/'
 
 # Minima settings
 author: プレハブ小屋

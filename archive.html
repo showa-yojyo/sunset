@@ -9,7 +9,7 @@ permalink: /archive/
 {%- assign year_last = site.posts[0].date | date: '%Y' -%}
 <ul>
   {% for i in (year_first..year_last) %}
-  <li><a href="./{{ i }}.html">{{ i }} 年</a></li>
+  <li><a href="./{{ i }}/">{{ i }} 年</a></li>
   {%- endfor %}
 </ul>
 

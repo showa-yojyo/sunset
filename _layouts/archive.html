@@ -1,6 +1,5 @@
 ---
 layout: page
-year: "20xx"
 ---
 
 {% comment %}
@@ -9,17 +8,18 @@ Jekyll/Liquid Templating: How to group blog posts by year? - Stack Overflow
 <https://stackoverflow.com/questions/19086284/jekyll-liquid-templating-how-to-group-blog-posts-by-year>
 {% endcomment %}
 
+{%- assign this_year = page.date | date: '%Y' -%}
 {%- assign date_format = site.minima.date_format -%}
 {%-
-    assign posts_by_year = site.posts
+    assign posts_by_year = page.posts
     | group_by_exp: "post", "post.date | date: '%Y'"
-    | where_exp: "year", "year.name == page.year"
+    | where_exp: "year", "year.name == this_year"
 -%}
 {%-
   assign posts_by_month = posts_by_year[0].items
   | group_by_exp: "post", "post.date | date: '%m'"
 -%}
-{%- for month in posts_by_month reversed -%}
+{%- for month in posts_by_month -%}
   {%- capture nmonth -%}{{ month.name }}{%- endcapture -%}
   <h2 id="{{ page.year }}{{ nmonth }}">{{ nmonth }} 月</h2>
   <ul class="posts">
