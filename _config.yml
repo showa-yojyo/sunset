@@ -173,6 +173,15 @@ theme: minima
 minima:
   date_format: "%Y-%m-%d (%a)"
 
+# Archive settings
+jekyll-archives:
+  enabled:
+    - year
+  layouts:
+    year: archive
+  permalinks:
+    year: '/archive/:year/'
+
 # Minima settings
 author: プレハブ小屋
 description: このブログは私にとって門外不出の真実の日記でなければならない。
