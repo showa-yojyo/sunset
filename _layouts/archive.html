@@ -23,7 +23,7 @@ Jekyll/Liquid Templating: How to group blog posts by year? - Stack Overflow
   {%- capture nmonth -%}{{ month.name }}{%- endcapture -%}
   <h2 id="{{ page.year }}{{ nmonth }}">{{ nmonth }} 月</h2>
   <ul class="posts">
-    {%- for post in month.items reversed -%}
+    {%- for post in month.items -%}
     <li>
       <span class="post-date">{{ post.date | date: date_format }}</span>
       <a href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a>
