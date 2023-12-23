@@ -54,6 +54,7 @@ unpublished: false
 # Plugins
 whitelist: []
 plugins:
+  - jekyll-archives
   - jekyll-feed
   - jekyll-include-cache
   - jekyll-seo-tag
