@@ -3,15 +3,11 @@ document.addEventListener("DOMContentLoaded", initCalendar);
 function initCalendar(event){
     const dateControl = document.querySelector('input[id="start"]');
     const today = new Date();
-    const [month, date, year] = [
-      today.getMonth() + 1,
-      today.getDate() - 1,
-      today.getFullYear(),
-    ];
+    const todayYYYYmmdd = today.toISOString().split('T', 1);
 
-    dateControl.value = `${year}-${month}-${date}`;
+    dateControl.value = todayYYYYmmdd;
     dateControl.min = '2020-04-27';
-    dateControl.max = `${year}-${month}-${date}`;
+    dateControl.max = todayYYYYmmdd;
 }
 
 function navigateToDiaryPage(basePath){
