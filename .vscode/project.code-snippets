@@ -4,14 +4,18 @@
 		"prefix": "diary",
 		"body": [
 			"---",
+			"date: ${CURRENT_YEAR}-${CURRENT_MONTH}-${CURRENT_DATE} 23:59:59 +0900",
 			"title: ${1:xxx} 日目（${2|晴れ,曇り,雨|}）（執筆中）",
 			"---",
 			"",
 			"${0}",
-			"",
-			"7:05 起床。納豆、梅粥、バナナ。歯を磨く。出勤。",
 			""
 		]
+	},
+	"就寝": {
+		"scope": "markdown",
+		"prefix": "neru",
+		"body": "${1:HH:SS} 消灯。就寝。$0"
 	},
 	"朝食": {
 		"scope": "markdown",
@@ -21,7 +25,7 @@
 	"バイト": {
 		"scope": "markdown",
 		"prefix": "gemba",
-		"body": "${1:7:45} 現場。${2|可燃,資源,不燃|ゴミ}の日。",
+		"body": "${1:7:45} 現場。${2|可燃,資源,不燃|}ゴミの日。",
 	},
 	"ビッグエー": {
 		"scope": "markdown",
@@ -50,6 +54,21 @@
 			""
 		]
 	},
+	"曳舟の部屋": {
+		"scope": "markdown",
+		"prefix": "heya",
+		"body": "曳舟の部屋。PC を開く。"
+	},
+	"風呂": {
+		"scope": "markdown",
+		"prefix": "huro",
+		"body": "曳舟の部屋。入浴。\n\n風呂から出る。PC を開く。晩飯。"
+	},
+	"電車": {
+		"scope": "markdown",
+		"prefix": "densha",
+		"body": "${1|押上駅～東日本橋駅～小川町駅。万世橋。,白泉社前。小川町駅～馬喰横山駅～押上駅。|}"
+	}
 	"画像挿し込み": {
 		"scope": "markdown",
 		"prefix": "image",
