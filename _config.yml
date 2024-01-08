@@ -121,12 +121,13 @@ defaults:
       categories:
         - diary
       layout: diary
+      sitemap: false
   - scope:
       path: archive
       type: pages
     values:
       description: 日記アーカイブ
-      layout: archive
+      sitemap: false
 
 liquid:
   error_mode: warn
