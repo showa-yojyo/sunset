@@ -39,6 +39,7 @@ exclude:
   - .github/
   - .gitignore
   - .mailmap
+  - _scripts/
 keep_files:
   - .git
 encoding: "utf-8"

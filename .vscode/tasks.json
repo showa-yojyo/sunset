@@ -12,6 +12,19 @@
             "problemMatcher": []
         },
         {
+            "label": "Generate diary template",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "_scripts/generate.py",
+                "${workspaceFolder}"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            }
+        },
+        {
             "label": "Optimize PNG files recently modified",
             "type": "shell",
             "command": "optipng $(find assets/images -type f -iname \\*.png -mtime -24)",

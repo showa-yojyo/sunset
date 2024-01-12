@@ -5,7 +5,7 @@
 		"body": [
 			"---",
 			"date: ${CURRENT_YEAR}-${CURRENT_MONTH}-${CURRENT_DATE} 23:59:59 +0900",
-			"title: ${1:xxx} 日目（${2|晴れ,曇り,雨|}）（執筆中）",
+			"title: ${1:xxx} 日目（${2|晴れ,曇り,雨|}）(WIP)",
 			"---",
 			"",
 			"${0}",
