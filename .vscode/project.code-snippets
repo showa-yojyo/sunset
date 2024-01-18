@@ -154,6 +154,10 @@
 		"prefix": "glMatrix",
 		"body": "${1|[glMatrix],[glMatrix]: https://glmatrix.net/|}"
 	},
+	"libreoffice": {
+		"prefix": "libreoffice",
+		"body": "${1|[LibreOffice],[LibreOffice]: https://www.libreoffice.org/|}"
+	},
 	"mermaid": {
 		"prefix": "mermaid",
 		"body": "${1|[Mermaid.JS],[Mermaid.JS]: https://mermaid-js.github.io/mermaid/|}"
