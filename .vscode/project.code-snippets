@@ -22,6 +22,11 @@
 		"prefix": "mesi",
 		"body": "${1:7:05} 起床。納豆、梅粥、バナナ。歯を磨く。${2|出勤,外出|}。"
 	},
+	"歯を磨く": {
+		"scope": "markdown",
+		"prefix": "ha",
+		"body": "${1:HH}:${2:MM} 歯を磨く。"
+	},
 	"バイト": {
 		"scope": "markdown",
 		"prefix": "gemba",
@@ -61,14 +66,14 @@
 	},
 	"風呂": {
 		"scope": "markdown",
-		"prefix": "huro",
+		"prefix": ["huro", "furo"],
 		"body": "曳舟の部屋。入浴。\n\n風呂から出る。PC を開く。晩飯。"
 	},
 	"電車": {
 		"scope": "markdown",
 		"prefix": "densha",
 		"body": "${1|押上駅～東日本橋駅～小川町駅。万世橋。,白泉社前。小川町駅～馬喰横山駅～押上駅。|}"
-	}
+	},
 	"画像挿し込み": {
 		"scope": "markdown",
 		"prefix": "image",
@@ -95,126 +100,157 @@
 		]
 	},
 	"abs-guide": {
+		"scope": "markdown",
 		"prefix": "Advanced Bash-Scripting Guide",
 		"body": "${1|[abs-guide],[abs-guide]: https://www.tldp.org/LDP/abs/abs-guide.pdf|}$0"
 	},
 	"bshf20": {
+		"scope": "markdown",
 		"prefix": "bshf20",
 		"body": "${1|[地獄の伯爵令嬢の逆襲][bshf20],[bshf20]: https://wodifes.net/game/show/412|}$0"
 	},
 	"bshf21a":{
+		"scope": "markdown",
 		"prefix": "bshf21a",
 		"body": "${1|[地獄の伯爵令嬢の逆襲 v1.10][bshf21a],[bshf21a]: https://www.freem.ne.jp/win/game/24805|}$0"
 	},
 	"bshf21b":{
+		"scope": "markdown",
 		"prefix": "bshf21b",
 		"body": "${1|[ウルファールのサンプルゲーム with DTC][bshf21b],[bshf21b]: https://wodifes.net/game/show/446|}$0"
 	},
 	"cpprefjp": {
+		"scope": "markdown",
 		"prefix": "cpprefjp",
 		"body": "[cpprefjp]: https://cpprefjp.github.io/reference/$0"
 	},
 	"DeepL": {
+		"scope": "markdown",
 		"prefix": "DeepL",
 		"body": "${1|[DeepL],[DeepL]: https://www.deepl.com/translator|}$0"
 	},
 	"draw.io": {
+		"scope": "markdown",
 		"prefix": "draw.io",
 		"body": "${1|[draw.io],[draw.io]: https://www.drawio.com/|}$0"
 	},
 	"dtp22a":{
+		"scope": "markdown",
 		"prefix": "dtp22a",
 		"body": "${1|[SOPHIE][dtp22a],[dtp22a]: https://wodifes.net/game/show/469|}$0"
 	},
 	"dtp22b":{
+		"scope": "markdown",
 		"prefix": ["dtp22b", "sophie"],
 		"body": "${1|[SOPHIE Naked Massacre Version][dtp22b],[dtp22b]: https://www.dlsite.com/maniax/work/=/product_id/RJ424807/|}$0"
 	},
 	"dtp23a":{
+		"scope": "markdown",
 		"prefix": "dtp23a",
 		"body": "${1|[FOUR CURSES(アルファ版)][dtp23a],[dtp23a]: https://wodifes.net/game/show/520|}$0"
 	},
 	"Haverbeke18": {
+		"scope": "markdown",
 		"prefix": ["Haverbeke18", "eloquent"],
 		"body": "${1|[Eloquent JavaScript][Haverbeke18],[Haverbeke18]: https://eloquentjavascript.net/|}$0"
 	},
 	"ffmpeg":{
+		"scope": "markdown",
 		"prefix": "FFmpeg",
 		"body": "${1|[FFmpeg],[ffmpeg]: https://ffmpeg.org/ffmpeg.html|}$0"
 	},
 	"gist": {
+		"scope": "markdown",
 		"prefix": "gist",
 		"body": "[gist]: https://gist.github.com/showa-yojyo/$0"
 	},
 	"github docs":{
+		"scope": "markdown",
 		"prefix": "github",
 		"body": "${1|[GitHub Docs],[GitHub Docs]: https://docs.github.com/en|}"
 	},
 	"glMatrix": {
+		"scope": "markdown",
 		"prefix": "glMatrix",
 		"body": "${1|[glMatrix],[glMatrix]: https://glmatrix.net/|}"
 	},
 	"libreoffice": {
+		"scope": "markdown",
 		"prefix": "libreoffice",
 		"body": "${1|[LibreOffice],[LibreOffice]: https://www.libreoffice.org/|}"
 	},
 	"mermaid": {
+		"scope": "markdown",
 		"prefix": "mermaid",
 		"body": "${1|[Mermaid.JS],[Mermaid.JS]: https://mermaid-js.github.io/mermaid/|}"
 	},
 	"metal": {
+		"scope": "markdown",
 		"prefix": "metal",
 		"body": "[metal]: http://metal.the-ninja.jp/$0"
 	},
 	"note": {
+		"scope": "markdown",
 		"prefix": "note",
 		"body": "${1|[読書ノート][note],[note]: https://showa-yojyo.github.io/notebook/|}$0"
 	},
 	"pcloud": {
+		"scope": "markdown",
 		"prefix": "pcloud",
 		"body": "${1|[pCloud],[pCloud]: https://www.pcloud.com/,[pCloud](https://www.pcloud.com/)|}$0"
 	},
 	"powertoys":{
+		"scope": "markdown",
 		"prefix": "powertoys",
 		"body": "${1|[PowerToys],[PowerToys]: https://github.com/microsoft/PowerToys|}$0"
 	},
 	"pytube": {
+		"scope": "markdown",
 		"prefix": "pytube",
 		"body": "${1|[Pytube],[pytube]: https://pytube.io/en/latest/|}$0"
 	},
 	"scrapy": {
+		"scope": "markdown",
 		"prefix": "scrapy",
 		"body": "${1|[Scrapy],[scrapy]: https://scrapy.org/|}$0"
 	},
 	"soejima1000": {
+		"scope": "markdown",
 		"prefix": "soejima1000",
 		"body": "${1|[soejima1000 - YouTube],[soejima1000]: https://www.youtube.com/user/soejima1000/videos|}$0"
 	},
 	"The Book of Shaders": {
+		"scope": "markdown",
 		"prefix": "thebookofshaders",
 		"body": "${1|[The Book of Shaders],[The Book of Shaders]: https://thebookofshaders.com/|}$0"
 	},
 	"type":{
+		"scope": "markdown",
 		"prefix": "type",
 		"body": "[転職・求人情報サイトの type](https://type.jp/)"
 	},
 	"twgl":{
+		"scope": "markdown",
 		"prefix": "twgl",
 		"body": "${1|[TWGL],[TWGL]: https://twgljs.org/docs/|}$0"
 	},
 	"wf": {
+		"scope": "markdown",
 		"prefix": "wf",
 		"body": "${1|[WebGL2 Fundamentals],[WebGL2 Fundamentals]: https://webgl2fundamentals.org|}$0"
 	},
 	"wsl": {
+		"scope": "markdown",
 		"prefix": "wsl",
 		"body": "${1|[WSL],[WSL]: https://learn.microsoft.com/ja-jp/windows/wsl/|}$0"
 	},
 	"youtube-dl":{
+		"scope": "markdown",
 		"prefix": "youtube-dl",
 		"body": "${1|[youtube-dl],[youtube-dl]: https://github.com/ytdl-org/youtube-dl|}$0"
 	},
 	"zoom":{
+		"scope": "markdown",
 		"prefix": "zoom",
 		"body": "${1|[Zoom],[Zoom Cloud Meetings][Zoom],[Zoom]: https://zoom.us/|}$0"
 	}
