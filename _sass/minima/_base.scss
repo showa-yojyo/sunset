@@ -214,8 +214,10 @@ table {
     }
   }
   th, td {
-    $padding-top-bottom: calc($spacing-unit / 3);
-    $padding-left-right: calc($spacing-unit * 0.5);
+    $padding-top-bottom: -webkit-calc(#{$spacing-unit} / 6);
+    $padding-top-bottom: calc(#{$spacing-unit} / 6);
+    $padding-left-right: -webkit-calc(#{$spacing-unit} / 4);
+    $padding-left-right: calc(#{$spacing-unit} / 4);
     padding: $padding-top-bottom $padding-left-right;
   }
   th {
