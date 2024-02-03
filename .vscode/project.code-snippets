@@ -1,17 +1,4 @@
 {
-	"日記テンプレ": {
-		"scope": "markdown",
-		"prefix": "diary",
-		"body": [
-			"---",
-			"date: ${CURRENT_YEAR}-${CURRENT_MONTH}-${CURRENT_DATE} 23:59:59 +0900",
-			"title: ${1:xxx} 日目（${2|晴れ,曇り,雨|}）(WIP)",
-			"---",
-			"",
-			"${0}",
-			""
-		]
-	},
 	"就寝": {
 		"scope": "markdown",
 		"prefix": "neru",
@@ -36,7 +23,7 @@
 		"scope": "markdown",
 		"prefix": "Big-A",
 		"body": [
-			"ビッグエー${1:|墨田京島,墨田業平|}店。${2:JPN} 円。",
+			"ビッグエー${1|墨田京島,墨田業平|}店。${2:JPN} 円。",
 			"",
 			"* カレーピラフ風おにぎり",
 			"* オニオンとレタスのミックスサラダ",
@@ -51,7 +38,7 @@
 		"scope": "markdown",
 		"prefix": "TFS",
 		"body": [
-			"${1:18:00} タイトー F ステーションオリナス錦糸町店。MJ プロ卓東風戦 ${2:5} クレ。",
+			"タイトー F ステーションオリナス錦糸町店。MJ プロ卓東風戦 ${2:5} クレ。",
 			"",
 			"```text",
 			"",
@@ -118,6 +105,11 @@
 		"scope": "markdown",
 		"prefix": "bshf21b",
 		"body": "${1|[ウルファールのサンプルゲーム with DTC][bshf21b],[bshf21b]: https://wodifes.net/game/show/446|}$0"
+	},
+	"calc": {
+		"scope": "markdown",
+		"prefix": "calc",
+		"body": "${1|[LibreOffice Calc Guide],[LibreOffice Calc Guide]: https://documentation.libreoffice.org/en/english-documentation/calc/|}$0"
 	},
 	"cpprefjp": {
 		"scope": "markdown",
