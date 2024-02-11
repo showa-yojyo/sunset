@@ -203,7 +203,7 @@ pre {
  */
 table {
   margin-bottom: $spacing-unit;
-  width: 100%;
+  width: auto;
   text-align: $table-text-align;
   color: lighten($text-color, 18%);
   border-collapse: collapse;
