@@ -59,7 +59,7 @@
     "電車": {
         "scope": "markdown",
         "prefix": "densha",
-        "body": "${1|押上駅～東日本橋駅～小川町駅。万世橋。,白泉社前。小川町駅～馬喰横山駅～押上駅。|}"
+        "body": "${1|押上駅～東日本橋駅～小川町駅。万世橋。,白泉社前。小川町駅～馬喰横山駅～押上駅。,押上駅～蔵前駅～,～蔵前駅～押上駅|}"
     },
     "画像挿し込み": {
         "scope": "markdown",
@@ -93,7 +93,7 @@
     },
     "aviutl": {
         "scope": "markdown",
-        "prefix": "AviUtl",
+        "prefix": ["aviutl", "AviUtl"],
         "body": "${1|[AviUtl],[AviUtl]: https://spring-fragrance.mints.ne.jp/aviutl/|}$0",
     },
     "bshf20": {
@@ -113,12 +113,12 @@
     },
     "calc": {
         "scope": "markdown",
-        "prefix": "calc",
+        "prefix": ["calc", "Calc"],
         "body": "${1|[Calc],[LibreOffice Calc Guide][Calc],[Calc]: https://documentation.libreoffice.org/en/english-documentation/calc/|}$0"
     },
     "writer": {
         "scope": "markdown",
-        "prefix": "writer",
+        "prefix": ["writer", "Writer"],
         "body": "${1|[Writer],[LibreOffice Writer Guide][Writer],[Writer]: https://documentation.libreoffice.org/en/english-documentation/writer/|}$0"
     },
     "cpprefjp": {
@@ -250,6 +250,17 @@
         "scope": "markdown",
         "prefix": "youtube-dl",
         "body": "${1|[youtube-dl],[youtube-dl]: https://github.com/ytdl-org/youtube-dl|}$0"
+    },
+    "markup twitter video": {
+        "scope": "markdown",
+        "prefix": "twitter video",
+        "body": [
+            "<blockquote class=\"twitter-tweet\" data-media-max-width=\"${1|640,720|}\">",
+            "<a href=\"$TM_SELECTED_TEXT\"></a>",
+            "</blockquote>",
+            "<script async src=\"https://platform.twitter.com/widgets.js\" charset=\"utf-8\"></script>"
+        ]
+        "description": "F1 snippet"
     },
     "zoom":{
         "scope": "markdown",
