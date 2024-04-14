@@ -253,13 +253,12 @@
     },
     "markup twitter video": {
         "scope": "markdown",
-        "prefix": "twitter video",
         "body": [
             "<blockquote class=\"twitter-tweet\" data-media-max-width=\"${1|640,720|}\">",
             "<a href=\"$TM_SELECTED_TEXT\"></a>",
             "</blockquote>",
             "<script async src=\"https://platform.twitter.com/widgets.js\" charset=\"utf-8\"></script>"
-        ]
+        ],
         "description": "F1 snippet"
     },
     "zoom":{
