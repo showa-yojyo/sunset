@@ -26,6 +26,8 @@
             "ビッグエー${1|墨田京島,墨田業平|}店。${2:JPN} 円。",
             "",
             "* カレーピラフ風おにぎり",
+            "* 大きなおむすび鮭めんたい",
+            "* 柿ピー",
             "* オニオンとレタスのミックスサラダ",
             "* 大根と水菜のミックスサラダ",
             "* バナナ (3)",
@@ -158,8 +160,8 @@
     },
     "ffmpeg":{
         "scope": "markdown",
-        "prefix": "FFmpeg",
-        "body": "${1|[FFmpeg],[ffmpeg]: https://ffmpeg.org/ffmpeg.html|}$0"
+        "prefix": "ffmpeg",
+        "body": "${1|[FFmpeg],[FFmpeg]: https://ffmpeg.org/ffmpeg.html|}$0"
     },
     "gist": {
         "scope": "markdown",
@@ -254,8 +256,10 @@
     "markup twitter video": {
         "scope": "markdown",
         "body": [
-            "<blockquote class=\"twitter-tweet\" data-media-max-width=\"${1|640,720|}\">",
-            "<a href=\"$TM_SELECTED_TEXT\"></a>",
+            "<blockquote class=\"twitter-tweet\"",
+            "  data-conversation=\"none\"",
+            "  data-media-max-width=\"480\" data-theme=\"dark\" data-align=\"center\">",
+            "<a href=\"$CLIPBOARD\"></a>",
             "</blockquote>",
             "<script async src=\"https://platform.twitter.com/widgets.js\" charset=\"utf-8\"></script>"
         ],
