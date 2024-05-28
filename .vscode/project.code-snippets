@@ -21,7 +21,7 @@
     },
     "ビッグエー": {
         "scope": "markdown",
-        "prefix": "Big-A",
+        "prefix": ["Big-A", "biga"],
         "body": [
             "ビッグエー${1|墨田京島,墨田業平|}店。${2:JPN} 円。",
             "",
@@ -38,7 +38,7 @@
     },
     "TFS": {
         "scope": "markdown",
-        "prefix": "TFS",
+        "prefix": "tfs",
         "body": [
             "タイトー F ステーションオリナス錦糸町店。MJ プロ卓東風戦 ${2:5} クレ。",
             "",
@@ -259,7 +259,7 @@
             "<blockquote class=\"twitter-tweet\"",
             "  data-conversation=\"none\"",
             "  data-media-max-width=\"480\" data-theme=\"dark\" data-align=\"center\">",
-            "<a href=\"$CLIPBOARD\"></a>",
+            "<a href=\"${CLIPBOARD/x\\.com/twitter.com/}\"></a>",
             "</blockquote>",
             "<script async src=\"https://platform.twitter.com/widgets.js\" charset=\"utf-8\"></script>"
         ],
