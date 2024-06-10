@@ -260,8 +260,7 @@
             "  data-conversation=\"none\"",
             "  data-media-max-width=\"480\" data-theme=\"dark\" data-align=\"center\">",
             "<a href=\"${CLIPBOARD/x\\.com/twitter.com/}\"></a>",
-            "</blockquote>",
-            "<script async src=\"https://platform.twitter.com/widgets.js\" charset=\"utf-8\"></script>"
+            "</blockquote>"
         ],
         "description": "F1 snippet"
     },
