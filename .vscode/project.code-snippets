@@ -63,6 +63,11 @@
         "prefix": "densha",
         "body": "${1|押上駅～東日本橋駅～小川町駅。万世橋。,白泉社前。小川町駅～馬喰横山駅～押上駅。,押上駅～蔵前駅～,～蔵前駅～押上駅|}"
     },
+    "豆腐": {
+        "scope": "markdown",
+        "prefix": ["tohu", "tofu"],
+        "body": "豆腐、カットサラダ、$0"
+    },
     "画像挿し込み": {
         "scope": "markdown",
         "prefix": "image",
