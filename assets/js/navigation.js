@@ -31,3 +31,32 @@ document.addEventListener('keydown', event => {
     document.location = link.href;
     event.preventDefault();
 });
+
+const SWIPE_THRESHOLD = 200;
+const pointerTarget = document.querySelector('main');
+
+pointerTarget.addEventListener("pointerdown", (eDown) => {
+    function onPointerUp(eUp){
+        //pointerTarget.releasePointerCapture(eUp.Id);
+        pointerTarget.removeEventListener("pointerup", onPointerUp)
+        //console.debug(`Pointer up ${eUp.clientX} ${eUp.clientY}`);
+
+        const diff = eUp.clientX - eDown.clientX;
+        if(Math.abs(diff) < SWIPE_THRESHOLD){
+            return;
+        }
+
+        const rel = diff > 0 ? 'prev' : 'next';
+        //console.debug(rel)
+        const link = document.querySelector(`link[rel="${rel}"]`);
+        if (!link){
+             return;
+        }
+        document.location = link.href;
+        eUp.preventDefault();
+    }
+
+    //console.debug(`Pointer down ${eDown.clientX} ${eDown.clientY}`);
+    //pointerTarget.setPointerCapture(eDown.Id);
+    pointerTarget.addEventListener("pointerup", onPointerUp);
+});
