@@ -14,6 +14,11 @@
         "prefix": "ha",
         "body": "歯を磨く。"
     },
+    "洗濯物を干す": {
+        "scope": "markdown",
+        "prefix": "se",
+        "body": "洗濯物を干す。"
+    },
     "バイト": {
         "scope": "markdown",
         "prefix": "gemba",
