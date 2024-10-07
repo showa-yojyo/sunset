@@ -221,6 +221,11 @@
         "prefix": "metal",
         "body": "[metal]: http://metal.the-ninja.jp/$0"
     },
+    "mypy": {
+        "scope": "markdown",
+        "prefix": "mypy",
+        "body": "[mypy]: https://mypy.readthedocs.io/en/stable/"
+    },
     "note": {
         "scope": "markdown",
         "prefix": "note",
