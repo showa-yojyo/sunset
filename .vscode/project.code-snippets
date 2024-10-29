@@ -206,6 +206,11 @@
         "prefix": "glMatrix",
         "body": "${1|[glMatrix],[glMatrix]: https://glmatrix.net/|}"
     },
+    "hatch": {
+        "scope": "markdown",
+        "prefix": "hatch",
+        "body": "${1|[Hatch],[Hatch]: https://hatch.pypa.io/dev/|}"
+    },
     "libreoffice": {
         "scope": "markdown",
         "prefix": "libreoffice",
