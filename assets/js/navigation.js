@@ -2,9 +2,15 @@
 // Adopt from JAVASCRIPT.INFO
 
 const IGNORED_ELEMENTS = ['INPUT', 'TEXTAREA', 'SELECT'];
-const KEY_BINDS = new Map([
+const KEYMAP_CTRL = new Map([
     ['ArrowLeft', 'prev'],
     ['ArrowRight', 'next'],
+]);
+const KEYMAP_SINGLE = new Map([
+    ['Comma', 'prev'],
+    ['Period', 'next'],
+    ['KeyP', 'prev'],
+    ['KeyN', 'next'],
 ]);
 
 document.addEventListener('keydown', event => {
@@ -14,11 +20,8 @@ document.addEventListener('keydown', event => {
         return;
     }
 
-    if (!event.ctrlKey) {
-        return;
-    }
-
-    const rel = KEY_BINDS.get(event.key, null);
+    const keymap = event.ctrlKey ? KEYMAP_CTRL : KEYMAP_SINGLE;
+    const rel = keymap.get(event.key, null);
     if(!rel){
         return;
     }
