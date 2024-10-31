@@ -21,7 +21,7 @@ document.addEventListener('keydown', event => {
     }
 
     const keymap = event.ctrlKey ? KEYMAP_CTRL : KEYMAP_SINGLE;
-    const rel = keymap.get(event.key, null);
+    const rel = keymap.get(event.code, null);
     if(!rel){
         return;
     }
