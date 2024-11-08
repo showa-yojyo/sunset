@@ -6,8 +6,18 @@
     },
     "朝食": {
         "scope": "markdown",
-        "prefix": "mesi",
+        "prefix": "asamesi",
         "body": "起床。納豆、${1|梅,白,玉子|}粥、バナナ。歯を磨く。${2|出勤,外出|}。"
+    },
+    "昼飯": {
+        "scope": "markdown",
+        "prefix": "hirumesi",
+        "body": "豆腐、カットサラダ、ざるそば、バナナ二本。$0"
+    },
+    "飯": {
+        "scope": "markdown",
+        "prefix": ["tohu", "mesi"],
+        "body": "豆腐、カットサラダ、$0"
     },
     "歯を磨く": {
         "scope": "markdown",
@@ -53,10 +63,9 @@
             "",
             "* ${3|特盛ペペロンチーノ,大盛チーズとベーコンカルボナーラ,大盛ナポリタン,カツカレー,ロースカツ重|}",
             "* ベビーチーズ塩分カット (4p)",
-            "* 大むすび${4|カレーピラフ,うなぎのタレ|}",
             "* オニオンとレタスのミックスサラダ",
             "* 大根と水菜のミックスサラダ",
-            "* ${5|あんパン,ホイップあんパン,二色パン|}"
+            "* ${5|ホイップあんパン,あんパン,二色パン|}"
         ]
     },
     "TFS": {
@@ -85,11 +94,6 @@
         "scope": "markdown",
         "prefix": "densha",
         "body": "${1|押上駅～東日本橋駅～小川町駅。万世橋。,白泉社前。小川町駅～馬喰横山駅～押上駅。,押上駅～蔵前駅～,～蔵前駅～押上駅|}"
-    },
-    "豆腐": {
-        "scope": "markdown",
-        "prefix": ["tohu", "tofu"],
-        "body": "豆腐、カットサラダ、${1|ざるそば、バナナ二本|}。$0"
     },
     "画像挿し込み": {
         "scope": "markdown",
@@ -209,7 +213,7 @@
     "mypy": {
         "scope": "markdown",
         "prefix": "mypy",
-        "body": "[mypy]: <https://mypy.readthedocs.io/en/stable/>"
+        "body": "${1|[mypy],[mypy]: <https://mypy.readthedocs.io/en/stable/>|}"
     },
     "note": {
         "scope": "markdown",
