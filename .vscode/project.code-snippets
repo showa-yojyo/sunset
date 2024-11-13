@@ -230,6 +230,11 @@
         "prefix": "powertoys",
         "body": "${1|[PowerToys],[PowerToys]: <https://github.com/microsoft/PowerToys>|}$0"
     },
+    "pytest": {
+        "scope": "markdown",
+        "prefix": "pytest",
+        "body": "${1|[pytest],[pytest]: <https://docs.pytest.org/en/stable/>|}$0"
+    },
     "pytube": {
         "scope": "markdown",
         "prefix": "pytube",
