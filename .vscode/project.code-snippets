@@ -16,7 +16,7 @@
     },
     "飯": {
         "scope": "markdown",
-        "prefix": ["tohu", "mesi"],
+        "prefix": ["tofu", "tohu", "mesi"],
         "body": "豆腐、カットサラダ、$0"
     },
     "歯を磨く": {
