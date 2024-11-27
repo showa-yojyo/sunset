@@ -53,3 +53,18 @@ div.notice {
     color: black;
   }
 }
+
+details {
+  margin-block-end: $base-font-size;
+  border: calc(#{$base-font-size} / 4) solid $text-color;
+  border-radius: calc(#{$base-font-size} / 2);
+  padding: calc(#{$base-font-size} / 2);
+
+  summary {
+    cursor: pointer;
+  }
+
+  *:last-child {
+    margin-bottom: 0px;
+  }
+}
