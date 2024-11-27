@@ -121,6 +121,15 @@
             "振り込み率 ${12}% (${13})$0"
         ]
     },
+    "dq11": {
+        "scope": "markdown",
+        "prefix": "dq11",
+        "body": [
+            "<details><summary>ドラクエ 11 進行記録</summary>",
+            "<p>${1:TBW}</p>$0",
+            "</details>"
+        ]
+    },
     "aviutl": {
         "scope": "markdown",
         "prefix": ["aviutl", "AviUtl"],
