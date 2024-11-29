@@ -6,12 +6,12 @@
     },
     "朝食": {
         "scope": "markdown",
-        "prefix": "asamesi",
+        "prefix": "asa",
         "body": "起床。納豆、${1|梅,白,玉子|}粥、バナナ。歯を磨く。${2|出勤,外出|}。"
     },
     "昼飯": {
         "scope": "markdown",
-        "prefix": "hirumesi",
+        "prefix": "hiru",
         "body": "豆腐、カットサラダ、ざるそば、バナナ二本。$0"
     },
     "飯": {
