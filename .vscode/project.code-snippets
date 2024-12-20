@@ -155,10 +155,10 @@
         "prefix": ["calc", "Calc"],
         "body": "${1|[Calc],[LibreOffice Calc Guide][Calc],[Calc]: <https://documentation.libreoffice.org/en/english-documentation/calc/>|}$0"
     },
-    "writer": {
+    "click": {
         "scope": "markdown",
-        "prefix": ["writer", "Writer"],
-        "body": "${1|[Writer],[LibreOffice Writer Guide][Writer],[Writer]: <https://documentation.libreoffice.org/en/english-documentation/writer/>|}$0"
+        "prefix": "click",
+        "body": "${1|[Click],[Click]: <https://click.palletsprojects.com/en/stable/|}$0>"
     },
     "DeepL": {
         "scope": "markdown",
@@ -279,6 +279,11 @@
         "scope": "markdown",
         "prefix": "wf",
         "body": "${1|[WebGL2 Fundamentals],[WebGL2 Fundamentals]: <https://webgl2fundamentals.org>|}$0"
+    },
+    "writer": {
+        "scope": "markdown",
+        "prefix": ["writer", "Writer"],
+        "body": "${1|[Writer],[LibreOffice Writer Guide][Writer],[Writer]: <https://documentation.libreoffice.org/en/english-documentation/writer/>|}$0"
     },
     "wsl": {
         "scope": "markdown",
