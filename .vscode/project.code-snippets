@@ -158,7 +158,7 @@
     "click": {
         "scope": "markdown",
         "prefix": "click",
-        "body": "${1|[Click],[Click]: <https://click.palletsprojects.com/en/stable/|}$0>"
+        "body": "${1|[Click],[Click]: <https://click.palletsprojects.com/en/stable/>|}$0"
     },
     "DeepL": {
         "scope": "markdown",
