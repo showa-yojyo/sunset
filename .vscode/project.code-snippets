@@ -258,7 +258,7 @@
     "scrapy": {
         "scope": "markdown",
         "prefix": "scrapy",
-        "body": "${1|[Scrapy],[scrapy]: <https://scrapy.org/>|}$0"
+        "body": "${1|[Scrapy],[Scrapy]: <https://scrapy.org/>|}$0"
     },
     "soejima1000": {
         "scope": "markdown",
