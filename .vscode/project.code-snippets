@@ -218,6 +218,11 @@
         "prefix": "metal",
         "body": "[metal]: <http://metal.the-ninja.jp/>$0"
     },
+    "mkdocs": {
+        "scope": "markdown",
+        "prefix": "mkdocs",
+        "body": "${1|[MkDocs],[MkDocs]: <https://www.mkdocs.org/>|}"
+    },
     "mypy": {
         "scope": "markdown",
         "prefix": "mypy",
