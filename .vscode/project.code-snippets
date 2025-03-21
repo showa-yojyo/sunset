@@ -203,6 +203,11 @@
         "prefix": "hatch",
         "body": "${1|[Hatch],[Hatch]: <https://hatch.pypa.io/dev/>|}"
     },
+    "issues": {
+        "scope": "markdown",
+        "prefix": "issues",
+        "body": "[${1:num}]: <https://github.com/showa-yojyo/${2:notebook}/issues/$1>"
+    },
     "libreoffice": {
         "scope": "markdown",
         "prefix": "libreoffice",
