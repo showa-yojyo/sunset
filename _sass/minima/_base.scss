@@ -1,3 +1,5 @@
+@use "sass:color";
+
 /**
  * Reset some basic elements
  */
@@ -91,7 +93,7 @@ a {
   text-decoration: none;
 
   &:visited {
-    color: darken($brand-color, 15%);
+    color: color.adjust($brand-color, $lightness: -15%, $space: hsl);
   }
 
   &:hover {
@@ -204,12 +206,12 @@ table {
   margin-bottom: $spacing-unit;
   width: auto;
   text-align: $table-text-align;
-  color: lighten($text-color, 18%);
+  color: color.adjust($text-color, $lightness: 18%, $space: hsl);
   border-collapse: collapse;
   border: 1px solid $grey-color-light;
   tr {
     &:nth-child(even) {
-      background-color: lighten($grey-color-light, 6%);
+      background-color: color.adjust($grey-color-light, $lightness: 6%, $space: hsl);
     }
   }
   th, td {
@@ -220,9 +222,9 @@ table {
     padding: $padding-top-bottom $padding-left-right;
   }
   th {
-    background-color: lighten($grey-color-light, 3%);
-    border: 1px solid darken($grey-color-light, 4%);
-    border-bottom-color: darken($grey-color-light, 12%);
+    background-color: color.adjust($grey-color-light, $lightness: 3%, $space: hsl);
+    border: 1px solid color.adjust($grey-color-light, $lightness: -4%, $space: hsl);
+    border-bottom-color: color.adjust($grey-color-light, $lightness: -12%, $space: hsl);
   }
   td {
     border: 1px solid $grey-color-light;
