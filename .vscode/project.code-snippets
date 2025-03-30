@@ -273,6 +273,11 @@
         "prefix": "soejima1000",
         "body": "${1|[soejima1000 - YouTube],[soejima1000]: <https://www.youtube.com/user/soejima1000/videos>|}$0"
     },
+    "taoup": {
+        "scope": "markdown",
+        "prefix": "taoup",
+        "body": "${1|[The Art of Unix Programming][TAOUP],[TAOUP]: <http://www.catb.org/esr/writings/taoup/html>|}"
+    },
     "type":{
         "scope": "markdown",
         "prefix": "type",
