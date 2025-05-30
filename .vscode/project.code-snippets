@@ -12,7 +12,7 @@
     "昼飯": {
         "scope": "markdown",
         "prefix": "hiru",
-        "body": "豆腐、カットサラダ、そば、バナナ、柿ピー少々。$0"
+        "body": "豆腐、カットサラダ、そば、バナナ。$0"
     },
     "飯": {
         "scope": "markdown",
