@@ -123,7 +123,7 @@
         "scope": "markdown",
         "prefix": "dq11",
         "body": [
-            "<details><summary>ドラクエ 11 進行記録：${1:TBW}</summary>",
+            "<details><summary>ドラクエ 11 全しばりプレイ記録：${1:TBW}</summary>",
             "$0",
             "</details>"
         ]
