@@ -82,7 +82,7 @@
     "曳舟の部屋": {
         "scope": "markdown",
         "prefix": "heya",
-        "body": "曳舟の部屋。${1|洗濯開始。|}PC を開く。"
+        "body": "曳舟の部屋。水浴び。${1|洗濯開始。|}PC を開く。"
     },
     "風呂": {
         "scope": "markdown",
