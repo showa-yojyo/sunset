@@ -187,6 +187,11 @@
         "prefix": "ffmpeg",
         "body": "${1|[FFmpeg],[FFmpeg]: <https://ffmpeg.org/ffmpeg.html>|}$0"
     },
+    "gimp3": {
+        "scope": "markdown",
+        "prefix": "gimp3",
+        "body": "${1|[GIMP3],[GIMP3]: <https://docs.gimp.org/3.0/en/>|}$0"
+    },
     "gist": {
         "scope": "markdown",
         "prefix": "gist",
