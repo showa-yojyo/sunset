@@ -127,11 +127,6 @@
             "</details>"
         ]
     },
-    "aviutl": {
-        "scope": "markdown",
-        "prefix": ["aviutl", "AviUtl"],
-        "body": "${1|[AviUtl],[AviUtl]: <https://spring-fragrance.mints.ne.jp/aviutl/>|}$0",
-    },
     "bshf20": {
         "scope": "markdown",
         "prefix": "bshf20",
@@ -146,26 +141,6 @@
         "scope": "markdown",
         "prefix": "bshf21b",
         "body": "${1|[ウルファールのサンプルゲーム with DTC][bshf21b],[bshf21b]: <https://wodifes.net/game/show/446>|}$0"
-    },
-    "calc": {
-        "scope": "markdown",
-        "prefix": ["calc", "Calc"],
-        "body": "${1|[Calc],[LibreOffice Calc Guide][Calc],[Calc]: <https://documentation.libreoffice.org/en/english-documentation/calc/>|}$0"
-    },
-    "click": {
-        "scope": "markdown",
-        "prefix": "click",
-        "body": "${1|[Click],[Click]: <https://click.palletsprojects.com/en/stable/>|}$0"
-    },
-    "DeepL": {
-        "scope": "markdown",
-        "prefix": "DeepL",
-        "body": "${1|[DeepL],[DeepL]: <https://www.deepl.com/translator>|}$0"
-    },
-    "draw.io": {
-        "scope": "markdown",
-        "prefix": "draw.io",
-        "body": "${1|[draw.io],[draw.io]: <https://www.drawio.com/>|}$0"
     },
     "dtp22a":{
         "scope": "markdown",
@@ -182,135 +157,30 @@
         "prefix": "dtp23a",
         "body": "${1|[FOUR CURSES(アルファ版)][dtp23a],[dtp23a]: <https://wodifes.net/game/show/520>|}$0"
     },
-    "ffmpeg":{
-        "scope": "markdown",
-        "prefix": "ffmpeg",
-        "body": "${1|[FFmpeg],[FFmpeg]: <https://ffmpeg.org/ffmpeg.html>|}$0"
-    },
-    "gimp3": {
-        "scope": "markdown",
-        "prefix": "gimp3",
-        "body": "${1|[GIMP3],[GIMP3]: <https://docs.gimp.org/3.0/en/>|}$0"
-    },
-    "gist": {
-        "scope": "markdown",
-        "prefix": "gist",
-        "body": "[gist]: <https://gist.github.com/showa-yojyo/>$0"
-    },
-    "github docs":{
-        "scope": "markdown",
-        "prefix": "github",
-        "body": "${1|[GitHub Docs],[GitHub Docs]: <https://docs.github.com/en>|}"
-    },
-    "hatch": {
-        "scope": "markdown",
-        "prefix": "hatch",
-        "body": "${1|[Hatch],[Hatch]: <https://hatch.pypa.io/dev/>|}"
-    },
     "issues": {
         "scope": "markdown",
         "prefix": "issues",
         "body": "[${1:num}]: <https://github.com/showa-yojyo/${2:notebook}/issues/$1>"
-    },
-    "libreoffice": {
-        "scope": "markdown",
-        "prefix": "libreoffice",
-        "body": "${1|[LibreOffice],[LibreOffice]: <https://www.libreoffice.org/>|}"
-    },
-    "mermaid": {
-        "scope": "markdown",
-        "prefix": "mermaid",
-        "body": "${1|[Mermaid.JS],[Mermaid.JS]: <https://mermaid-js.github.io/mermaid/>|}"
     },
     "metal": {
         "scope": "markdown",
         "prefix": "metal",
         "body": "[metal]: <http://metal.the-ninja.jp/>$0"
     },
-    "mkdocs": {
-        "scope": "markdown",
-        "prefix": "mkdocs",
-        "body": "${1|[MkDocs],[MkDocs]: <https://www.mkdocs.org/>|}"
-    },
-    "mypy": {
-        "scope": "markdown",
-        "prefix": "mypy",
-        "body": "${1|[mypy],[mypy]: <https://mypy.readthedocs.io/en/stable/>|}"
-    },
     "note": {
         "scope": "markdown",
         "prefix": "note",
         "body": "${1|[読書ノート][note],[note]: <https://showa-yojyo.github.io/notebook/>|}$0"
-    },
-    "pcloud": {
-        "scope": "markdown",
-        "prefix": "pcloud",
-        "body": "${1|[pCloud],[pCloud]: <https://www.pcloud.com/>,[pCloud](https://www.pcloud.com/)|}$0"
-    },
-    "powertoys":{
-        "scope": "markdown",
-        "prefix": "powertoys",
-        "body": "${1|[PowerToys],[PowerToys]: <https://github.com/microsoft/PowerToys>|}$0"
-    },
-    "pytest": {
-        "scope": "markdown",
-        "prefix": "pytest",
-        "body": "${1|[pytest],[pytest]: <https://docs.pytest.org/en/stable/>|}$0"
-    },
-    "pytube": {
-        "scope": "markdown",
-        "prefix": "pytube",
-        "body": "${1|[Pytube],[pytube]: <https://pytube.io/en/latest/>|}$0"
-    },
-    "ruff": {
-        "scope": "markdown",
-        "prefix": "ruff",
-        "body": "${1|[Ruff],[Ruff]: <https://docs.astral.sh/ruff/>|}$0"
-    },
-    "scrapy": {
-        "scope": "markdown",
-        "prefix": "scrapy",
-        "body": "${1|[Scrapy],[Scrapy]: <https://scrapy.org/>|}$0"
     },
     "soejima1000": {
         "scope": "markdown",
         "prefix": "soejima1000",
         "body": "${1|[soejima1000 - YouTube],[soejima1000]: <https://www.youtube.com/user/soejima1000/videos>|}$0"
     },
-    "taoup": {
-        "scope": "markdown",
-        "prefix": "taoup",
-        "body": "${1|[The Art of Unix Programming][TAOUP],[TAOUP]: <http://www.catb.org/esr/writings/taoup/html>|}"
-    },
     "type":{
         "scope": "markdown",
         "prefix": "type",
         "body": "[転職・求人情報サイトの type](https://type.jp/)"
-    },
-    "twgl":{
-        "scope": "markdown",
-        "prefix": "twgl",
-        "body": "${1|[TWGL],[TWGL]: <https://twgljs.org/docs/>|}$0"
-    },
-    "wf": {
-        "scope": "markdown",
-        "prefix": "wf",
-        "body": "${1|[WebGL2 Fundamentals],[WebGL2 Fundamentals]: <https://webgl2fundamentals.org>|}$0"
-    },
-    "writer": {
-        "scope": "markdown",
-        "prefix": ["writer", "Writer"],
-        "body": "${1|[Writer],[LibreOffice Writer Guide][Writer],[Writer]: <https://documentation.libreoffice.org/en/english-documentation/writer/>|}$0"
-    },
-    "wsl": {
-        "scope": "markdown",
-        "prefix": "wsl",
-        "body": "${1|[WSL],[WSL]: <https://learn.microsoft.com/ja-jp/windows/wsl/>|}$0"
-    },
-    "youtube-dl":{
-        "scope": "markdown",
-        "prefix": "youtube-dl",
-        "body": "${1|[youtube-dl],[youtube-dl]: <https://github.com/ytdl-org/youtube-dl>|}$0"
     },
     "markup twitter video": {
         "scope": "markdown",
@@ -322,10 +192,5 @@
             "</blockquote>"
         ],
         "description": "F1 snippet"
-    },
-    "zoom":{
-        "scope": "markdown",
-        "prefix": "zoom",
-        "body": "${1|[Zoom],[Zoom Cloud Meetings][Zoom],[Zoom]: <https://zoom.us/>|}$0"
     }
 }
