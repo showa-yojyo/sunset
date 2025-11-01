@@ -81,12 +81,12 @@
     "曳舟の部屋": {
         "scope": "markdown",
         "prefix": "heya",
-        "body": "曳舟の部屋。${1|洗濯開始。|}PC を開く。"
+        "body": "曳舟の部屋。${1|洗濯開始。|}Vostro を開く。"
     },
     "風呂": {
         "scope": "markdown",
         "prefix": ["huro", "furo"],
-        "body": "曳舟の部屋。入浴。\n\n風呂から出る。PC を開く。晩飯。"
+        "body": "曳舟の部屋。入浴。\n\n風呂から出る。Vostro を開く。晩飯。"
     },
     "電車": {
         "scope": "markdown",
