@@ -17,7 +17,7 @@
     "飯": {
         "scope": "markdown",
         "prefix": ["tofu", "tohu", "mesi"],
-        "body": "豆腐、カットサラダ、$0"
+        "body": "豆腐 95 kcal, カットサラダ ${|16,20|} kcal, $0"
     },
     "歯を磨く": {
         "scope": "markdown",
