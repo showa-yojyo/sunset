@@ -132,11 +132,11 @@
             "振り込み率 ${12}% (${13})$0"
         ]
     },
-    "dq11": {
+    "dq": {
         "scope": "markdown",
-        "prefix": "dq11",
+        "prefix": "dq",
         "body": [
-            "<details><summary>ドラクエ 11 全しばりプレイ記録：${1:TBW}</summary>",
+            "<details><summary>${1|ドラクエ 3 HD-2D 初回プレイ記録,ドラクエ 11 全しばりプレイ記録|}：${2:TBW}</summary>",
             "$0",
             "</details>"
         ]
