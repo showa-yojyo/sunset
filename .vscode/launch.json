@@ -1,0 +1,13 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Launcher",
+            "preLaunchTask": "Run Jekyll server",
+            "request": "attach",
+            "type": "chrome",
+            "url": "http://127.0.0.1:4000/",
+            "webRoot": "${workspaceFolder}",
+        }
+    ]
+}
