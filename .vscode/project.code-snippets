@@ -15,7 +15,7 @@
     "昼飯": {
         "scope": "markdown",
         "prefix": "hiru",
-        "body": "豆腐 ${1|95,77|} kcal, カットサラダ ${2|20,16|} kcal, そば 420 kcal, バナナ。$0"
+        "body": "豆腐 ${1|95,77|} kcal, カットサラダ ${2|20,16|} kcal, ${3|そば 420,うどん 418|} kcal, バナナ。$0"
     },
     "飯": {
         "scope": "markdown",
@@ -44,6 +44,7 @@
             "ビッグエー${1|墨田京島,墨田業平|}店。${2:JPN} 円。",
             "",
             "* 和風そば (150 g)(2)",
+            "* 玉うどん (150 g, 3p)",
             "* ${3|オニオンとレタス,大根と水菜|}のミックスサラダ (2)",
             "* バナナ (${4|3,4|})",
             "* 小粒納豆 (3p)",
@@ -166,12 +167,12 @@
     "note": {
         "scope": "markdown",
         "prefix": "note",
-        "body": "${1|[読書ノート][note],[note]: <https://showa-yojyo.github.io/notebook/>|}$0"
+        "body": "${1|[読書ノート][note],[note]: <https://showa-yojyo.github.io/notebook/> \"読者ノート\"|}$0"
     },
     "soejima1000": {
         "scope": "markdown",
         "prefix": "soejima1000",
-        "body": "${1|[soejima1000 - YouTube],[soejima1000]: <https://www.youtube.com/user/soejima1000/videos>|}$0"
+        "body": "${1|[soejima1000 - YouTube],[soejima1000]: <https://www.youtube.com/user/soejima1000/videos> \"soejima1000\"|}$0"
     },
     "type":{
         "scope": "markdown",
