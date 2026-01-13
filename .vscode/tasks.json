@@ -27,7 +27,7 @@
         {
             "label": "Optimize PNG files recently modified",
             "type": "shell",
-            "command": "optipng $(find assets/images -type f -iname \\*.png -mtime -24)",
+            "command": "optipng $(find assets/images -type f -iname \\*.png -mtime -1)",
             "group": {
                 "kind": "build",
                 "isDefault": false
