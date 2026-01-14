@@ -12,6 +12,15 @@
             "problemMatcher": []
         },
         {
+            "label": "Update script for today's Jekyll blog post",
+            "type": "shell",
+            "command": "_scripts/new-post.sh",
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            }
+        },
+        {
             "label": "Generate diary template",
             "type": "shell",
             "command": "python",
