@@ -12,11 +12,11 @@
             "problemMatcher": []
         },
         {
-            "label": "Update script for today's Jekyll blog post",
+            "label": "Stage today's Jekyll blog post",
             "type": "shell",
             "command": "_scripts/new-post.sh",
             "group": {
-                "kind": "build",
+                "kind": "none",
                 "isDefault": false
             }
         },
@@ -24,12 +24,20 @@
             "label": "Generate diary template",
             "type": "shell",
             "command": "python",
-            "args": [
-                "_scripts/generate.py",
-                "${workspaceFolder}"
+            "args": ["_scripts/generate.py", "${workspaceFolder}"],
+            "group": {
+                "kind": "none",
+                "isDefault": false
+            }
+        },
+        {
+            "label": "Stage and generate",
+            "dependsOn": [
+                "Stage today's Jekyll blog post",
+                "Generate diary template"
             ],
             "group": {
-                "kind": "build",
+                "kind": "none",
                 "isDefault": false
             }
         },
@@ -46,13 +54,11 @@
             "label": "Update Gemfile.lock: execute `bundle update`",
             "type": "process",
             "command": "bundle",
-            "args": [
-                "update"
-            ],
+            "args": ["update"],
             "group": {
                 "kind": "build",
                 "isDefault": false
-            },
+            }
         },
         {
             "label": "Check how many days",
