@@ -36,6 +36,7 @@
                 "Stage today's Jekyll blog post",
                 "Generate diary template"
             ],
+            "dependsOrder": "sequence",
             "group": {
                 "kind": "none",
                 "isDefault": false
