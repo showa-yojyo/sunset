@@ -24,7 +24,10 @@
             "label": "Generate diary template",
             "type": "shell",
             "command": "python",
-            "args": ["_scripts/generate.py", "${workspaceFolder}"],
+            "args": [
+                "_scripts/generate.py",
+                "${workspaceFolder}"
+            ],
             "group": {
                 "kind": "none",
                 "isDefault": false
@@ -40,7 +43,8 @@
             "group": {
                 "kind": "none",
                 "isDefault": false
-            }
+            },
+            "problemMatcher": []
         },
         {
             "label": "Optimize PNG files recently modified",
@@ -55,7 +59,9 @@
             "label": "Update Gemfile.lock: execute `bundle update`",
             "type": "process",
             "command": "bundle",
-            "args": ["update"],
+            "args": [
+                "update"
+            ],
             "group": {
                 "kind": "build",
                 "isDefault": false
