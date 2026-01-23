@@ -18,7 +18,8 @@
             "group": {
                 "kind": "none",
                 "isDefault": false
-            }
+            },
+            "problemMatcher": []
         },
         {
             "label": "Generate diary template",

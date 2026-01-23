@@ -14,7 +14,7 @@ date_today=$(echo $path_today | grep -oP "\d{4}-\d{2}-\d{2}")
 title_today=$(grep -oP '(^title:[^）]+）)\K.+$' "$path_today")
 if [ $title_today == "(WIP)" ]; then
   echo "WIP post detected, skipping commit." > /dev/stderr
-  exit 0
+  exit 1
 fi
 
 # Assemble commit message from date and title.
@@ -23,7 +23,7 @@ commit_log="${date_today}: ${title_today}"
 git commit -m "$commit_log"
 if [ $? -ne 0 ]; then
   echo "No changes to commit." > /dev/stderr
-  exit 0
+  exit 1
 fi
 
 git push origin main
