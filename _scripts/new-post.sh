@@ -21,4 +21,12 @@ fi
 commit_log="${date_today}: ${title_today}"
 
 git commit -m "$commit_log"
-#git push origin main
+if [ $? -ne 0 ]; then
+  echo "No changes to commit." > /dev/stderr
+  exit 0
+fi
+
+git push origin main
+if [ $? -ne 0 ]; then
+  git push --force-with-lease origin main
+fi
