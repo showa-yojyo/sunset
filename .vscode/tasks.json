@@ -32,7 +32,8 @@
             "group": {
                 "kind": "none",
                 "isDefault": false
-            }
+            },
+            "problemMatcher": []
         },
         {
             "label": "Stage and generate",
