@@ -26,7 +26,7 @@ if [ $? -ne 0 ]; then
   exit 1
 fi
 
-git push origin main
+git push origin master
 if [ $? -ne 0 ]; then
-  git push --force-with-lease origin main
+  git push --force-with-lease origin master
 fi
