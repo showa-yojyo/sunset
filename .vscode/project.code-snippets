@@ -119,8 +119,7 @@
         "scope": "markdown",
         "prefix": "dq",
         "body": [
-            "<details><summary>${1|ドラクエ 3 HD-2D 二周目プレイ記録,ドラクエ 11 全しばりプレイ記録|}：${2:TBW}</summary>",
-            "$0",
+            "<details><summary>ドラクエ 1 HD-2D 一周目プレイ記録：${1:TBW}</summary>",
             "</details>"
         ]
     },
