@@ -68,3 +68,10 @@ details {
     margin-bottom: 0px;
   }
 }
+
+q::before {
+  content: "《";
+}
+q::after{
+  content: "》";
+}
