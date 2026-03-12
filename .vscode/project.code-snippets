@@ -99,7 +99,7 @@
     "風呂": {
         "scope": "markdown",
         "prefix": ["huro", "furo"],
-        "body": "曳舟の部屋。入浴。\n\n風呂から出る。Vostro を開く。晩飯。"
+        "body": "曳舟の部屋。${1|排便。|}入浴。\n\n風呂から出る。Vostro を開く。晩飯。"
     },
     "電車": {
         "scope": "markdown",
