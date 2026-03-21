@@ -72,6 +72,10 @@ details {
     padding: $details-padding;
   }
 
+  &[open] ul, ol{
+    padding-left: calc(#{$details-padding} * 2.25);
+  }
+
   &[open] summary {
     border-bottom: 2px solid $details-border-color;
   }
