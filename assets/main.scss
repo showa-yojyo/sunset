@@ -89,6 +89,12 @@ details {
   &[open] >:last-child {
     margin-bottom: $details-padding;
   }
+
+  img{
+    display: block;
+    height: auto;
+    max-width: 100%;
+  }
 }
 
 q::before {
