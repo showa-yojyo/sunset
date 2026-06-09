@@ -5,28 +5,25 @@
 git add -A
 
 # Get the path of today's newly added post.
-path_today=$(git diff --cached --name-only --diff-filter=A -G "^title:" | grep '_posts')
+declare -r post_path=$(git diff --cached --name-only --diff-filter=A -G "^title:" | grep "_posts")
 
 # E.g. "2026-01-14"
-date_today=$(echo $path_today | grep -oP "\d{4}-\d{2}-\d{2}")
+declare -r post_date=$(echo $post_path | grep -oP "\d{4}-\d{2}-\d{2}")
 
 # Extract the title from the post's front matter.
-title_today=$(grep -oP '(^title:[^）]+）)\K.+$' "$path_today")
-if [ $title_today == "(WIP)" ]; then
-  echo "WIP post detected, skipping commit." > /dev/stderr
+declare -r post_title=$(grep -oP '(^title:[^）]+）)\K.+$' "$post_path")
+if [[ "$post_title" == "(WIP)" ]]; then
+  echo "WIP post detected, skipping commit." >&2
   exit 1
 fi
 
 # Assemble commit message from date and title.
-commit_log="${date_today}: ${title_today}"
+declare -r commit_log="${post_date}: ${post_title}"
 
 git commit -m "$commit_log"
-if [ $? -ne 0 ]; then
-  echo "No changes to commit." > /dev/stderr
+if [[ $? -ne 0 ]]; then
+  echo "No changes to commit." >&2
   exit 1
 fi
 
-git push origin master
-if [ $? -ne 0 ]; then
-  git push --force-with-lease origin master
-fi
+git push origin master || git push --force-with-lease origin master
