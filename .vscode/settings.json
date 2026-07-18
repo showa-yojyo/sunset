@@ -1,3 +1,8 @@
 {
+    "files.exclude": {
+        "**/.git": true,
+        "_posts/202[0-5]": true,
+        "_posts/2026/0[1-6]": true,
+    },
     "markdown.styles": ["_site/assets/main.css"]
 }
