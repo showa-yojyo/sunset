@@ -1,11 +1,11 @@
 {
     "files.exclude": {
         "_posts/202[0-5]": true,
-        "_posts/2026/0[1-7]": true
+        "_posts/2026/0[1-8]": true
     },
     "files.watcherExclude": {
         "_posts/202[0-5]": true,
-        "_posts/2026/0[1-7]": true
+        "_posts/2026/0[1-8]": true
     },
     "markdown.styles": ["_site/assets/main.css"]
 }
