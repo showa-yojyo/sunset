@@ -1,6 +1,10 @@
 #!/bin/bash
 # Update script for today's Jekyll blog post.
 
+set -o errexit
+set -o nounset
+set -o pipefail
+
 # Stage all changes in the repository.
 git add -A
 
@@ -20,8 +24,7 @@ fi
 # Assemble commit message from date and title.
 declare -r commit_log="${post_date}: ${post_title}"
 
-git commit -m "$commit_log"
-if [[ $? -ne 0 ]]; then
+if ! git commit -m "$commit_log"; then
   echo "No changes to commit." >&2
   exit 1
 fi
