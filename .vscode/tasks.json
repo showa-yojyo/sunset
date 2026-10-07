@@ -58,11 +58,12 @@
             }
         },
         {
-            "label": "Update Gemfile.lock: execute `bundle update`",
+            "label": "Update Gemfile.lock: execute `bundle update --all`",
             "type": "process",
             "command": "bundle",
             "args": [
-                "update"
+                "update",
+                "--all"
             ],
             "group": {
                 "kind": "build",
