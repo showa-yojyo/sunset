@@ -126,6 +126,11 @@
         ],
         "description": "夜飯を買いに行く"
     },
+    "弁当": {
+        "scope": "markdown",
+        "prefix": "bento",
+        "body": "${1|中華丼 549,コロッケヒレカツ弁当 666,ロコモコボウル 686 kcal,カツ重 688,麻婆丼 707,ミックルフライ弁当 721,生姜焼弁当 785|}kcal"
+    }
     "画像挿し込み": {
         "scope": "markdown",
         "prefix": "image",
